@@ -16,15 +16,34 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = primaryDark,
+    onPrimary = onPrimaryDark,
+    secondary = secondaryDark,
+    onSecondary = onSecondaryDark,
+    tertiary = tertiaryDark,
+    onTertiary = onTertiaryDark,
+    background = backgroundDark,
+    onBackground = onBackgroundDark,
+    surface = surfaceDark,
+    onSurface = onSurfaceDark,
+    error = errorDark,
+    onError = onErrorDark
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    primary = primaryLight,
+    onPrimary = onPrimaryLight,
+    secondary = secondaryLight,
+    onSecondary = onSecondaryLight,
+    tertiary = tertiaryLight,
+    onTertiary = onTertiaryLight,
+    background = backgroundLight,
+    onBackground = onBackgroundLight,
+    surface = surfaceLight,
+    onSurface = onSurfaceLight,
+    error = errorLight,
+    onError = onErrorLight
+)
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -35,12 +54,10 @@ private val LightColorScheme = lightColorScheme(
     onBackground = Color(0xFF1C1B1F),
     onSurface = Color(0xFF1C1B1F),
     */
-)
 
 @Composable
 fun GymAppDemoTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
@@ -53,6 +70,7 @@ fun GymAppDemoTheme(
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
+
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
