@@ -27,7 +27,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.Alignment
-
+import com.example.gymappdemo.sampledata.Excercise
 
 
 class MainActivity : ComponentActivity() {

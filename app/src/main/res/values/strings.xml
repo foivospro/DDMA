@@ -1,7 +1,10 @@
 <resources>
     <string name="app_name">Gym App Demo</string>
-    <string name="snatch"> Snatch is so pog</string>
-    <string name='biceps'> With bicep curls you can be massive</string>
-    <string name='bench'>Bench is the most manly exercise</string>
+    <string name="snatch_des"> Snatch is so pog</string>
+    <string name="snatch"> Snatch </string>
+    <string name='biceps_des'> With bicep curls you can be massive</string>
+    <string name='biceps'> Bicep Curls</string>
+    <string name='bench_des'>Bench is the most manly exercise</string>
+    <string name='bench'>Bench</string>
     <string name="cardio">Cardio Workout</string>
 </resources>
