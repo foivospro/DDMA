@@ -69,13 +69,10 @@ fun ExcercisesList(
     var query by rememberSaveable { mutableStateOf("") }
     var active by rememberSaveable { mutableStateOf(false) }
     val muscleGroups = listOf("Chest", "Legs", "Arms")
-    Scaffold(
-        bottomBar = { BottomNavigationBar() }
-    ) { scaffoldPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(scaffoldPadding)
+                .padding(contentPadding)
         ) {
             // Search Bar
             SearchBar(
@@ -191,7 +188,7 @@ fun ExcercisesList(
             }
         }
     }
-}
+
 
 @Composable
 fun ExerciseCard(
