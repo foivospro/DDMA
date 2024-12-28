@@ -29,7 +29,7 @@ fun QuickStartRoutinesUI() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black) // Black background
+            .background(MaterialTheme.colorScheme.background) // Black background
             .padding(16.dp)
     ) {
         Column(
@@ -40,9 +40,9 @@ fun QuickStartRoutinesUI() {
             // Title "Quick Start"
             Text(
                 text = "Quick Start",
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
@@ -54,9 +54,9 @@ fun QuickStartRoutinesUI() {
             // Title "Routines"
             Text(
                 text = "Routines",
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
@@ -75,7 +75,7 @@ fun QuickStartRoutinesUI() {
 fun StartWorkoutButton() {
     Button(
         onClick = { /* TODO: Add functionality */ },
-        colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
+        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary ),
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -86,7 +86,10 @@ fun StartWorkoutButton() {
                 modifier = Modifier.size(24.dp) // Adjust size
             )
             Spacer(modifier = Modifier.width(8.dp)) // Space between icon and text
-            Text(text = "Start Empty Workout", color = Color.White)
+            Text(text = "Start Empty Workout",
+                color = MaterialTheme.colorScheme.onPrimary,
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
     }
 }
@@ -95,7 +98,7 @@ fun StartWorkoutButton() {
 fun NewRoutineButton() {
     Button(
         onClick = { /* TODO: Add functionality */ },
-        colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
+        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -106,7 +109,10 @@ fun NewRoutineButton() {
                 modifier = Modifier.size(24.dp) // Adjust size
             )
             Spacer(modifier = Modifier.width(8.dp)) // Space between icon and text
-            Text(text = "New Routine", color = Color.White)
+            Text(text = "New Routine",
+                color = MaterialTheme.colorScheme.onPrimary,
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
     }
 }
@@ -115,7 +121,7 @@ fun NewRoutineButton() {
 fun ExploreRoutinesButton() {
     Button(
         onClick = { /* TODO: Add functionality */ },
-        colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
+        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -126,7 +132,10 @@ fun ExploreRoutinesButton() {
                 modifier = Modifier.size(24.dp) // Adjust size
             )
             Spacer(modifier = Modifier.width(8.dp)) // Space between icon and text
-            Text(text = "Explore Routines", color = Color.White)
+            Text(text = "Explore Routines",
+                color = MaterialTheme.colorScheme.onPrimary,
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
     }
 }
