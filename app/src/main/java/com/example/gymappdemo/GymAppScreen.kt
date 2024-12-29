@@ -25,8 +25,10 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.gymappdemo.sampledata.Excercise
-import com.example.gymappdemo.ui.theme.ExcercisesList
+import com.example.gymappdemo.data.Excercise
+import com.example.gymappdemo.ui.theme.screens.ExcercisesList
+import com.example.gymappdemo.ui.theme.screens.HomeScreen
+import com.example.gymappdemo.ui.theme.screens.NavigationItem
 
 enum class GymAppScreen {
     Home,

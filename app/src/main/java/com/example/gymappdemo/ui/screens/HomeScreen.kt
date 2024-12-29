@@ -1,4 +1,4 @@
-package com.example.gymappdemo
+package com.example.gymappdemo.ui.theme.screens
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.gymappdemo.R
 import com.example.gymappdemo.ui.theme.GymAppDemoTheme
 
 @Composable

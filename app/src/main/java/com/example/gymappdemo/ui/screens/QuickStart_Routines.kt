@@ -1,4 +1,4 @@
-package com.example.gymappdemo.ui
+package com.example.gymappdemo.ui.theme.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
