@@ -26,6 +26,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.gymappdemo.sampledata.Excercise
+import com.example.gymappdemo.ui.QuickStartRoutinesUI
 import com.example.gymappdemo.ui.theme.ExcercisesList
 
 enum class GymAppScreen {
@@ -49,6 +50,7 @@ fun MainScreen() {
             composable(route = GymAppScreen.Home.name) {
                 HomeScreen(navController = navController)
             }
+            composable("QuickStartRoutinesUI") { QuickStartRoutinesUI() }
             // Exercise Picker Screen in NavHost
             composable(route = GymAppScreen.ExercisePicker.name) {
                 ExcercisesList(

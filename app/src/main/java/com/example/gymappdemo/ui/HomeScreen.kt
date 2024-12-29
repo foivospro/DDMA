@@ -100,7 +100,7 @@ fun HomeScreen(navController: NavController) {
                 Spacer(modifier = Modifier.height(64.dp))
 
                 Button(
-                    onClick = { navController.navigate("ExercisePicker")},
+                    onClick = { navController.navigate("QuickStartRoutinesUI")},
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(60.dp),
