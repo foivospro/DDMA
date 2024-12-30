@@ -1,4 +1,4 @@
-package com.example.gymappdemo.ui.theme.screens
+package com.example.gymappdemo.ui.screens
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
