@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 data class Exercise(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val name: String,
-    val imagePath: String,
+    val icon: String,
     val description: String,
     val muscleGroup: String
 )

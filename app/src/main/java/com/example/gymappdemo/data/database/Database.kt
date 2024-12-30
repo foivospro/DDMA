@@ -1,5 +1,6 @@
 package com.example.gymappdemo.data.database
 
+import android.content.Context
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.example.gymappdemo.data.dao.ExerciseDao
@@ -12,6 +13,9 @@ import com.example.gymappdemo.data.entities.GymSession
 import com.example.gymappdemo.data.entities.SessionExercise
 import com.example.gymappdemo.data.entities.Set
 import com.example.gymappdemo.data.entities.User
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Database(
     entities = [
@@ -44,7 +48,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "gym_database"
                 )
-                    .addCallback(DatabaseCallback())
+                    .addCallback(PrepopulateCallback(context))
                     .fallbackToDestructiveMigration() // Use this cautiously. Replace with migrations if needed.
                     .build()
                 INSTANCE = instance
@@ -53,10 +57,24 @@ abstract class AppDatabase : RoomDatabase() {
         }
     }
 
-    private class DatabaseCallback : RoomDatabase.Callback() {
+    private class PrepopulateCallback(
+        private val context: Context
+    ): RoomDatabase.Callback() {
         override fun onCreate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
             super.onCreate(db)
-            // Optional: Add pre-population logic here if needed
+            // Populate the database with hardcoded exercises
+            CoroutineScope(Dispatchers.IO).launch {
+                val database = getInstance(context)
+                val exerciseDao = database.exerciseDao()
+
+                val exercises = listOf(
+                    Exercise(name = "Push-up", description = "Upper body exercise.", icon = "weightlifter", muscleGroup = "Chest"),
+                    Exercise(name = "Squat", description = "Lower body exercise.", icon = "weightlifter", muscleGroup = "Legs"),
+                    Exercise(name = "Plank", description = "Core stability exercise.", icon = "weightlifter", muscleGroup = "Core")
+                )
+
+                exerciseDao.insertAll(exercises)
+            }
         }
     }
 }

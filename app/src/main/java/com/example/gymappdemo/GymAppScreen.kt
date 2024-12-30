@@ -1,9 +1,6 @@
 package com.example.gymappdemo
 
 
-// For composable() and NavHost
-
-// For NavController
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -22,13 +19,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.gymappdemo.data.Excercise
-import com.example.gymappdemo.ui.theme.screens.ExcercisesList
+import com.example.gymappdemo.data.database.AppDatabase
+import com.example.gymappdemo.data.repositories.WorkoutRepository
+import com.example.gymappdemo.ui.theme.screens.ExercisesList
 import com.example.gymappdemo.ui.theme.screens.HomeScreen
 import com.example.gymappdemo.ui.theme.screens.NavigationItem
+import com.example.gymappdemo.ui.theme.screens.QuickStartRoutinesUI
+import com.example.gymappdemo.ui.viewmodel.AppViewModelFactory
+import com.example.gymappdemo.ui.viewmodels.ExercisePickerViewModel
 
 enum class GymAppScreen {
     Home,
@@ -38,7 +41,6 @@ enum class GymAppScreen {
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
-
     Scaffold(
         bottomBar = { BottomNavigationBar() }
     ) { paddingValues ->
@@ -51,21 +53,22 @@ fun MainScreen() {
             composable(route = GymAppScreen.Home.name) {
                 HomeScreen(navController = navController)
             }
+            composable("QuickStartRoutinesUI") {
+                QuickStartRoutinesUI(navController = navController)
+            }
             // Exercise Picker Screen in NavHost
             composable(route = GymAppScreen.ExercisePicker.name) {
-                ExcercisesList(
-                    listOf(
-                        Excercise(R.string.snatch, R.drawable.weightlifter, R.string.snatch),
-                        Excercise(R.string.biceps, R.drawable.weightlifter, R.string.biceps),
-                        Excercise(R.string.bench, R.drawable.weightlifter, R.string.bench),
-                        Excercise(R.string.snatch, R.drawable.weightlifter, R.string.snatch),
-                        Excercise(R.string.biceps, R.drawable.weightlifter, R.string.biceps),
-                        Excercise(R.string.bench, R.drawable.weightlifter, R.string.bench),
-                        Excercise(R.string.snatch, R.drawable.weightlifter, R.string.snatch),
-                        Excercise(R.string.biceps, R.drawable.weightlifter, R.string.biceps),
-                        Excercise(R.string.bench, R.drawable.weightlifter, R.string.bench)
-                    )
+                val context = LocalContext.current
+                val factory = AppViewModelFactory(
+                    workoutRepository = WorkoutRepository.getInstance(
+                        AppDatabase.getInstance(context).gymSessionDao(),
+                        AppDatabase.getInstance(context).sessionExerciseDao(),
+                        AppDatabase.getInstance(context).exerciseDao(),
+                        AppDatabase.getInstance(context).setDao()
+                    ) // Provide your repository instance
                 )
+                val viewModel: ExercisePickerViewModel = viewModel(factory = factory)
+                ExercisesList(viewModel)
             }
         }
     }
