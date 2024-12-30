@@ -1,4 +1,4 @@
-package com.example.gymappdemo.ui
+package com.example.gymappdemo.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -24,11 +24,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.gymappdemo.R
 
 
 @Composable
-fun QuickStartRoutinesUI() {
+fun QuickStartRoutinesUI(navController: NavController) {
     // Background color of the screen
     Box(
         modifier = Modifier
@@ -51,7 +52,7 @@ fun QuickStartRoutinesUI() {
             )
 
             // "Start Empty Workout" Button
-            StartWorkoutButton()
+            StartWorkoutButton(navController)
 
             Spacer(modifier = Modifier.height(32.dp)) // Space between sections
 
@@ -76,9 +77,9 @@ fun QuickStartRoutinesUI() {
 }
 
 @Composable
-fun StartWorkoutButton() {
+fun StartWorkoutButton(navController: NavController) {
     Button(
-        onClick = { /* TODO: Add functionality */ },
+        onClick = { navController.navigate("ExercisePicker") },
         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary ),
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier.fillMaxWidth()

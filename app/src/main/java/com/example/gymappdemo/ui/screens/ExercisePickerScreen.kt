@@ -1,7 +1,6 @@
-package com.example.gymappdemo.ui.theme
+package com.example.gymappdemo.ui.screens
 
 import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.Spring
@@ -45,6 +44,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -53,23 +53,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.gymappdemo.R
-import com.example.gymappdemo.sampledata.Excercise
+import com.example.gymappdemo.ui.theme.GymAppDemoTheme
+import com.example.gymappdemo.ui.viewmodels.ExercisePickerViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
-fun ExcercisesList(
-    excercises: List<Excercise>,
-    modifier: Modifier = Modifier,
+fun ExercisesList(
+    viewModel: ExercisePickerViewModel,
     contentPadding: PaddingValues = PaddingValues(0.dp),
+    modifier: Modifier = Modifier
 ) {
     var query by rememberSaveable { mutableStateOf("") }
     var active by rememberSaveable { mutableStateOf(false) }
     val muscleGroups = listOf("Chest", "Legs", "Arms")
-        Column(
+    val exercises by viewModel.exercises.collectAsState()
+    Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(contentPadding)
@@ -142,11 +143,11 @@ fun ExcercisesList(
             }
             // Filtered Exercise List
             val filteredExercises = if (query.isNotEmpty()) {
-                excercises.filter {
-                    stringResource(it.name).contains(query, ignoreCase = true)
+                exercises.filter {
+                    (it.name).contains(query, ignoreCase = true)
                 }
             } else {
-                excercises
+                exercises
             }
 
             LazyColumn(
@@ -175,9 +176,10 @@ fun ExcercisesList(
                             ),
                             exit = fadeOut()
                         ) {
+                            val iconResId = viewModel.getIconResource(exercise.icon)
                             ExerciseCard(
-                                iconResource = exercise.image,
-                                descriptionRes = exercise.description,
+                                iconResource = iconResId,
+                                description = exercise.description,
                                 name = exercise.name,
                                 modifier = Modifier
                                     .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -193,8 +195,8 @@ fun ExcercisesList(
 @Composable
 fun ExerciseCard(
     @DrawableRes iconResource: Int,
-    @StringRes descriptionRes: Int,
-    @StringRes name: Int,
+    description: String,
+    name: String,
     modifier: Modifier = Modifier,
     onStartClick: () -> Unit = {} // Callback for the button
 ) {
@@ -218,7 +220,7 @@ fun ExerciseCard(
             ) {
                 Icon(
                     painter = painterResource(iconResource),
-                    contentDescription = stringResource(name),
+                    contentDescription = name,
                     modifier = Modifier
                         .size(56.dp) // Adjust size for better fit
                         .clip(RoundedCornerShape(8.dp)),
@@ -240,11 +242,11 @@ fun ExerciseCard(
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = stringResource(name),
+                    text = name,
                     style = MaterialTheme.typography.displaySmall
                 )
                 Text(
-                    text = stringResource(descriptionRes),
+                    text = description,
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
@@ -316,17 +318,6 @@ fun SearchBarSample() {
 @Composable
 fun HeroPreview() {
     GymAppDemoTheme {
-        val mockExercises = listOf(
-            Excercise(name = R.string.biceps, description = R.string.biceps_des, image = R.drawable.weightlifter),
-            Excercise(name = R.string.biceps, description = R.string.biceps_des, image = R.drawable.weightlifter),
-            Excercise(name = R.string.biceps, description = R.string.biceps_des, image = R.drawable.weightlifter),
-            Excercise(name = R.string.biceps, description = R.string.biceps_des, image = R.drawable.weightlifter),
-            Excercise(name = R.string.biceps, description = R.string.biceps_des, image = R.drawable.weightlifter),
-            Excercise(name = R.string.biceps, description = R.string.biceps_des, image = R.drawable.weightlifter),
-            Excercise(name = R.string.biceps, description = R.string.biceps_des, image = R.drawable.weightlifter),
-            Excercise(name = R.string.biceps, description = R.string.biceps_des, image = R.drawable.weightlifter),
-            Excercise(name = R.string.biceps, description = R.string.biceps_des, image = R.drawable.weightlifter),
-        )
-        ExcercisesList(excercises = mockExercises)
+
     }
 }

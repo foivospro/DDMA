@@ -1,9 +1,6 @@
-package com.example.gymappdemo
+package com.example.gymappdemo.Navigation
 
 
-// For composable() and NavHost
-
-// For NavController
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -22,24 +19,33 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.gymappdemo.sampledata.Excercise
-import com.example.gymappdemo.ui.QuickStartRoutinesUI
-import com.example.gymappdemo.ui.theme.ExcercisesList
+
+import com.example.gymappdemo.data.database.AppDatabase
+import com.example.gymappdemo.data.repositories.WorkoutRepository
+import com.example.gymappdemo.ui.screens.ExercisesList
+import com.example.gymappdemo.ui.screens.HomeScreen
+import com.example.gymappdemo.ui.screens.NavigationItem
+import com.example.gymappdemo.ui.screens.QuickStartRoutinesUI
+import com.example.gymappdemo.ui.viewmodel.AppViewModelFactory
+import com.example.gymappdemo.ui.viewmodels.ExercisePickerViewModel
 
 enum class GymAppScreen {
     Home,
-    ExercisePicker
+    ExercisePicker,
+    QuickStartRoutinesUI
 }
 
 @Composable
-fun MainScreen() {
+fun AppNavHost() {
     val navController = rememberNavController()
-
     Scaffold(
-        bottomBar = { BottomNavigationBar() }
+        bottomBar = { BottomNavigationBar(navController) }
     ) { paddingValues ->
         NavHost(
             navController = navController,
@@ -50,22 +56,22 @@ fun MainScreen() {
             composable(route = GymAppScreen.Home.name) {
                 HomeScreen(navController = navController)
             }
-            composable("QuickStartRoutinesUI") { QuickStartRoutinesUI() }
+            composable(GymAppScreen.QuickStartRoutinesUI.name) {
+                QuickStartRoutinesUI(navController = navController)
+            }
             // Exercise Picker Screen in NavHost
             composable(route = GymAppScreen.ExercisePicker.name) {
-                ExcercisesList(
-                    listOf(
-                        Excercise(R.string.snatch, R.drawable.weightlifter, R.string.snatch),
-                        Excercise(R.string.biceps, R.drawable.weightlifter, R.string.biceps),
-                        Excercise(R.string.bench, R.drawable.weightlifter, R.string.bench),
-                        Excercise(R.string.snatch, R.drawable.weightlifter, R.string.snatch),
-                        Excercise(R.string.biceps, R.drawable.weightlifter, R.string.biceps),
-                        Excercise(R.string.bench, R.drawable.weightlifter, R.string.bench),
-                        Excercise(R.string.snatch, R.drawable.weightlifter, R.string.snatch),
-                        Excercise(R.string.biceps, R.drawable.weightlifter, R.string.biceps),
-                        Excercise(R.string.bench, R.drawable.weightlifter, R.string.bench)
-                    )
+                val context = LocalContext.current
+                val factory = AppViewModelFactory(
+                    workoutRepository = WorkoutRepository.getInstance(
+                        AppDatabase.getInstance(context).gymSessionDao(),
+                        AppDatabase.getInstance(context).sessionExerciseDao(),
+                        AppDatabase.getInstance(context).exerciseDao(),
+                        AppDatabase.getInstance(context).setDao()
+                    ) // Provide your repository instance
                 )
+                val viewModel: ExercisePickerViewModel = viewModel(factory = factory)
+                ExercisesList(viewModel)
             }
         }
     }
@@ -74,7 +80,7 @@ fun MainScreen() {
 
 
 @Composable
-fun BottomNavigationBar() {
+fun BottomNavigationBar(navController: NavController) {
     var selectedItem by remember { mutableStateOf(0) }
 
     // Menu elements
@@ -98,7 +104,9 @@ fun BottomNavigationBar() {
                 },
                 label = { Text(text = item.label) },
                 selected = selectedItem == index,
-                onClick = { selectedItem = index },
+                onClick = {
+                    navController.navigate(GymAppScreen.Home.name)
+                          },
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = MaterialTheme.colorScheme.onPrimary,
                     unselectedIconColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
