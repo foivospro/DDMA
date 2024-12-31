@@ -1,6 +1,8 @@
 package com.example.gymappdemo.Navigation
 
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -32,13 +34,16 @@ import com.example.gymappdemo.ui.screens.ExercisesList
 import com.example.gymappdemo.ui.screens.HomeScreen
 import com.example.gymappdemo.ui.screens.NavigationItem
 import com.example.gymappdemo.ui.screens.QuickStartRoutinesUI
+import com.example.gymappdemo.ui.screens.UserProfileScreen
 import com.example.gymappdemo.ui.viewmodel.AppViewModelFactory
 import com.example.gymappdemo.ui.viewmodels.ExercisePickerViewModel
 
 enum class GymAppScreen {
     Home,
     ExercisePicker,
-    QuickStartRoutinesUI
+    QuickStartRoutinesUI,
+    MyProfile, // Added MyProfile entry
+    ProfileSettings
 }
 
 @Composable
@@ -56,7 +61,8 @@ fun AppNavHost() {
             composable(route = GymAppScreen.Home.name) {
                 HomeScreen(navController = navController)
             }
-            composable(GymAppScreen.QuickStartRoutinesUI.name) {
+            // Quick Start Routines Screen in NavHost
+            composable(route = GymAppScreen.QuickStartRoutinesUI.name) {
                 QuickStartRoutinesUI(navController = navController)
             }
             // Exercise Picker Screen in NavHost
@@ -68,16 +74,18 @@ fun AppNavHost() {
                         AppDatabase.getInstance(context).sessionExerciseDao(),
                         AppDatabase.getInstance(context).exerciseDao(),
                         AppDatabase.getInstance(context).setDao()
-                    ) // Provide your repository instance
+                    )
                 )
                 val viewModel: ExercisePickerViewModel = viewModel(factory = factory)
                 ExercisesList(viewModel)
             }
+            // MyProfile Screen in NavHost
+            composable(route = GymAppScreen.MyProfile.name) {
+                UserProfileScreen()
+            }
         }
     }
 }
-
-
 
 @Composable
 fun BottomNavigationBar(navController: NavController) {
@@ -105,8 +113,13 @@ fun BottomNavigationBar(navController: NavController) {
                 label = { Text(text = item.label) },
                 selected = selectedItem == index,
                 onClick = {
-                    navController.navigate(GymAppScreen.Home.name)
-                          },
+                    selectedItem = index
+                    when (item.label) {
+                        "Home" -> navController.navigate(GymAppScreen.Home.name)
+                        "Favorites" -> navController.navigate(GymAppScreen.QuickStartRoutinesUI.name)
+                        "Profile" -> navController.navigate(GymAppScreen.MyProfile.name) // Navigate to MyProfile
+                    }
+                },
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = MaterialTheme.colorScheme.onPrimary,
                     unselectedIconColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
