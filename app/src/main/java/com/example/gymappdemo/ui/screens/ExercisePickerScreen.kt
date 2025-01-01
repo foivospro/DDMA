@@ -55,6 +55,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.gymappdemo.R
 import com.example.gymappdemo.ui.theme.GymAppDemoTheme
 import com.example.gymappdemo.ui.viewmodels.ExercisePickerViewModel
@@ -63,6 +64,7 @@ import com.example.gymappdemo.ui.viewmodels.ExercisePickerViewModel
 @Composable
 fun ExercisesList(
     viewModel: ExercisePickerViewModel,
+    navController: NavController,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     modifier: Modifier = Modifier
 ) {
