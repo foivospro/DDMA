@@ -79,7 +79,7 @@ fun QuickStartRoutinesUI(navController: NavController) {
 @Composable
 fun StartWorkoutButton(navController: NavController) {
     Button(
-        onClick = { navController.navigate("ExercisePicker") },
+        onClick = { navController.navigate("CurrentStatus") },
         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary ),
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier.fillMaxWidth()
