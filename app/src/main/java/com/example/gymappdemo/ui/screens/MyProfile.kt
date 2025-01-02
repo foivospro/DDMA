@@ -23,13 +23,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.gymappdemo.Navigation.GymAppScreen
 import com.example.gymappdemo.ui.theme.GymAppDemoTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserProfileScreen() {
+fun UserProfileScreen(navController: NavController) {
     //val navController = rememberNavController() // Access NavController in the composable
     Scaffold(
         topBar = {
@@ -41,16 +42,6 @@ fun UserProfileScreen() {
                         color = MaterialTheme.colorScheme.onSurface // Use theme color
                     )
                 }
-                /*,,
-            navigationIcon = {
-                IconButton(onClick = { /* Back action */ }) {
-                    Icon(
-                        Icons.Filled.ArrowBack,
-                        contentDescription = "Back",
-                        tint = MaterialTheme.colorScheme.primary // Use theme color
-                    )
-                }
-            }*/
             )
         }
     ) { padding ->
@@ -171,9 +162,9 @@ fun UserProfileScreen() {
                 text = "Edit Profile",
                 style = MaterialTheme.typography.titleSmall, // Use Title Medium style
                 color = MaterialTheme.colorScheme.tertiary,
-                /*modifier = Modifier.clickable {
+                modifier = Modifier.clickable {
                     navController.navigate(GymAppScreen.ProfileSettings.name) // Navigate to ProfileSettings
-                }*/
+                }
             )
         }
     }
@@ -218,7 +209,7 @@ fun UserDetailCard(label: String, value: String) {
 @Composable
 fun MyProfileScreenPreview() {
     GymAppDemoTheme { // Wrap in your custom theme
-        UserProfileScreen()
+        //UserProfileScreen()
     }
 }
 

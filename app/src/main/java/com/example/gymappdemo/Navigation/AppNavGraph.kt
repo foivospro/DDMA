@@ -30,6 +30,7 @@ import androidx.navigation.compose.rememberNavController
 
 import com.example.gymappdemo.data.database.AppDatabase
 import com.example.gymappdemo.data.repositories.WorkoutRepository
+import com.example.gymappdemo.ui.screens.EditProfileScreen
 import com.example.gymappdemo.ui.screens.ExercisesList
 import com.example.gymappdemo.ui.screens.HomeScreen
 import com.example.gymappdemo.ui.screens.NavigationItem
@@ -79,9 +80,20 @@ fun AppNavHost() {
                 val viewModel: ExercisePickerViewModel = viewModel(factory = factory)
                 ExercisesList(viewModel)
             }
-            // MyProfile Screen in NavHost
+            // MyProfile Screen
             composable(route = GymAppScreen.MyProfile.name) {
-                UserProfileScreen()
+                UserProfileScreen(navController = navController)
+            }
+
+            // Profile Settings Screen - No bottom bar shown here
+            composable(route = GymAppScreen.ProfileSettings.name) {
+                EditProfileScreen(
+                    false,
+                    {},
+                    onBackPressed = {
+                        navController.navigateUp() // Go back to MyProfileScreen
+                    }
+                )
             }
         }
     }
