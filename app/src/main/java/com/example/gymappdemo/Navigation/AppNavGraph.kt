@@ -27,10 +27,10 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-
 import com.example.gymappdemo.data.database.AppDatabase
 import com.example.gymappdemo.data.repositories.WorkoutRepository
 import com.example.gymappdemo.ui.screens.EditProfileScreen
+import com.example.gymappdemo.ui.screens.CurrentStatus
 import com.example.gymappdemo.ui.screens.ExercisesList
 import com.example.gymappdemo.ui.screens.HomeScreen
 import com.example.gymappdemo.ui.screens.NavigationItem
@@ -43,8 +43,9 @@ enum class GymAppScreen {
     Home,
     ExercisePicker,
     QuickStartRoutinesUI,
-    MyProfile, // Added MyProfile entry
-    ProfileSettings
+    MyProfile, 
+    ProfileSettings,
+    CurrentStatus
 }
 
 @Composable
@@ -78,7 +79,10 @@ fun AppNavHost() {
                     )
                 )
                 val viewModel: ExercisePickerViewModel = viewModel(factory = factory)
-                ExercisesList(viewModel)
+                ExercisesList(viewModel, navController = navController)
+            }
+            composable(route = GymAppScreen.CurrentStatus.name) {
+                CurrentStatus(navController = navController)
             }
             // MyProfile Screen
             composable(route = GymAppScreen.MyProfile.name) {

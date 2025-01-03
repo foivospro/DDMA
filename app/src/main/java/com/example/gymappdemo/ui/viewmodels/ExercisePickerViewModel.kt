@@ -25,7 +25,18 @@ class ExercisePickerViewModel(private val workoutRepository: WorkoutRepository) 
     }
     fun getIconResource(icon: String): Int {
         return when (icon) {
-            "ic_bench_press" -> com.example.gymappdemo.R.drawable.weightlifter
+            "bench" -> com.example.gymappdemo.R.drawable.bench
+            "biceps" -> com.example.gymappdemo.R.drawable.biceps
+            "cycling" -> com.example.gymappdemo.R.drawable.cycling
+            "deadlift" -> com.example.gymappdemo.R.drawable.deadlift
+           "dips" -> com.example.gymappdemo.R.drawable.dips
+            "pullups" -> com.example.gymappdemo.R.drawable.pullups
+            "rdl" -> com.example.gymappdemo.R.drawable.rdl
+            "rows" -> com.example.gymappdemo.R.drawable.rows
+            "snatch" -> com.example.gymappdemo.R.drawable.snatch
+            "squat" -> com.example.gymappdemo.R.drawable.squat
+            "triceps" -> com.example.gymappdemo.R.drawable.triceps
+            "triceps2" -> com.example.gymappdemo.R.drawable.triceps2
             else -> com.example.gymappdemo.R.drawable.weightlifter
         }
     }
