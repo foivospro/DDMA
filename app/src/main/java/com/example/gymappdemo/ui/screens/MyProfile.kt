@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.ui.Alignment
@@ -135,7 +136,7 @@ fun UserProfileScreen(navController: NavController) {
                     ),
                     leadingIcon = {
                         Icon(
-                            painter = painterResource(id = android.R.drawable.ic_dialog_email),
+                            imageVector = Icons.Default.Mail,
                             contentDescription = "Mail Icon",
                             tint = MaterialTheme.colorScheme.primary
                         )
@@ -209,7 +210,9 @@ fun UserDetailCard(label: String, value: String) {
 @Composable
 fun MyProfileScreenPreview() {
     GymAppDemoTheme { // Wrap in your custom theme
-        //UserProfileScreen()
+        UserProfileScreen(
+            navController = rememberNavController()
+        )
     }
 }
 

@@ -47,7 +47,10 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Key
+import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material.icons.filled.NightsStay
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -379,6 +382,23 @@ fun EnhancedTextField(
                         )
                     }
                 }
+            },
+            leadingIcon = {
+                val icon = when (title) {
+                    "Username" -> Icons.Default.Person
+                    "Email" -> Icons.Default.Mail
+                    else -> Icons.Default.Key
+                }
+
+                Icon(
+                    imageVector = icon,
+                    contentDescription = when (title) {
+                        "Username" -> "Profile Icon"
+                        "Email" -> "Mail Icon"
+                        else -> "Password Icon"
+                    },
+                    tint = MaterialTheme.colorScheme.primary
+                )
             },
             colors = TextFieldDefaults.textFieldColors(
                 focusedIndicatorColor = if (errorMessage != null) Color.Red else Color.Transparent,
