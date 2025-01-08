@@ -49,7 +49,10 @@ enum class GymAppScreen {
 }
 
 @Composable
-fun AppNavHost() {
+fun AppNavHost(
+    isDarkMode: Boolean,
+    onDarkModeToggle: (Boolean) -> Unit
+) {
     val navController = rememberNavController()
     Scaffold(
         bottomBar = { BottomNavigationBar(navController) }
@@ -97,6 +100,13 @@ fun AppNavHost() {
                     onBackPressed = {
                         navController.navigateUp() // Go back to MyProfileScreen
                     }
+                )
+            }
+            composable(route = GymAppScreen.ProfileSettings.name) {
+                EditProfileScreen(
+                    isDarkMode = isDarkMode,
+                    onDarkModeToggle = onDarkModeToggle,  // Passing the callback here
+                    onBackPressed = { navController.navigateUp() }
                 )
             }
         }
