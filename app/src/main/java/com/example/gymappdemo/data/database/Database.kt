@@ -37,6 +37,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun sessionExerciseDao(): SessionExerciseDao
     abstract fun setDao(): SetDao
 
+
     companion object {
         @Volatile
         private var INSTANCE: AppDatabase? = null
@@ -66,6 +67,7 @@ abstract class AppDatabase : RoomDatabase() {
             CoroutineScope(Dispatchers.IO).launch {
                 val database = getInstance(context)
                 val exerciseDao = database.exerciseDao()
+                val userDao = database.userDao()
 
                 val exercises = listOf(
                     Exercise(
@@ -142,6 +144,31 @@ abstract class AppDatabase : RoomDatabase() {
                     )
                 )
                 exerciseDao.insertAll(exercises)
+                // Insert Default Users
+                val users = listOf(
+                    User(
+                        name = "John Doe",
+                        email = "johndoe@example.com",
+                        passwordHash = "JohnbigDoe12!",
+                        age = 30,
+                        height = 175,
+                        weight = 70
+                    ),
+                    User(
+                        name = "Jane Smith",
+                        email = "janesmith@example.com",
+                        passwordHash = "#TheQueen123",
+                        age = 25,
+                        height = 165,
+                        weight = 60
+
+                    )
+                )
+
+                // Insert users into the database
+                users.forEach { user ->
+                    userDao.insert(user)
+                }
             }
         }
     }

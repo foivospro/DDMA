@@ -1,8 +1,7 @@
 package com.example.gymappdemo.Navigation
 
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -28,6 +27,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.gymappdemo.data.database.AppDatabase
+import com.example.gymappdemo.data.repositories.UserRepository
 import com.example.gymappdemo.data.repositories.WorkoutRepository
 import com.example.gymappdemo.ui.screens.EditProfileScreen
 import com.example.gymappdemo.ui.screens.CurrentStatus
@@ -38,6 +38,7 @@ import com.example.gymappdemo.ui.screens.QuickStartRoutinesUI
 import com.example.gymappdemo.ui.screens.UserProfileScreen
 import com.example.gymappdemo.ui.viewmodel.AppViewModelFactory
 import com.example.gymappdemo.ui.viewmodels.ExercisePickerViewModel
+import com.example.gymappdemo.ui.viewmodels.MyProfileViewModel
 
 enum class GymAppScreen {
     Home,
@@ -79,17 +80,35 @@ fun AppNavHost(
                         AppDatabase.getInstance(context).sessionExerciseDao(),
                         AppDatabase.getInstance(context).exerciseDao(),
                         AppDatabase.getInstance(context).setDao()
-                    )
-                )
+                    ),
+                    userRepository = UserRepository.getInstance(AppDatabase.getInstance(context).userDao()))
                 val viewModel: ExercisePickerViewModel = viewModel(factory = factory)
                 ExercisesList(viewModel, navController = navController)
             }
             composable(route = GymAppScreen.CurrentStatus.name) {
+
                 CurrentStatus(navController = navController)
             }
             // MyProfile Screen
             composable(route = GymAppScreen.MyProfile.name) {
-                UserProfileScreen(navController = navController)
+                // Manually creating the ViewModel using a custom factory
+                val context = LocalContext.current
+                val factory = AppViewModelFactory(
+                    workoutRepository = WorkoutRepository.getInstance(
+                        AppDatabase.getInstance(context).gymSessionDao(),
+                        AppDatabase.getInstance(context).sessionExerciseDao(),
+                        AppDatabase.getInstance(context).exerciseDao(),
+                        AppDatabase.getInstance(context).setDao()
+                ),
+                    userRepository = UserRepository.getInstance(AppDatabase.getInstance(context).userDao()))
+                val viewModel: MyProfileViewModel = viewModel(factory = factory)
+
+                // Pass the viewModel to the UserProfileScreen
+                UserProfileScreen(
+                    navController = navController,
+                    viewModel = viewModel,
+                    userId = 1 // You can pass a dynamic userId here
+                )
             }
 
             // Profile Settings Screen - No bottom bar shown here
