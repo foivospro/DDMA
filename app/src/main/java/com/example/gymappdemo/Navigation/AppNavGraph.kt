@@ -1,8 +1,6 @@
 package com.example.gymappdemo.Navigation
 
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -29,14 +27,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.gymappdemo.data.database.AppDatabase
 import com.example.gymappdemo.data.repositories.WorkoutRepository
-import com.example.gymappdemo.ui.screens.EditProfileScreen
 import com.example.gymappdemo.ui.screens.CurrentStatus
+import com.example.gymappdemo.ui.screens.EditProfileScreen
 import com.example.gymappdemo.ui.screens.ExercisesList
 import com.example.gymappdemo.ui.screens.HomeScreen
 import com.example.gymappdemo.ui.screens.NavigationItem
 import com.example.gymappdemo.ui.screens.QuickStartRoutinesUI
 import com.example.gymappdemo.ui.screens.UserProfileScreen
 import com.example.gymappdemo.ui.viewmodel.AppViewModelFactory
+import com.example.gymappdemo.ui.viewmodels.CurrentStatusViewModel
 import com.example.gymappdemo.ui.viewmodels.ExercisePickerViewModel
 
 enum class GymAppScreen {
@@ -51,6 +50,19 @@ enum class GymAppScreen {
 @Composable
 fun AppNavHost() {
     val navController = rememberNavController()
+    val context = LocalContext.current
+
+    // Create a shared ViewModel instance for the CurrentStatusViewModel
+    val factory = AppViewModelFactory(
+        workoutRepository = WorkoutRepository.getInstance(
+            AppDatabase.getInstance(context).gymSessionDao(),
+            AppDatabase.getInstance(context).sessionExerciseDao(),
+            AppDatabase.getInstance(context).exerciseDao(),
+            AppDatabase.getInstance(context).setDao()
+        )
+    )
+    val currentStatusViewModel: CurrentStatusViewModel = viewModel(factory = factory)
+    val exercisePickerViewModel: ExercisePickerViewModel = viewModel(factory = factory)
     Scaffold(
         bottomBar = { BottomNavigationBar(navController) }
     ) { paddingValues ->
@@ -59,6 +71,7 @@ fun AppNavHost() {
             startDestination = GymAppScreen.Home.name,
             modifier = Modifier.padding(paddingValues)
         ) {
+
             // Home Screen in NavHost
             composable(route = GymAppScreen.Home.name) {
                 HomeScreen(navController = navController)
@@ -69,20 +82,10 @@ fun AppNavHost() {
             }
             // Exercise Picker Screen in NavHost
             composable(route = GymAppScreen.ExercisePicker.name) {
-                val context = LocalContext.current
-                val factory = AppViewModelFactory(
-                    workoutRepository = WorkoutRepository.getInstance(
-                        AppDatabase.getInstance(context).gymSessionDao(),
-                        AppDatabase.getInstance(context).sessionExerciseDao(),
-                        AppDatabase.getInstance(context).exerciseDao(),
-                        AppDatabase.getInstance(context).setDao()
-                    )
-                )
-                val viewModel: ExercisePickerViewModel = viewModel(factory = factory)
-                ExercisesList(viewModel, navController = navController)
+                ExercisesList(exercisePickerViewModel, navController = navController)
             }
             composable(route = GymAppScreen.CurrentStatus.name) {
-                CurrentStatus(navController = navController)
+                CurrentStatus(currentStatusViewModel, navController = navController)
             }
             // MyProfile Screen
             composable(route = GymAppScreen.MyProfile.name) {

@@ -26,6 +26,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -37,6 +38,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
@@ -47,6 +49,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -70,9 +73,11 @@ fun ExercisesList(
 ) {
     var query by rememberSaveable { mutableStateOf("") }
     var active by rememberSaveable { mutableStateOf(false) }
-    val muscleGroups = listOf("Chest", "Legs", "Arms")
+    val muscleGroups = listOf("Upper Body", "Lower Body", "Cardio")
     val exercises by viewModel.exercises.collectAsState()
-    Column(
+    var selectedMuscleGroup by remember { mutableStateOf<String?>(null) }
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(contentPadding)
@@ -118,8 +123,11 @@ fun ExercisesList(
                 horizontalArrangement = Arrangement.Center
             ) {
                 for (muscleGroup in muscleGroups) {
+                    val isSelected = muscleGroup == selectedMuscleGroup
                     FilterChip(
-                        onClick = { /*TODO*/ },
+                        onClick = {
+                            selectedMuscleGroup = if (isSelected) null else muscleGroup
+                        },
                         label = { Text(muscleGroup) },
                         selected = false,
                         modifier = Modifier
@@ -139,18 +147,17 @@ fun ExercisesList(
                             borderColor = MaterialTheme.colorScheme.outline,
                             selectedBorderColor = MaterialTheme.colorScheme.primary,
                             disabledBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.25f)
-                    )
+                        )
                     )
                 }
             }
             // Filtered Exercise List
-            val filteredExercises = if (query.isNotEmpty()) {
-                exercises.filter {
-                    (it.name).contains(query, ignoreCase = true)
-                }
+            val filteredExercises = if (selectedMuscleGroup != null) {
+                exercises.filter { it.muscleGroup == selectedMuscleGroup }
             } else {
-                exercises
+                exercises // Show all exercises if no muscle group is selected
             }
+
 
             LazyColumn(
                 contentPadding = contentPadding,
@@ -191,8 +198,23 @@ fun ExercisesList(
                 }
             }
         }
+        FloatingActionButton(
+            onClick = { navController.navigate("CurrentStatus") },
+            shape = CircleShape,
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+            modifier = Modifier
+                .align(Alignment.BottomStart) // Align to the bottom-end of the Box
+                .padding(16.dp) // Padding from edges
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.arrow_back),
+                contentDescription = "Add Exercise"
+            )
+        }
     }
 
+}
 
 @Composable
 fun ExerciseCard(
@@ -320,6 +342,5 @@ fun SearchBarSample() {
 @Composable
 fun HeroPreview() {
     GymAppDemoTheme {
-
     }
 }
