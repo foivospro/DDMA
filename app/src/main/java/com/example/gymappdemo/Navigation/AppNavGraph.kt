@@ -1,6 +1,7 @@
 package com.example.gymappdemo.Navigation
 
 
+import HomeScreenViewModel
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -26,17 +27,22 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.gymappdemo.data.database.AppDatabase
+import com.example.gymappdemo.data.repositories.UserRepository
 import com.example.gymappdemo.data.repositories.WorkoutRepository
 import com.example.gymappdemo.ui.screens.CurrentStatus
 import com.example.gymappdemo.ui.screens.EditProfileScreen
 import com.example.gymappdemo.ui.screens.ExercisesList
 import com.example.gymappdemo.ui.screens.HomeScreen
+import com.example.gymappdemo.ui.screens.LoginScreen
 import com.example.gymappdemo.ui.screens.NavigationItem
 import com.example.gymappdemo.ui.screens.QuickStartRoutinesUI
+import com.example.gymappdemo.ui.screens.RegisterScreen
 import com.example.gymappdemo.ui.screens.UserProfileScreen
 import com.example.gymappdemo.ui.viewmodel.AppViewModelFactory
 import com.example.gymappdemo.ui.viewmodels.CurrentStatusViewModel
 import com.example.gymappdemo.ui.viewmodels.ExercisePickerViewModel
+import com.example.gymappdemo.ui.viewmodels.LoginViewModel
+import com.example.gymappdemo.ui.viewmodels.RegisterViewModel
 
 enum class GymAppScreen {
     Home,
@@ -44,56 +50,83 @@ enum class GymAppScreen {
     QuickStartRoutinesUI,
     MyProfile, 
     ProfileSettings,
-    CurrentStatus
+    CurrentStatus,
+    Login,
+    Register
 }
 
 @Composable
-fun AppNavHost() {
+fun AppNavHost(isAuthenticated: Boolean) {
     val navController = rememberNavController()
     val context = LocalContext.current
-
-    // Create a shared ViewModel instance for the CurrentStatusViewModel
     val factory = AppViewModelFactory(
         workoutRepository = WorkoutRepository.getInstance(
             AppDatabase.getInstance(context).gymSessionDao(),
             AppDatabase.getInstance(context).sessionExerciseDao(),
             AppDatabase.getInstance(context).exerciseDao(),
             AppDatabase.getInstance(context).setDao()
+        ),
+        userRepository = UserRepository.getInstance(
+            AppDatabase.getInstance(context).userDao(),
+            context
         )
     )
+    val homeScreenViewModel: HomeScreenViewModel = viewModel(factory = factory)
     val currentStatusViewModel: CurrentStatusViewModel = viewModel(factory = factory)
     val exercisePickerViewModel: ExercisePickerViewModel = viewModel(factory = factory)
+    val loginViewModel: LoginViewModel = viewModel(factory = factory)
+    val registerViewModel: RegisterViewModel = viewModel(factory = factory)
+
+    // List of routes where the BottomNavigationBar should not be shown
+    val hideBottomBarScreens = listOf(
+        GymAppScreen.Login.name,
+        GymAppScreen.Register.name,
+        GymAppScreen.ProfileSettings.name
+    )
+
+    // State to track if the current destination should hide the BottomNavigationBar
+    var shouldShowBottomBar by remember { mutableStateOf(true) }
+
     Scaffold(
-        bottomBar = { BottomNavigationBar(navController) }
+        bottomBar = {
+            if (shouldShowBottomBar) {
+                BottomNavigationBar(navController)
+            }
+        }
     ) { paddingValues ->
         NavHost(
             navController = navController,
-            startDestination = GymAppScreen.Home.name,
+            startDestination = if (isAuthenticated) GymAppScreen.Home.name else GymAppScreen.Login.name,
             modifier = Modifier.padding(paddingValues)
         ) {
-
-            // Home Screen in NavHost
+            // Home Screen
             composable(route = GymAppScreen.Home.name) {
-                HomeScreen(navController = navController)
+                shouldShowBottomBar = true
+                HomeScreen(homeScreenViewModel,navController = navController)
             }
-            // Quick Start Routines Screen in NavHost
+            // Quick Start Routines Screen
             composable(route = GymAppScreen.QuickStartRoutinesUI.name) {
+                shouldShowBottomBar = true
                 QuickStartRoutinesUI(navController = navController)
             }
-            // Exercise Picker Screen in NavHost
+            // Exercise Picker Screen
             composable(route = GymAppScreen.ExercisePicker.name) {
+                shouldShowBottomBar = true
                 ExercisesList(exercisePickerViewModel, navController = navController)
             }
+            // Current Status Screen
             composable(route = GymAppScreen.CurrentStatus.name) {
+                shouldShowBottomBar = true
                 CurrentStatus(currentStatusViewModel, navController = navController)
             }
             // MyProfile Screen
             composable(route = GymAppScreen.MyProfile.name) {
+                shouldShowBottomBar = true
                 UserProfileScreen(navController = navController)
             }
-
-            // Profile Settings Screen - No bottom bar shown here
+            // Profile Settings Screen - Hide bottom bar
             composable(route = GymAppScreen.ProfileSettings.name) {
+                shouldShowBottomBar = false
                 EditProfileScreen(
                     false,
                     {},
@@ -101,6 +134,24 @@ fun AppNavHost() {
                         navController.navigateUp() // Go back to MyProfileScreen
                     }
                 )
+            }
+            // Login Screen - Hide bottom bar
+            composable(route = GymAppScreen.Login.name) {
+                shouldShowBottomBar = false
+                LoginScreen(onLoginSuccess = {
+                    navController.navigate(GymAppScreen.Home.name) {
+                        popUpTo(GymAppScreen.Login.name) { inclusive = true }
+                    }
+                },
+                    navController = navController,
+                    loginViewModel)
+            }
+            // Register Screen - Hide bottom bar
+            composable(route = GymAppScreen.Register.name) {
+                shouldShowBottomBar = false
+                RegisterScreen(
+                    registerViewModel = registerViewModel,
+                    navController = navController)
             }
         }
     }
