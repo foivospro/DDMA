@@ -90,8 +90,7 @@ fun CurrentStatus(
             Button(
                 onClick = {
                     // Τερματισμός προπόνησης
-                    //viewModel.terminateGymSession()
-                    viewModel.stopTimer()
+                    viewModel.resetTimer()
                     // Κλήση του callback για τερματισμό στο HomeViewModel
                     onWorkoutTerminated(timer)
                     // Πλοήγηση πίσω στην HomeScreen

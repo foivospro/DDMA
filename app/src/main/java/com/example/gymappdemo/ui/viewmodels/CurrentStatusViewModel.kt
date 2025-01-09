@@ -1,6 +1,7 @@
 package com.example.gymappdemo.ui.viewmodels
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gymappdemo.data.entities.Exercise
@@ -35,8 +36,6 @@ class CurrentStatusViewModel(
     private val _isWorkoutActive = MutableStateFlow(false)
     val isWorkoutActive: StateFlow<Boolean> = _isWorkoutActive.asStateFlow()
 
-
-
     fun loadExercises(sessionId: Int) {
         viewModelScope.launch {
             val exercisesWithSets = workoutRepository.getExercisesWithSets(sessionId)
@@ -62,12 +61,18 @@ class CurrentStatusViewModel(
         timerJob?.cancel()
     }
 
+    fun resetTimer() {
+        stopTimer()
+        _timerState.value = 0
+        _caloriesState.value = 0
+    }
+
     fun setSessionId(sessionId: Int) {
         _currentSessionId.value = sessionId
         loadExercises(sessionId)
     }
 
-    
+
     fun removeSetAndSessionExercise(setId: Int) {
         viewModelScope.launch {
             try {
