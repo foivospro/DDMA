@@ -51,22 +51,25 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.gymappdemo.R
 import com.example.gymappdemo.data.entities.ExerciseWithSets
+import com.example.gymappdemo.data.entities.Set
 import com.example.gymappdemo.ui.viewmodels.CurrentStatusViewModel
+import com.example.gymappdemo.Navigation.GymAppScreen
+
+
 @Composable
 fun CurrentStatus(
     sessionId: Int,
     viewModel: CurrentStatusViewModel,
     navController: NavController,
-    contentPadding: PaddingValues = PaddingValues(0.dp),
-    modifier: Modifier = Modifier
+    onWorkoutTerminated: (Int) -> Unit
 ) {
     val timer by viewModel.timerState.collectAsState()
     val calories by viewModel.caloriesState.collectAsState()
     val exercisesWithSets by viewModel.currentExercises.collectAsState()
 
-    // Φόρτωση ασκήσεων με τα σετ όταν ανοίγει η οθόνη
     LaunchedEffect(sessionId) {
-        viewModel.loadExercises(sessionId)
+        viewModel.setSessionId(sessionId)
+        viewModel.startTimer()
     }
 
     Scaffold(
@@ -74,8 +77,8 @@ fun CurrentStatus(
             FloatingActionButton(
                 onClick = { navController.navigate("ExercisePicker/$sessionId") },
                 shape = CircleShape,
-                containerColor = colorScheme.primary,
-                contentColor = colorScheme.onPrimary
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.add),
@@ -83,16 +86,42 @@ fun CurrentStatus(
                 )
             }
         },
+        bottomBar = {
+            Button(
+                onClick = {
+                    // Τερματισμός προπόνησης
+                    //viewModel.terminateGymSession()
+                    viewModel.stopTimer()
+                    // Κλήση του callback για τερματισμό στο HomeViewModel
+                    onWorkoutTerminated(timer)
+                    // Πλοήγηση πίσω στην HomeScreen
+                    navController.navigate(GymAppScreen.Home.name) {
+                        popUpTo("CurrentStatus/$sessionId") { inclusive = true }
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .height(56.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Red,
+                    contentColor = Color.White
+                )
+            ) {
+                Text("Τερματισμός Workout")
+            }
+        },
         content = { innerPadding ->
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(colorScheme.background)
+                    .background(MaterialTheme.colorScheme.background)
                     .padding(innerPadding)
             ) {
                 Column(
                     modifier = Modifier
-                        .fillMaxSize(),
+                        .fillMaxSize()
+                        .padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Top
                 ) {
@@ -106,19 +135,18 @@ fun CurrentStatus(
                         }
                     )
 
+                    Spacer(modifier = Modifier.height(16.dp))
+
                     // List of Exercises with Sets
                     LazyColumn(
-                        contentPadding = contentPadding,
                         verticalArrangement = Arrangement.spacedBy(16.dp),
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp)
+                        modifier = Modifier.fillMaxSize()
                     ) {
                         items(exercisesWithSets) { exerciseWithSets ->
-                            ExerciseCard(
+                            ExerciseWithSetsCard(
                                 exerciseWithSets = exerciseWithSets,
                                 onRemoveSet = { setId ->
-                                    viewModel.removeSetAndSessionExercise(setId) // Διαγραφή του set
+                                    viewModel.removeSetAndSessionExercise(setId)
                                 }
                             )
                         }
@@ -128,6 +156,7 @@ fun CurrentStatus(
         }
     )
 }
+
 
 @Composable
 fun TimerAndCalories(
@@ -196,47 +225,71 @@ fun TimerAndCalories(
 }
 
 @Composable
-fun ExerciseCard(
+fun ExerciseWithSetsCard(
     exerciseWithSets: ExerciseWithSets,
     onRemoveSet: (Int) -> Unit
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
-        shape = MaterialTheme.shapes.medium
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(8.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Text(
-                text = exerciseWithSets.exercise.name,
-                style = MaterialTheme.typography.titleLarge,
-                color = colorScheme.primary
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "Σετ:",
-                style = MaterialTheme.typography.titleSmall,
-                color = colorScheme.onSurface
-            )
-            exerciseWithSets.sets.forEach { set ->
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Επαναλήψεις: ${set.reps}, Βάρος: ${set.weight}kg",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = colorScheme.onSurfaceVariant
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.weightlifter), // θα βαλω αλλο κανονικα ε
+                        contentDescription = exerciseWithSets.exercise.name,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .size(40.dp)
+                            .padding(end = 16.dp)
                     )
-                    IconButton(onClick = { onRemoveSet(set.id) }) {
-                    }
+                    Text(
+                        text = exerciseWithSets.exercise.name,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
                 }
+                // Προσθέστε κουμπιά για επεξεργασία ή διαγραφή της άσκησης αν χρειάζεται
             }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            exerciseWithSets.sets.forEach { set ->
+                SetCard(set = set, onRemove = { onRemoveSet(set.id) })
+            }
+        }
+    }
+}
+
+@Composable
+fun SetCard(set: Set, onRemove: () -> Unit) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+    ) {
+        Column {
+            Text(text = "Reps: ${set.reps}", style = MaterialTheme.typography.bodyMedium)
+            Text(text = "Weight: ${set.weight} kg", style = MaterialTheme.typography.bodyMedium)
+        }
+        IconButton(onClick = onRemove) {
+            Icon(
+                imageVector = Icons.Default.Delete,
+                contentDescription = "Delete Set",
+                tint = Color.Red
+            )
         }
     }
 }

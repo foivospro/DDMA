@@ -1,28 +1,41 @@
 package com.example.gymappdemo.ui.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gymappdemo.data.entities.Exercise
 import com.example.gymappdemo.data.entities.ExerciseWithSets
 import com.example.gymappdemo.data.repositories.WorkoutRepository
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class CurrentStatusViewModel(
     private val workoutRepository: WorkoutRepository
 ) : ViewModel() {
 
-    private val _timerState = MutableStateFlow(0) // Tracks elapsed time in seconds
-    private val _caloriesState = MutableStateFlow(0)
-    private val _currentExercises = MutableStateFlow<List<ExerciseWithSets>>(emptyList())
+    private val _currentSessionId = MutableStateFlow<Int?>(null)
+    val currentSessionId: StateFlow<Int?> = _currentSessionId.asStateFlow()
 
-    val timerState: StateFlow<Int> = _timerState
-    val caloriesState: StateFlow<Int> = _caloriesState
-    val currentExercises: StateFlow<List<ExerciseWithSets>> = _currentExercises
+    private val _currentExercises = MutableStateFlow<List<ExerciseWithSets>>(emptyList())
+    val currentExercises: StateFlow<List<ExerciseWithSets>> = _currentExercises.asStateFlow()
+
+    private val _timerState = MutableStateFlow(0) // Δευτερόλεπτα
+    val timerState: StateFlow<Int> = _timerState.asStateFlow()
+
+    private val _caloriesState = MutableStateFlow(0)
+    val caloriesState: StateFlow<Int> = _caloriesState.asStateFlow()
 
     private var isTimerRunning = false
+    private var timerJob: Job? = null
+
+    private val _isWorkoutActive = MutableStateFlow(false)
+    val isWorkoutActive: StateFlow<Boolean> = _isWorkoutActive.asStateFlow()
+
+
 
     fun loadExercises(sessionId: Int) {
         viewModelScope.launch {
@@ -34,7 +47,7 @@ class CurrentStatusViewModel(
     fun startTimer() {
         if (!isTimerRunning) {
             isTimerRunning = true
-            viewModelScope.launch {
+            timerJob = viewModelScope.launch {
                 while (isTimerRunning) {
                     delay(1000L)
                     _timerState.value += 1
@@ -46,9 +59,15 @@ class CurrentStatusViewModel(
 
     fun stopTimer() {
         isTimerRunning = false
+        timerJob?.cancel()
     }
 
+    fun setSessionId(sessionId: Int) {
+        _currentSessionId.value = sessionId
+        loadExercises(sessionId)
+    }
 
+    
     fun removeSetAndSessionExercise(setId: Int) {
         viewModelScope.launch {
             try {

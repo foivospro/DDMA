@@ -34,7 +34,7 @@ import com.example.gymappdemo.data.database.AppDatabase
 import com.example.gymappdemo.data.repositories.WorkoutRepository
 import com.example.gymappdemo.ui.screens.CurrentStatus
 import com.example.gymappdemo.ui.screens.EditProfileScreen
-import com.example.gymappdemo.ui.screens.ExercisesList
+import com.example.gymappdemo.ui.screens.ExercisePickerScreen
 import com.example.gymappdemo.ui.screens.HomeScreen
 import com.example.gymappdemo.ui.screens.NavigationItem
 import com.example.gymappdemo.ui.screens.QuickStartRoutinesUI
@@ -49,7 +49,7 @@ import com.example.gymappdemo.ui.viewmodels.SetRepsViewModel
 enum class GymAppScreen {
     Home,
     ExercisePicker,
-    QuickStartRoutinesUI,
+
     MyProfile, 
     ProfileSettings,
     CurrentStatus
@@ -72,6 +72,7 @@ fun AppNavHost() {
     val currentStatusViewModel: CurrentStatusViewModel = viewModel(factory = factory)
     val exercisePickerViewModel: ExercisePickerViewModel = viewModel(factory = factory)
     val homeViewModel: HomeViewModel = viewModel(factory = factory)
+    val setRepsViewModel: SetRepsViewModel = viewModel(factory = factory)
     Scaffold(
         bottomBar = { BottomNavigationBar(navController) }
     ) { paddingValues ->
@@ -83,28 +84,30 @@ fun AppNavHost() {
 
             // Home Screen in NavHost
             composable(route = GymAppScreen.Home.name) {
-                HomeScreen(navController = navController, viewModel = homeViewModel)
-            }
-
-            // Exercise Picker Screen in NavHost
-            composable("ExercisePicker/{sessionId}") { backStackEntry ->
-                val sessionId = backStackEntry.arguments?.getString("sessionId")?.toIntOrNull() ?: 0
-
-                ExercisesList(
-                    viewModel = exercisePickerViewModel,
+                HomeScreen(
                     navController = navController,
-                    currentSessionId = sessionId
+                    viewModel = homeViewModel,
+                    currentStatusViewModel = currentStatusViewModel
                 )
             }
 
+            // ExercisePicker Screen
+            composable("ExercisePicker/{sessionId}") { backStackEntry ->
+                val sessionId = backStackEntry.arguments?.getString("sessionId")?.toIntOrNull() ?: 0
 
+                ExercisePickerScreen(
+                    viewModel = exercisePickerViewModel,
+                    navController = navController,
+                    sessionId = sessionId
+                )
+            }
+            // SetReps Screen
             composable(
                 route = "SetReps/{sessionExerciseId}",
                 arguments = listOf(navArgument("sessionExerciseId") { type = NavType.IntType })
             ) { backStackEntry ->
                 val sessionExerciseId = backStackEntry.arguments?.getInt("sessionExerciseId")
                 sessionExerciseId?.let {
-                    val setRepsViewModel: SetRepsViewModel = viewModel(factory = factory)
 
                     SetRepsScreen(
                         sessionExerciseId = it,
@@ -115,18 +118,20 @@ fun AppNavHost() {
                 }
             }
 
+            // CurrentStatus Screen
             composable(
                 route = "CurrentStatus/{sessionId}",
                 arguments = listOf(navArgument("sessionId") { type = NavType.IntType })
             ) { backStackEntry ->
-                val sessionId = backStackEntry.arguments?.getInt("sessionId")
-                sessionId?.let {
-                    CurrentStatus(
-                        sessionId = it,
-                        viewModel = currentStatusViewModel,
-                        navController = navController
-                    )
-                }
+                val sessionId = backStackEntry.arguments?.getInt("sessionId") ?: return@composable
+                CurrentStatus(
+                    sessionId = sessionId,
+                    viewModel = currentStatusViewModel,
+                    navController = navController,
+                    onWorkoutTerminated = { duration ->
+                        homeViewModel.terminateWorkout(sessionId, duration)
+                    }
+                )
             }
             // MyProfile Screen
             composable(route = GymAppScreen.MyProfile.name) {
@@ -175,9 +180,27 @@ fun BottomNavigationBar(navController: NavController) {
                 onClick = {
                     selectedItem = index
                     when (item.label) {
-                        "Home" -> navController.navigate(GymAppScreen.Home.name)
-                        "Favorites" -> navController.navigate(GymAppScreen.QuickStartRoutinesUI.name)
-                        "Profile" -> navController.navigate(GymAppScreen.MyProfile.name) // Navigate to MyProfile
+                        "Home" -> navController.navigate(GymAppScreen.Home.name) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                        "Favorites" -> navController.navigate(GymAppScreen.MyProfile.name) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                        "Profile" -> navController.navigate(GymAppScreen.MyProfile.name) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
                     }
                 },
                 colors = NavigationBarItemDefaults.colors(

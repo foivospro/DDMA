@@ -1,6 +1,7 @@
 package com.example.gymappdemo.ui.viewmodels
 
 import android.util.Log
+import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gymappdemo.data.repositories.WorkoutRepository
@@ -9,6 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import com.example.gymappdemo.data.entities.Set
 
+
 class SetRepsViewModel(private val repository: WorkoutRepository) : ViewModel() {
     private val _sets = MutableStateFlow<List<Set>>(emptyList())
     val sets: StateFlow<List<Set>> = _sets
@@ -16,11 +18,19 @@ class SetRepsViewModel(private val repository: WorkoutRepository) : ViewModel() 
     private val _temporarySets = MutableStateFlow<List<Set>>(emptyList())
     val temporarySets: StateFlow<List<Set>> = _temporarySets
 
+    // SnackbarHostState για εμφάνιση μηνυμάτων
+    val snackbarHostState = SnackbarHostState()
+
     fun loadSets(sessionExerciseId: Int) {
         viewModelScope.launch {
-            // Φόρτωση των sets από τη βάση δεδομένων
-            val sets = repository.getSetsForExercise(sessionExerciseId)
-            _temporarySets.value = sets
+            try {
+                // Φόρτωση των sets από τη βάση δεδομένων
+                val sets = repository.getSetsForExercise(sessionExerciseId)
+                _temporarySets.value = sets
+            } catch (e: Exception) {
+                Log.e("SetRepsViewModel", "Error loading sets: ${e.message}")
+                snackbarHostState.showSnackbar("Error loading sets: ${e.message}")
+            }
         }
     }
 
@@ -41,75 +51,24 @@ class SetRepsViewModel(private val repository: WorkoutRepository) : ViewModel() 
         }
     }
 
-    fun addNewSet(sessionExerciseId: Int) {
-        viewModelScope.launch {
-            Log.d("Debug", "addNewSet called with sessionExerciseId: $sessionExerciseId")
-
-            try {
-                val sessionExercise = repository.getSessionById(sessionExerciseId)
-                if (sessionExercise != null) {
-                    Log.d("Debug", "SessionExercise found: $sessionExercise")
-                    val newSet = Set(
-                        sessionExerciseId = sessionExerciseId,
-                        reps = 8,
-                        weight = 0.0,
-                        notes = ""
-                    )
-                    repository.addSet(newSet)
-                    Log.d("Debug", "New Set added: $newSet")
-                } else {
-                    Log.e("DatabaseError", "No SessionExercise found with id $sessionExerciseId")
-                }
-            } catch (e: Exception) {
-                Log.e("DatabaseError", "Error occurred: ${e.message}")
-            }
-        }
-    }
-
     fun removeTemporarySet(setId: Int) {
         val updatedSets = temporarySets.value.toMutableList() // Δημιουργούμε αντιγραφή της λίστας
         updatedSets.removeAll { it.id == setId } // Αφαιρούμε το στοιχείο με το συγκεκριμένο ID
         _temporarySets.value = updatedSets // Ενημερώνουμε το StateFlow
     }
 
-    fun updateWeight(setId: Int, newWeight: Double) {
-        viewModelScope.launch {
-            val updatedSet = _sets.value.first { it.id == setId }.copy(weight = newWeight)
-            repository.updateSet(updatedSet)
-            _sets.value = repository.getSetsForExercise(updatedSet.sessionExerciseId)
-        }
-    }
-
-    fun updateReps(setId: Int, newReps: Int) {
-        viewModelScope.launch {
-            val updatedSet = _sets.value.first { it.id == setId }.copy(reps = newReps)
-            repository.updateSet(updatedSet)
-            _sets.value = repository.getSetsForExercise(updatedSet.sessionExerciseId)
-        }
-    }
-
-    fun removeSet(setId: Int) {
-        viewModelScope.launch {
-            try {
-                // Διαγραφή του set με το ID
-                repository.deleteSet(setId)
-
-                // Ενημέρωση της κατάστασης με τα υπόλοιπα sets
-                val sessionExerciseId = repository.getSessionExerciseIdBySetId(setId)
-                _sets.value = repository.getSetsForExercise(sessionExerciseId)
-            } catch (e: Exception) {
-                // Αντιμετώπιση σφαλμάτων
-                e.printStackTrace()
-            }
-        }
-    }
-
     fun saveSetsToDb(sessionExerciseId: Int) {
         viewModelScope.launch {
-            _temporarySets.value.forEach { set ->
-                repository.addSet(set.copy(sessionExerciseId = sessionExerciseId))
+            try {
+                _temporarySets.value.forEach { set ->
+                    repository.addSet(set.copy(sessionExerciseId = sessionExerciseId))
+                }
+                _temporarySets.value = emptyList() // Καθαρισμός της λίστας μετά την αποθήκευση
+                snackbarHostState.showSnackbar("Sets saved successfully!")
+            } catch (e: Exception) {
+                Log.e("SetRepsViewModel", "Error saving sets: ${e.message}")
+                snackbarHostState.showSnackbar("Error saving sets: ${e.message}")
             }
-            _temporarySets.value = emptyList() // Καθαρισμός της λίστας μετά την αποθήκευση
         }
     }
 }

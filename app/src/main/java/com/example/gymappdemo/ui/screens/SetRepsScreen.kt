@@ -24,6 +24,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -34,14 +35,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.gymappdemo.ui.viewmodels.SetRepsViewModel
 import com.example.gymappdemo.data.entities.Set
 
+
 @Composable
 fun SetRepsScreen(
     sessionExerciseId: Int,
-    setRepsViewModel: SetRepsViewModel,
+    setRepsViewModel: SetRepsViewModel = viewModel(),
     navController: NavController,
     onSaveClicked: () -> Unit
 ) {
@@ -73,6 +76,9 @@ fun SetRepsScreen(
                     Text("Αποθήκευση")
                 }
             }
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = setRepsViewModel.snackbarHostState)
         }
     ) { innerPadding ->
         Column(
@@ -221,4 +227,3 @@ fun WorkoutSetCard(
         }
     }
 }
-

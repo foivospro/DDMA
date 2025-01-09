@@ -6,6 +6,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,6 +31,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -42,16 +45,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.gymappdemo.Navigation.GymAppScreen
 import com.example.gymappdemo.R
 import com.example.gymappdemo.ui.theme.GymAppDemoTheme
+import com.example.gymappdemo.ui.viewmodels.CurrentStatusViewModel
 import com.example.gymappdemo.ui.viewmodels.HomeViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen(
     navController: NavController,
-    viewModel: HomeViewModel // Προσθέτουμε ViewModel
+    viewModel: HomeViewModel,
+    currentStatusViewModel: CurrentStatusViewModel
 ) {
+    val isWorkoutActive by viewModel.isWorkoutActive.collectAsState()
+    val currentSessionId by viewModel.currentSessionId.collectAsState()
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -77,6 +86,10 @@ fun HomeScreen(
                     modifier = Modifier
                         .size(40.dp)
                         .padding(start = 8.dp)
+                        .clickable {
+                            // Πλοήγηση στην οθόνη προφίλ
+                            navController.navigate(GymAppScreen.MyProfile.name)
+                        }
                 )
             }
 
@@ -104,44 +117,59 @@ fun HomeScreen(
             WorkoutSummary()
         }
 
-        // Start New Workout Button
+        // Start New Workout / Continue Workout Button
         item {
             Spacer(modifier = Modifier.height(64.dp))
 
-            Button(
-                onClick = {
-                    viewModel.startNewWorkout(
-                        userId = 1,
-                        onSessionCreated = { session ->
-                            // Πλοήγηση στο νέο session με χρήση του ID
-                            navController.navigate("CurrentStatus/${session.id}")
-                        },
-                        onError = { error ->
-                            // Διαχείριση σφάλματος (π.χ., εμφάνιση μηνύματος)
-                            Log.e("UI", "Failed to start new workout: $error")
+            Button(onClick = {
+                    if (!isWorkoutActive) {
+                        // Δημιουργία νέας προπόνησης
+                        viewModel.startNewWorkout(
+                            userId = 1, // Αντικαταστήστε με το πραγματικό userId
+                            onSessionCreated = { session ->
+                                // Ρύθμιση του sessionId στο CurrentStatusViewModel
+                                currentStatusViewModel.setSessionId(session.id)
+                                // Πλοήγηση στο νέο session με χρήση του ID
+                                navController.navigate("CurrentStatus/${session.id}")
+                            },
+                            onError = { error ->
+                                // Διαχείριση σφάλματος (π.χ., εμφάνιση μηνύματος)
+                                Log.e("HomeScreen", "Failed to start new workout: $error")
+                            }
+                        )
+                    } else {
+                        // Πλοήγηση στην υπάρχουσα ενεργή προπόνηση
+                        currentSessionId?.let { sessionId ->
+                            navController.navigate("CurrentStatus/$sessionId")
                         }
-                    )
-                },
-                modifier = Modifier
+                    }
+                }, modifier = Modifier
                     .fillMaxWidth()
-                    .height(60.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(
+                    .height(60.dp), shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary
-                )
-            ) {
+                )) {
                 Text(
-                    text = "Start New Workout",
+                    text = if (isWorkoutActive) "Continue Workout" else "Start New Workout",
                     style = MaterialTheme.typography.titleMedium,
                     fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            // Προαιρετικό: Εμφάνιση μηνύματος αν υπάρχει ενεργή προπόνηση
+            if (isWorkoutActive) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Έχει ήδη ενεργή προπόνηση.",
+                    color = Color.Red,
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.Bold
                 )
             }
         }
     }
 }
-
 
 @Composable
 fun WorkoutHistory() {
