@@ -1,5 +1,6 @@
 package com.example.gymappdemo.ui.screens
 
+import HomeScreenViewModel
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
@@ -27,6 +28,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -42,14 +45,17 @@ import androidx.navigation.compose.rememberNavController
 import com.example.gymappdemo.R
 import com.example.gymappdemo.ui.theme.GymAppDemoTheme
 
+
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(
+    homeScreenViewModel: HomeScreenViewModel,
+    navController: NavController) {
+    val username by homeScreenViewModel.username.collectAsState()
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-            // Top Row with Welcome Text and Profile Icon
             item {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -57,7 +63,7 @@ fun HomeScreen(navController: NavController) {
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = "Hi 👋, User",
+                        text = "Hi 👋, $username",
                         style = MaterialTheme.typography.headlineLarge,
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.weight(1f)
@@ -283,6 +289,6 @@ data class NavigationItem(val label: String, val icon: ImageVector)
 fun HomeScreenPreview() {
     GymAppDemoTheme {
         val mockNavController = rememberNavController() // Mock controller for preview
-        HomeScreen(navController = mockNavController)
+        //HomeScreen(navController = mockNavController)
     }
 }
