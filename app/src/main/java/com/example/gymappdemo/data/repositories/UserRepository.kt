@@ -26,5 +26,9 @@ class UserRepository(private val userDao: UserDao) {
                 instance ?: UserRepository(userDao).also { instance = it }
             }
         }
+
+        fun insertUser(user: User) {
+
+        }
     }
 }

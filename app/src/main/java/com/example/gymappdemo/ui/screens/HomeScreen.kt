@@ -1,6 +1,9 @@
 package com.example.gymappdemo.ui.screens
 
+import android.os.Build
+import android.util.Log
 import androidx.annotation.DrawableRes
+import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -41,86 +44,103 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.gymappdemo.R
 import com.example.gymappdemo.ui.theme.GymAppDemoTheme
+import com.example.gymappdemo.ui.viewmodels.HomeViewModel
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(
+    navController: NavController,
+    viewModel: HomeViewModel // Προσθέτουμε ViewModel
+) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-            // Top Row with Welcome Text and Profile Icon
-            item {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = "Hi 👋, User",
-                        style = MaterialTheme.typography.headlineLarge,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = "Profile",
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier
-                            .size(40.dp)
-                            .padding(start = 8.dp)
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-
-            // Workout History Section
-            item {
+        // Top Row with Welcome Text and Profile Icon
+        item {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 Text(
-                    text = "Workout History",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    text = "Hi 👋, User",
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.weight(1f)
                 )
-
-                Divider(color = Color.Gray, thickness = 1.dp, modifier = Modifier.padding(bottom = 16.dp))
-
-                WorkoutHistory()
-            }
-
-            // Workout Summary Section
-            item {
-                Spacer(modifier = Modifier.height(24.dp))
-
-                WorkoutSummary()
-            }
-
-            // Start New Workout Button
-            item {
-                Spacer(modifier = Modifier.height(64.dp))
-
-                Button(
-                    onClick = { navController.navigate("QuickStartRoutinesUI")},
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = "Profile",
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
+                        .size(40.dp)
+                        .padding(start = 8.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
+        // Workout History Section
+        item {
+            Text(
+                text = "Workout History",
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            Divider(color = Color.Gray, thickness = 1.dp, modifier = Modifier.padding(bottom = 16.dp))
+
+            WorkoutHistory()
+        }
+
+        // Workout Summary Section
+        item {
+            Spacer(modifier = Modifier.height(24.dp))
+
+            WorkoutSummary()
+        }
+
+        // Start New Workout Button
+        item {
+            Spacer(modifier = Modifier.height(64.dp))
+
+            Button(
+                onClick = {
+                    viewModel.startNewWorkout(
+                        userId = 1,
+                        onSessionCreated = { session ->
+                            // Πλοήγηση στο νέο session με χρήση του ID
+                            navController.navigate("CurrentStatus/${session.id}")
+                        },
+                        onError = { error ->
+                            // Διαχείριση σφάλματος (π.χ., εμφάνιση μηνύματος)
+                            Log.e("UI", "Failed to start new workout: $error")
+                        }
                     )
-                ) {
-                    Text(
-                        text = "Start New Workout",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            ) {
+                Text(
+                    text = "Start New Workout",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }
+}
 
 
 @Composable
@@ -277,12 +297,3 @@ data class Workout(
 )
 
 data class NavigationItem(val label: String, val icon: ImageVector)
-
-@Preview(showBackground = true)
-@Composable
-fun HomeScreenPreview() {
-    GymAppDemoTheme {
-        val mockNavController = rememberNavController() // Mock controller for preview
-        HomeScreen(navController = mockNavController)
-    }
-}

@@ -60,6 +60,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.gymappdemo.R
+import com.example.gymappdemo.data.entities.Exercise
 import com.example.gymappdemo.ui.theme.GymAppDemoTheme
 import com.example.gymappdemo.ui.viewmodels.ExercisePickerViewModel
 
@@ -68,6 +69,7 @@ import com.example.gymappdemo.ui.viewmodels.ExercisePickerViewModel
 fun ExercisesList(
     viewModel: ExercisePickerViewModel,
     navController: NavController,
+    currentSessionId: Int,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     modifier: Modifier = Modifier
 ) {
@@ -187,11 +189,13 @@ fun ExercisesList(
                         ) {
                             val iconResId = viewModel.getIconResource(exercise.icon)
                             ExerciseCard(
-                                iconResource = iconResId,
+                                iconResource = viewModel.getIconResource(exercise.icon),
                                 description = exercise.description,
                                 name = exercise.name,
-                                modifier = Modifier
-                                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                                exerciseId = exercise.id,
+                                navController = navController,
+                                currentSessionId = currentSessionId, // Παράμετρος sessionId
+                                viewModel = viewModel // Παράμετρος viewModel
                             )
                         }
                     }
@@ -221,13 +225,16 @@ fun ExerciseCard(
     @DrawableRes iconResource: Int,
     description: String,
     name: String,
+    exerciseId: Int,
+    navController: NavController,
     modifier: Modifier = Modifier,
-    onStartClick: () -> Unit = {} // Callback for the button
+    currentSessionId: Int, // Προσθήκη sessionId
+    viewModel: ExercisePickerViewModel // Προσθήκη viewModel
 ) {
     Card(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         modifier = modifier,
-        shape = RoundedCornerShape(24.dp) // Rounded corners for the card
+        shape = RoundedCornerShape(24.dp)
     ) {
         Row(
             modifier = Modifier
@@ -246,13 +253,27 @@ fun ExerciseCard(
                     painter = painterResource(iconResource),
                     contentDescription = name,
                     modifier = Modifier
-                        .size(56.dp) // Adjust size for better fit
+                        .size(56.dp)
                         .clip(RoundedCornerShape(8.dp)),
                     tint = MaterialTheme.colorScheme.primary
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Button(
-                    onClick = onStartClick,
+                    onClick = {
+                        viewModel.addExerciseToSession(
+                            sessionId = currentSessionId,
+                            exercise = Exercise(
+                                id = exerciseId,
+                                name = name,
+                                description = description,
+                                icon = "",
+                                muscleGroup = ""
+                            )
+                        ) { sessionExerciseId ->
+                            // Μετάβαση στην οθόνη επιλογής reps
+                            navController.navigate("SetReps/$sessionExerciseId")
+                        }
+                    },
                     modifier = Modifier
                         .sizeIn(minWidth = 80.dp, minHeight = 24.dp)
                 ) {
@@ -277,6 +298,7 @@ fun ExerciseCard(
         }
     }
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchBarSample() {

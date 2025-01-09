@@ -1,4 +1,5 @@
 package com.example.gymappdemo.ui.viewmodels
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gymappdemo.data.entities.Exercise
@@ -14,15 +15,48 @@ class ExercisePickerViewModel(private val workoutRepository: WorkoutRepository) 
     val exercises: StateFlow<List<Exercise>> = _exercises
 
     init {
-        fetchAllExercises()
-    }
-
-    private fun fetchAllExercises() {
         viewModelScope.launch {
-            val exerciseList = workoutRepository.getAllExercises()
-            _exercises.value = exerciseList
+            val exercisesList = workoutRepository.getAllExercises()
+            Log.d("Debug", "Exercises loaded: ${exercisesList}")
+            _exercises.value = exercisesList
         }
     }
+
+    fun addExerciseToSession(
+        sessionId: Int,
+        exercise: Exercise,
+        onSuccess: (Int) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                // Υπολογισμός της σειράς (order) για το νέο SessionExercise
+                val order = getNextExerciseOrder(sessionId)
+
+                // Δημιουργία του SessionExercise
+                val sessionExercise = com.example.gymappdemo.data.entities.SessionExercise(
+                    sessionId = sessionId,
+                    exerciseId = exercise.id,
+                    order = order
+                )
+
+                // Εισαγωγή στη βάση δεδομένων και λήψη του ID
+                val sessionExerciseId = workoutRepository.insertSessionExercise(sessionExercise)
+                Log.d("Debug", "SessionExercise added: $sessionExercise")
+
+                // Επιστροφή του ID μέσω callback
+                onSuccess(sessionExerciseId.toInt())
+            } catch (e: Exception) {
+                // Καταγραφή σφάλματος
+                Log.e("DatabaseError", "Error adding exercise to session: ${e.message}")
+            }
+        }
+    }
+
+    private suspend fun getNextExerciseOrder(sessionId: Int): Int {
+        val sessionExercises = workoutRepository.getSessionExercisesBySessionId(sessionId)
+        return (sessionExercises.maxOfOrNull { it.order } ?: 0) + 1
+    }
+
     fun getIconResource(icon: String): Int {
         return when (icon) {
             "bench" -> com.example.gymappdemo.R.drawable.bench

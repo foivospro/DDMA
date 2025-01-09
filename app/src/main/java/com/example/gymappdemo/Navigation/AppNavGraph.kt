@@ -1,6 +1,8 @@
 package com.example.gymappdemo.Navigation
 
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -20,11 +22,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.gymappdemo.data.database.AppDatabase
 import com.example.gymappdemo.data.repositories.WorkoutRepository
 import com.example.gymappdemo.ui.screens.CurrentStatus
@@ -33,10 +38,13 @@ import com.example.gymappdemo.ui.screens.ExercisesList
 import com.example.gymappdemo.ui.screens.HomeScreen
 import com.example.gymappdemo.ui.screens.NavigationItem
 import com.example.gymappdemo.ui.screens.QuickStartRoutinesUI
+import com.example.gymappdemo.ui.screens.SetRepsScreen
 import com.example.gymappdemo.ui.screens.UserProfileScreen
 import com.example.gymappdemo.ui.viewmodel.AppViewModelFactory
 import com.example.gymappdemo.ui.viewmodels.CurrentStatusViewModel
 import com.example.gymappdemo.ui.viewmodels.ExercisePickerViewModel
+import com.example.gymappdemo.ui.viewmodels.HomeViewModel
+import com.example.gymappdemo.ui.viewmodels.SetRepsViewModel
 
 enum class GymAppScreen {
     Home,
@@ -47,12 +55,12 @@ enum class GymAppScreen {
     CurrentStatus
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavHost() {
     val navController = rememberNavController()
     val context = LocalContext.current
 
-    // Create a shared ViewModel instance for the CurrentStatusViewModel
     val factory = AppViewModelFactory(
         workoutRepository = WorkoutRepository.getInstance(
             AppDatabase.getInstance(context).gymSessionDao(),
@@ -63,6 +71,7 @@ fun AppNavHost() {
     )
     val currentStatusViewModel: CurrentStatusViewModel = viewModel(factory = factory)
     val exercisePickerViewModel: ExercisePickerViewModel = viewModel(factory = factory)
+    val homeViewModel: HomeViewModel = viewModel(factory = factory)
     Scaffold(
         bottomBar = { BottomNavigationBar(navController) }
     ) { paddingValues ->
@@ -74,18 +83,50 @@ fun AppNavHost() {
 
             // Home Screen in NavHost
             composable(route = GymAppScreen.Home.name) {
-                HomeScreen(navController = navController)
+                HomeScreen(navController = navController, viewModel = homeViewModel)
             }
-            // Quick Start Routines Screen in NavHost
-            composable(route = GymAppScreen.QuickStartRoutinesUI.name) {
-                QuickStartRoutinesUI(navController = navController)
-            }
+
             // Exercise Picker Screen in NavHost
-            composable(route = GymAppScreen.ExercisePicker.name) {
-                ExercisesList(exercisePickerViewModel, navController = navController)
+            composable("ExercisePicker/{sessionId}") { backStackEntry ->
+                val sessionId = backStackEntry.arguments?.getString("sessionId")?.toIntOrNull() ?: 0
+
+                ExercisesList(
+                    viewModel = exercisePickerViewModel,
+                    navController = navController,
+                    currentSessionId = sessionId
+                )
             }
-            composable(route = GymAppScreen.CurrentStatus.name) {
-                CurrentStatus(currentStatusViewModel, navController = navController)
+
+
+            composable(
+                route = "SetReps/{sessionExerciseId}",
+                arguments = listOf(navArgument("sessionExerciseId") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val sessionExerciseId = backStackEntry.arguments?.getInt("sessionExerciseId")
+                sessionExerciseId?.let {
+                    val setRepsViewModel: SetRepsViewModel = viewModel(factory = factory)
+
+                    SetRepsScreen(
+                        sessionExerciseId = it,
+                        setRepsViewModel = setRepsViewModel,
+                        navController = navController,
+                        onSaveClicked = { navController.navigateUp() }
+                    )
+                }
+            }
+
+            composable(
+                route = "CurrentStatus/{sessionId}",
+                arguments = listOf(navArgument("sessionId") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val sessionId = backStackEntry.arguments?.getInt("sessionId")
+                sessionId?.let {
+                    CurrentStatus(
+                        sessionId = it,
+                        viewModel = currentStatusViewModel,
+                        navController = navController
+                    )
+                }
             }
             // MyProfile Screen
             composable(route = GymAppScreen.MyProfile.name) {
