@@ -9,8 +9,8 @@ import com.example.gymappdemo.data.entities.Set
 
 @Dao
 interface SetDao {
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(set: Set): Long
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(set: Set)
 
     @Update
     suspend fun update(set: Set)
