@@ -71,7 +71,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
                 modifier = Modifier.padding(bottom = 24.dp) // Increased bottom padding for better spacing
             )
 
-// Email Input Field without KeyboardOptions
+            // Email Input Field without KeyboardOptions
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
@@ -84,7 +84,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
                 isError = showError && email.isEmpty()
             )
 
-// Password Input Field without KeyboardOptions
+            // Password Input Field without KeyboardOptions
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },

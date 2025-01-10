@@ -1,10 +1,8 @@
 package com.example.gymappdemo.ui.viewmodels
 
 import android.util.Log
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.gymappdemo.data.entities.Exercise
 import com.example.gymappdemo.data.entities.ExerciseWithSets
 import com.example.gymappdemo.data.repositories.WorkoutRepository
 import kotlinx.coroutines.Job
@@ -70,28 +68,21 @@ class CurrentStatusViewModel(
     fun setSessionId(sessionId: Int) {
         _currentSessionId.value = sessionId
         loadExercises(sessionId)
+        Log.d("CurrentViewModel", "SessionId updated to: $sessionId")
     }
 
 
     fun removeSetAndSessionExercise(setId: Int) {
         viewModelScope.launch {
             try {
-                // Βρίσκουμε το SessionExercise που συνδέεται με το Set
                 val sessionExerciseId = workoutRepository.getSessionExerciseIdBySetId(setId)
-
-                // Διαγραφή του Set
                 workoutRepository.deleteSet(setId)
-
-                // Αν δεν υπάρχουν άλλα Sets, διαγράφουμε και το SessionExercise
                 val remainingSets = workoutRepository.getSetsBySessionExerciseId(sessionExerciseId)
                 if (remainingSets.isEmpty()) {
                     workoutRepository.deleteSessionExercise(sessionExerciseId)
                 }
-
-                // Φόρτωση των ασκήσεων ξανά
                 _currentExercises.value = workoutRepository.getExercisesWithSets(sessionExerciseId)
             } catch (e: Exception) {
-                // Διαχείριση σφαλμάτων
                 e.printStackTrace()
             }
         }

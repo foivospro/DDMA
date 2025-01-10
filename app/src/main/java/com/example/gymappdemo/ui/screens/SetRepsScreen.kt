@@ -1,4 +1,3 @@
-// SetRepsScreen.kt
 package com.example.gymappdemo.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
@@ -50,7 +49,6 @@ fun SetRepsScreen(
 ) {
     val workoutSets by setRepsViewModel.temporarySets.collectAsState(initial = emptyList())
 
-    // Φορτώνουμε τα sets για το συγκεκριμένο sessionExerciseId
     LaunchedEffect(sessionExerciseId) {
         setRepsViewModel.loadSets(sessionExerciseId)
     }
@@ -66,8 +64,8 @@ fun SetRepsScreen(
             ) {
                 Button(
                     onClick = {
-                        setRepsViewModel.saveSetsToDb(sessionExerciseId) // Αποθήκευση στη βάση
-                        navController.navigate("CurrentStatus/$sessionExerciseId") // Πλοήγηση στο CurrentStatus
+                        setRepsViewModel.saveSetsToDb(sessionExerciseId)
+                        navController.navigate("CurrentStatus/$sessionExerciseId")
                     },
                     modifier = Modifier
                         .fillMaxWidth()

@@ -12,15 +12,15 @@ interface GymSessionDao {
     @Insert
     suspend fun insert(session: GymSession): Long
 
-    @Query("SELECT * FROM gym_sessions WHERE id = :id")
-    suspend fun getSessionById(id: Int): GymSession?
-
-    @Query("SELECT * FROM gym_sessions WHERE userId = :userId ORDER BY date DESC")
-    suspend fun getSessionsByUser(userId: Int): List<GymSession>
     @Delete
     suspend fun delete(session: GymSession)
 
     @Update
     suspend fun update(session: GymSession)
 
+    @Query("SELECT * FROM gym_sessions WHERE id = :id")
+    suspend fun getSessionById(id: Int): GymSession?
+
+    @Query("SELECT * FROM gym_sessions WHERE userId = :userId ORDER BY date DESC")
+    suspend fun getSessionsByUser(userId: Int): List<GymSession>
 }

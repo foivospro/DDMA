@@ -11,6 +11,7 @@ import com.example.gymappdemo.data.entities.User
 interface UserDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(user: User): Long
+
     @Update
     suspend fun update(user: User)
 

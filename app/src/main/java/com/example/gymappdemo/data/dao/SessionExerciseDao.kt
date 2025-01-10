@@ -17,10 +17,8 @@ interface SessionExerciseDao {
     suspend fun insert(sessionExercise: SessionExercise): Long
 
     @Query("SELECT * FROM session_exercises WHERE sessionId = :sessionId")
-    suspend fun getExercisesForSession(sessionId: Int): List<SessionExercise>
-
-    @Query("SELECT * FROM session_exercises WHERE sessionId = :sessionId")
     suspend fun getSessionExercisesBySessionId(sessionId: Int): List<SessionExercise>
+
     @Transaction
     @Query("""
         SELECT 

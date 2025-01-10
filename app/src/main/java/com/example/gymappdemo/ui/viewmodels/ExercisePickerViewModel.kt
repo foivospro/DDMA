@@ -39,15 +39,7 @@ class ExercisePickerViewModel(private val workoutRepository: WorkoutRepository) 
         }
     }
 
-    fun toggleExerciseSelection(exercise: Exercise) {
-        _selectedExercises.value = if (_selectedExercises.value.contains(exercise)) {
-            _selectedExercises.value - exercise
-        } else {
-            _selectedExercises.value + exercise
-        }
-    }
 
-    // Δημόσια συνάρτηση για την προσθήκη ασκήσεων στη συνεδρία
     fun addExerciseToSession(
         sessionId: Int,
         exercise: Exercise,
@@ -56,24 +48,18 @@ class ExercisePickerViewModel(private val workoutRepository: WorkoutRepository) 
     ) {
         viewModelScope.launch {
             try {
-                // Υπολογισμός της σειράς (order) για το νέο SessionExercise
                 val order = getNextExerciseOrder(sessionId)
-
-                // Δημιουργία του SessionExercise
                 val sessionExercise = SessionExercise(
                     sessionId = sessionId,
                     exerciseId = exercise.id,
                     order = order
                 )
 
-                // Εισαγωγή στη βάση δεδομένων και λήψη του ID
                 val sessionExerciseId = workoutRepository.insertSessionExercise(sessionExercise)
                 Log.d("ExercisePickerViewModel", "SessionExercise added: $sessionExercise with ID: $sessionExerciseId")
 
-                // Επιστροφή του ID μέσω callback
                 onSuccess(sessionExerciseId.toInt())
             } catch (e: Exception) {
-                // Καταγραφή σφάλματος και επιστροφή μέσω callback
                 Log.e("ExercisePickerViewModel", "Error adding exercise to session: ${e.message}")
                 onError(e.message ?: "Unknown error")
             }
@@ -103,7 +89,6 @@ class ExercisePickerViewModel(private val workoutRepository: WorkoutRepository) 
         }
     }
 
-    // Συνάρτηση για την ενημέρωση του μηνύματος σφάλματος
     fun setErrorMessage(message: String) {
         _errorMessage.value = message
     }

@@ -9,6 +9,8 @@ import com.example.gymappdemo.data.entities.ExerciseWithSets
 import com.example.gymappdemo.data.entities.GymSession
 import com.example.gymappdemo.data.entities.SessionExercise
 import com.example.gymappdemo.data.entities.Set
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class WorkoutRepository private constructor(
     private val gymSessionDao: GymSessionDao,
@@ -22,20 +24,12 @@ class WorkoutRepository private constructor(
         return gymSessionDao.getSessionById(sessionId)
     }
 
-    suspend fun getSessionsByUser(userId: Int): List<GymSession> {
-        return gymSessionDao.getSessionsByUser(userId)
-    }
-
     suspend fun insertSession(session: GymSession): Long {
         return gymSessionDao.insert(session)
     }
 
     suspend fun updateSession(session: GymSession) {
         gymSessionDao.update(session)
-    }
-
-    suspend fun deleteSession(session: GymSession) {
-        gymSessionDao.delete(session)
     }
 
     // SessionExercise Operations
@@ -64,10 +58,6 @@ class WorkoutRepository private constructor(
         return exerciseDao.getAllExercises()
     }
 
-    suspend fun insertExercise(exercise: Exercise) {
-        exerciseDao.insert(exercise)
-    }
-
     suspend fun getExercisesWithSets(sessionId: Int): List<ExerciseWithSets> {
         return sessionExerciseDao.getExercisesWithSetsBySession(sessionId)
     }
@@ -78,7 +68,9 @@ class WorkoutRepository private constructor(
     }
 
     suspend fun addSet(set: Set) {
-        setDao.insert(set)
+        withContext(Dispatchers.IO) {
+            setDao.insert(set)
+        }
     }
 
     suspend fun updateSet(set: Set) {
@@ -88,8 +80,6 @@ class WorkoutRepository private constructor(
     suspend fun deleteSet(setId: Int) {
         setDao.delete(setId)
     }
-
-
 
     companion object {
         @Volatile

@@ -22,7 +22,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavType
@@ -37,7 +36,6 @@ import com.example.gymappdemo.ui.screens.EditProfileScreen
 import com.example.gymappdemo.ui.screens.ExercisePickerScreen
 import com.example.gymappdemo.ui.screens.HomeScreen
 import com.example.gymappdemo.ui.screens.NavigationItem
-import com.example.gymappdemo.ui.screens.QuickStartRoutinesUI
 import com.example.gymappdemo.ui.screens.SetRepsScreen
 import com.example.gymappdemo.ui.screens.UserProfileScreen
 import com.example.gymappdemo.ui.viewmodel.AppViewModelFactory
@@ -49,7 +47,6 @@ import com.example.gymappdemo.ui.viewmodels.SetRepsViewModel
 enum class GymAppScreen {
     Home,
     ExercisePicker,
-
     MyProfile, 
     ProfileSettings,
     CurrentStatus
@@ -101,6 +98,7 @@ fun AppNavHost() {
                     sessionId = sessionId
                 )
             }
+
             // SetReps Screen
             composable(
                 route = "SetReps/{sessionExerciseId}",
@@ -133,6 +131,7 @@ fun AppNavHost() {
                     }
                 )
             }
+
             // MyProfile Screen
             composable(route = GymAppScreen.MyProfile.name) {
                 UserProfileScreen(navController = navController)

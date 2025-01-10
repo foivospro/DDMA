@@ -40,14 +40,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.gymappdemo.Navigation.GymAppScreen
 import com.example.gymappdemo.R
-import com.example.gymappdemo.ui.theme.GymAppDemoTheme
 import com.example.gymappdemo.ui.viewmodels.CurrentStatusViewModel
 import com.example.gymappdemo.ui.viewmodels.HomeViewModel
 
@@ -87,7 +84,6 @@ fun HomeScreen(
                         .size(40.dp)
                         .padding(start = 8.dp)
                         .clickable {
-                            // Πλοήγηση στην οθόνη προφίλ
                             navController.navigate(GymAppScreen.MyProfile.name)
                         }
                 )
@@ -123,22 +119,17 @@ fun HomeScreen(
 
             Button(onClick = {
                     if (!isWorkoutActive) {
-                        // Δημιουργία νέας προπόνησης
                         viewModel.startNewWorkout(
-                            userId = 1, // Αντικαταστήστε με το πραγματικό userId
+                            userId = 1, // αυτο πρεπει να το αλλαξουμε με το πραγματικό
                             onSessionCreated = { session ->
-                                // Ρύθμιση του sessionId στο CurrentStatusViewModel
                                 currentStatusViewModel.setSessionId(session.id)
-                                // Πλοήγηση στο νέο session με χρήση του ID
                                 navController.navigate("CurrentStatus/${session.id}")
                             },
                             onError = { error ->
-                                // Διαχείριση σφάλματος (π.χ., εμφάνιση μηνύματος)
                                 Log.e("HomeScreen", "Failed to start new workout: $error")
                             }
                         )
                     } else {
-                        // Πλοήγηση στην υπάρχουσα ενεργή προπόνηση
                         currentSessionId?.let { sessionId ->
                             navController.navigate("CurrentStatus/$sessionId")
                         }
@@ -157,7 +148,6 @@ fun HomeScreen(
                 )
             }
 
-            // Προαιρετικό: Εμφάνιση μηνύματος αν υπάρχει ενεργή προπόνηση
             if (isWorkoutActive) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
