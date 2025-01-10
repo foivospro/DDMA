@@ -5,8 +5,13 @@ import com.example.gymappdemo.data.dao.GymSessionDao
 import com.example.gymappdemo.data.dao.SessionExerciseDao
 import com.example.gymappdemo.data.dao.SetDao
 import com.example.gymappdemo.data.entities.Exercise
+import com.example.gymappdemo.data.entities.ExerciseWithSets
 import com.example.gymappdemo.data.entities.GymSession
 import com.example.gymappdemo.data.entities.SessionExercise
+import com.example.gymappdemo.data.entities.Set
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 
 class WorkoutRepository private constructor(
     private val gymSessionDao: GymSessionDao,
@@ -16,35 +21,69 @@ class WorkoutRepository private constructor(
 ) {
 
     // GymSession Operations
-    suspend fun getSessionByUser(userId: Int): List<GymSession> {
-        return gymSessionDao.getSessionsForUser(userId)
+    suspend fun getSessionById(sessionId: Int): GymSession? {
+        return gymSessionDao.getSessionById(sessionId)
     }
 
-    suspend fun insertSession(session: GymSession) {
-        gymSessionDao.insert(session)
+    suspend fun insertSession(session: GymSession): Long {
+        return gymSessionDao.insert(session)
+    }
+
+    suspend fun updateSession(session: GymSession) {
+        gymSessionDao.update(session)
     }
 
     // SessionExercise Operations
-    suspend fun insertSessionExercise(sessionExercise: SessionExercise) {
-        sessionExerciseDao.insert(sessionExercise)
+    suspend fun getActiveSession(): GymSession? {
+        return sessionExerciseDao.getActiveSession()
     }
 
-    suspend fun getExercisesForSession(sessionId: Int): List<SessionExercise> {
-        return sessionExerciseDao.getExercisesForSession(sessionId)
+    suspend fun insertSessionExercise(sessionExercise: SessionExercise): Long {
+        return sessionExerciseDao.insert(sessionExercise)
+    }
+
+    suspend fun getSessionExercisesBySessionId(sessionId: Int): List<SessionExercise> {
+        return sessionExerciseDao.getSessionExercisesBySessionId(sessionId)
+    }
+
+    suspend fun getSessionExerciseIdBySetId(setId: Int): Int {
+        return setDao.getSessionExerciseIdBySetId(setId)
+    }
+
+    suspend fun deleteSessionExercise(sessionExerciseId: Int) {
+        sessionExerciseDao.deleteSessionExercise(sessionExerciseId)
+    }
+
+    suspend fun getSetsBySessionExerciseId(sessionExerciseId: Int): List<Set> {
+        return setDao.getSetsBySessionExerciseId(sessionExerciseId)
     }
 
     // Exercise Operations
-    suspend fun getAllExercises(): List<Exercise> {
+     fun getAllExercises(): Flow<List<Exercise>> {
         return exerciseDao.getAllExercises()
     }
 
-    suspend fun insertExercise(exercise: Exercise) {
-        exerciseDao.insert(exercise)
+    suspend fun getExercisesWithSets(sessionId: Int): List<ExerciseWithSets> {
+        return sessionExerciseDao.getExercisesWithSetsBySession(sessionId)
     }
 
     // Set Operations
-    suspend fun getSet(setId: Int) {
-        setDao.getSet(setId)
+    suspend fun getSetsForExercise(sessionExerciseId: Int): List<Set> {
+        return setDao.getSetsForExercise(sessionExerciseId)
+    }
+
+    suspend fun addSet(set: Set) {
+        withContext(Dispatchers.IO) {
+            setDao.insert(set)
+        }
+    }
+
+    suspend fun updateSet(set: Set) {
+        setDao.update(set)
+    }
+
+    suspend fun deleteSet(setId: Int) {
+        setDao.delete(setId)
     }
 
     companion object {

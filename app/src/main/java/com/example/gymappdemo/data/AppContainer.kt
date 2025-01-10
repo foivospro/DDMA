@@ -11,9 +11,14 @@ interface AppContainer {
 }
 
 class AppContainerImpl(private val context: Context) : AppContainer {
+
     override val userRepository: UserRepository by lazy {
-        UserRepository(AppDatabase.getInstance(context).userDao())
+        UserRepository.getInstance(
+        AppDatabase.getInstance(context).userDao(),
+        context
+        )
     }
+
     override val workoutRepository: WorkoutRepository by lazy {
         WorkoutRepository.getInstance(
             AppDatabase.getInstance(context).gymSessionDao(),

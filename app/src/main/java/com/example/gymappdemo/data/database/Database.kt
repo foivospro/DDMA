@@ -1,6 +1,7 @@
 package com.example.gymappdemo.data.database
 
 import android.content.Context
+import android.util.Log
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.example.gymappdemo.data.dao.ExerciseDao
@@ -13,9 +14,11 @@ import com.example.gymappdemo.data.entities.GymSession
 import com.example.gymappdemo.data.entities.SessionExercise
 import com.example.gymappdemo.data.entities.Set
 import com.example.gymappdemo.data.entities.User
+import com.example.gymappdemo.data.repositories.UserRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 @Database(
     entities = [
@@ -25,7 +28,7 @@ import kotlinx.coroutines.launch
         SessionExercise::class,
         Set::class
     ],
-    version = 1,
+    version = 5,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -167,7 +170,7 @@ abstract class AppDatabase : RoomDatabase() {
 
                 // Insert users into the database
                 users.forEach { user ->
-                    userDao.insert(user)
+                    userDao.registerUser(user)
                 }
             }
         }
