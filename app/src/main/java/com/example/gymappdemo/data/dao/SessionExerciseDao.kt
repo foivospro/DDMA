@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import com.example.gymappdemo.data.entities.ExerciseWithSets
+import com.example.gymappdemo.data.entities.GymSession
 import com.example.gymappdemo.data.entities.SessionExercise
 
 @Dao
@@ -22,4 +23,7 @@ interface SessionExerciseDao {
     @Transaction
     @Query("SELECT * FROM session_exercises WHERE sessionId = :sessionId")
     suspend fun getExercisesWithSetsBySession(sessionId: Int): List<ExerciseWithSets>
+
+    @Query("SELECT * FROM gym_sessions WHERE duration = 0 LIMIT 1")
+    suspend fun getActiveSession(): GymSession?
 }

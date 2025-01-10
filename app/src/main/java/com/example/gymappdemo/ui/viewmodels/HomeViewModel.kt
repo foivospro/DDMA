@@ -20,6 +20,16 @@ class HomeViewModel(private val repository: WorkoutRepository) : ViewModel() {
     private val _currentSessionId = MutableStateFlow<Int?>(null)
     val currentSessionId: StateFlow<Int?> = _currentSessionId.asStateFlow()
 
+    init {
+        viewModelScope.launch {
+            val activeSession = repository.getActiveSession()
+            if (activeSession != null) {
+                _isWorkoutActive.value = true
+                _currentSessionId.value = activeSession.id
+            }
+        }
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     fun startNewWorkout(
         userId: Int,

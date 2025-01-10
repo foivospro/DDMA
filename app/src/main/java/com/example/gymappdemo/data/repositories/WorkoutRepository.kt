@@ -33,6 +33,10 @@ class WorkoutRepository private constructor(
     }
 
     // SessionExercise Operations
+    suspend fun getActiveSession(): GymSession? {
+        return sessionExerciseDao.getActiveSession()
+    }
+
     suspend fun insertSessionExercise(sessionExercise: SessionExercise): Long {
         return sessionExerciseDao.insert(sessionExercise)
     }

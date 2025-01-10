@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.gymappdemo.data.entities.Exercise
 import com.example.gymappdemo.data.entities.SessionExercise
 import com.example.gymappdemo.data.repositories.WorkoutRepository
 import kotlinx.coroutines.flow.MutableStateFlow

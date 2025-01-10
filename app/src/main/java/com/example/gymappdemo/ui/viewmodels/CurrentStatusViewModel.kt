@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import com.example.gymappdemo.data.entities.Set
 
 class CurrentStatusViewModel(
     private val workoutRepository: WorkoutRepository
@@ -89,6 +90,35 @@ class CurrentStatusViewModel(
                 _currentExercises.value = workoutRepository.getExercisesWithSets(sessionExerciseId)
             } catch (e: Exception) {
                 e.printStackTrace()
+            }
+        }
+    }
+
+    fun deleteExercise(exerciseId: Int) {
+        viewModelScope.launch {
+            try {
+                // Διαγραφή όλων των sets που σχετίζονται με την άσκηση
+                val sets = workoutRepository.getSetsForExercise(exerciseId)
+                sets.forEach { set ->
+                    workoutRepository.deleteSet(set.id)
+                }
+                // Διαγραφή της άσκησης
+                workoutRepository.deleteSessionExercise(exerciseId)
+                // Ενημέρωση της λίστας ασκήσεων
+                loadExercises(_currentSessionId.value!!)
+            } catch (e: Exception) {
+                Log.e("CurrentStatusViewModel", "Error deleting exercise: ${e.message}")
+            }
+        }
+    }
+
+    fun updateSet(updatedSet: Set) {
+        viewModelScope.launch {
+            try {
+                workoutRepository.updateSet(updatedSet)
+                loadExercises(_currentSessionId.value!!)
+            } catch (e: Exception) {
+                Log.e("CurrentStatusViewModel", "Error updating set: ${e.message}")
             }
         }
     }

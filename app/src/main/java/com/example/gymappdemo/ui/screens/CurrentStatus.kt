@@ -16,8 +16,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -27,6 +30,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.gymappdemo.R
@@ -60,6 +65,18 @@ fun CurrentStatus(
     val timer by viewModel.timerState.collectAsState()
     val calories by viewModel.caloriesState.collectAsState()
     val exercisesWithSets by viewModel.currentExercises.collectAsState()
+    var setToEdit by remember { mutableStateOf<Set?>(null) }
+
+    if (setToEdit != null) {
+        EditSetDialog(
+            set = setToEdit!!,
+            onDismiss = { setToEdit = null },
+            onSave = { updatedSet ->
+                viewModel.updateSet(updatedSet)
+                setToEdit = null
+            }
+        )
+    }
 
     LaunchedEffect(sessionId) {
         viewModel.setSessionId(sessionId)
@@ -146,12 +163,63 @@ fun CurrentStatus(
                                     exerciseWithSets = exerciseWithSets,
                                     onRemoveSet = { setId ->
                                         viewModel.removeSetAndSessionExercise(setId)
+                                    },
+                                    onDeleteExercise = { exerciseId ->
+                                        viewModel.deleteExercise(exerciseId)
+                                    },
+                                    onEditSet = { set ->
+                                        setToEdit = set
                                     }
                                 )
                             }
                         }
                     }
                 }
+            }
+        }
+    )
+}
+
+@Composable
+fun EditSetDialog(set: Set, onDismiss: () -> Unit, onSave: (Set) -> Unit) {
+    var reps by remember { mutableStateOf(set.reps.toString()) }
+    var weight by remember { mutableStateOf(set.weight.toString()) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = "Επεξεργασία Set") },
+        text = {
+            Column {
+                OutlinedTextField(
+                    value = reps,
+                    onValueChange = { reps = it },
+                    label = { Text("Επαναλήψεις") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
+                OutlinedTextField(
+                    value = weight,
+                    onValueChange = { weight = it },
+                    label = { Text("Βάρος (kg)") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    val updatedSet = set.copy(
+                        reps = reps.toIntOrNull() ?: set.reps,
+                        weight = weight.toDoubleOrNull() ?: set.weight
+                    )
+                    onSave(updatedSet)
+                }
+            ) {
+                Text("Αποθήκευση")
+            }
+        },
+        dismissButton = {
+            Button(onClick = onDismiss) {
+                Text("Ακύρωση")
             }
         }
     )
@@ -227,7 +295,9 @@ fun TimerAndCalories(
 @Composable
 fun ExerciseWithSetsCard(
     exerciseWithSets: ExerciseWithSets,
-    onRemoveSet: (Int) -> Unit
+    onRemoveSet: (Int) -> Unit,
+    onDeleteExercise: (Int) -> Unit,
+    onEditSet: (Set) -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -259,20 +329,32 @@ fun ExerciseWithSetsCard(
                         color = colorScheme.onBackground
                     )
                 }
-                // κουμπι για  διαγραφή της άσκησης
+                // Κουμπί για διαγραφή της άσκησης
+                IconButton(onClick = { onDeleteExercise(exerciseWithSets.exercise.id) }) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Διαγραφή Άσκησης",
+                        tint = Color.Red
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
             exerciseWithSets.sets.forEach { set ->
-                SetCard(set = set, onRemove = { onRemoveSet(set.id) })
+                SetCard(
+                    set = set,
+                    onRemove = { onRemoveSet(set.id) },
+                    onEdit = { onEditSet(set) }
+                )
             }
         }
     }
 }
 
+
 @Composable
-fun SetCard(set: Set, onRemove: () -> Unit) {
+fun SetCard(set: Set, onRemove: () -> Unit, onEdit: (Set) -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -284,12 +366,21 @@ fun SetCard(set: Set, onRemove: () -> Unit) {
             Text(text = "Reps: ${set.reps}", style = MaterialTheme.typography.bodyMedium)
             Text(text = "Weight: ${set.weight} kg", style = MaterialTheme.typography.bodyMedium)
         }
-        IconButton(onClick = onRemove) {
-            Icon(
-                imageVector = Icons.Default.Delete,
-                contentDescription = "Delete Set",
-                tint = Color.Red
-            )
+        Row {
+            IconButton(onClick = { onEdit(set) }) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = "Edit Set",
+                    tint = Color.Red
+                )
+            }
+            IconButton(onClick = onRemove) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Delete Set",
+                    tint = Color.Red
+                )
+            }
         }
     }
 }
