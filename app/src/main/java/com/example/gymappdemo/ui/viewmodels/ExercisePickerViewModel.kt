@@ -7,38 +7,21 @@ import com.example.gymappdemo.data.entities.Exercise
 import com.example.gymappdemo.data.entities.SessionExercise
 import com.example.gymappdemo.data.repositories.WorkoutRepository
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class ExercisePickerViewModel(private val workoutRepository: WorkoutRepository) : ViewModel() {
 
-    // StateFlow to hold the list of exercises
-    private val _exercises = MutableStateFlow<List<Exercise>>(emptyList())
-    val exercises: StateFlow<List<Exercise>> = _exercises
+    val exercises: StateFlow<List<Exercise>> = workoutRepository.getAllExercises()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     private val _selectedExercises = MutableStateFlow<Set<Exercise>>(emptySet())
     val selectedExercises: StateFlow<Set<Exercise>> = _selectedExercises
 
     private val _errorMessage = MutableStateFlow("")
     val errorMessage: StateFlow<String> = _errorMessage
-
-    init {
-        fetchExercises()
-    }
-
-
-    private fun fetchExercises() {
-        viewModelScope.launch {
-            try {
-                val allExercises = workoutRepository.getAllExercises()
-                _exercises.value = allExercises
-            } catch (e: Exception) {
-                Log.e("ExercisePickerViewModel", "Error fetching exercises: ${e.message}")
-                _errorMessage.value = "Error fetching exercises: ${e.message}"
-            }
-        }
-    }
-
 
     fun addExerciseToSession(
         sessionId: Int,

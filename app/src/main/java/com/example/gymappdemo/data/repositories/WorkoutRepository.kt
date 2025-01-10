@@ -10,6 +10,7 @@ import com.example.gymappdemo.data.entities.GymSession
 import com.example.gymappdemo.data.entities.SessionExercise
 import com.example.gymappdemo.data.entities.Set
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
 class WorkoutRepository private constructor(
@@ -58,7 +59,7 @@ class WorkoutRepository private constructor(
     }
 
     // Exercise Operations
-    suspend fun getAllExercises(): List<Exercise> {
+     fun getAllExercises(): Flow<List<Exercise>> {
         return exerciseDao.getAllExercises()
     }
 
