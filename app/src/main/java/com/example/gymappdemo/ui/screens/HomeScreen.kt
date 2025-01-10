@@ -2,7 +2,6 @@ package com.example.gymappdemo.ui.screens
 
 import android.os.Build
 import android.util.Log
-import HomeScreenViewModel
 import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
@@ -58,7 +57,7 @@ fun HomeScreen(
 ) {
     val isWorkoutActive by viewModel.isWorkoutActive.collectAsState()
     val currentSessionId by viewModel.currentSessionId.collectAsState()
-    val username by homeScreenViewModel.username.collectAsState()
+    val username by viewModel.username.collectAsState()
 
     LazyColumn(
         modifier = Modifier

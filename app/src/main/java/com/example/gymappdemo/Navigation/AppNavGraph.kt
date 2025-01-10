@@ -2,7 +2,6 @@ package com.example.gymappdemo.Navigation
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import HomeScreenViewModel
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -76,7 +75,6 @@ fun AppNavHost(isAuthenticated: Boolean) {
             context
         )
     )
-    val homeScreenViewModel: HomeScreenViewModel = viewModel(factory = factory)
     val currentStatusViewModel: CurrentStatusViewModel = viewModel(factory = factory)
     val exercisePickerViewModel: ExercisePickerViewModel = viewModel(factory = factory)
     val homeViewModel: HomeViewModel = viewModel(factory = factory)

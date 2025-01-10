@@ -1,6 +1,5 @@
 package com.example.gymappdemo.ui.viewmodel
 
-import HomeScreenViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.gymappdemo.data.repositories.UserRepository
@@ -26,26 +25,18 @@ class AppViewModelFactory(
                 CurrentStatusViewModel(workoutRepository) as T
             }
             modelClass.isAssignableFrom(HomeViewModel::class.java) -> {
-                HomeViewModel(workoutRepository) as T
+                HomeViewModel(workoutRepository, userRepository) as T
             }
             modelClass.isAssignableFrom(SetRepsViewModel::class.java) -> {
                 SetRepsViewModel(workoutRepository) as T
             }
+            modelClass.isAssignableFrom(LoginViewModel::class.java) -> {
+                LoginViewModel(userRepository) as T
+            }
+            modelClass.isAssignableFrom(RegisterViewModel::class.java) -> {
+                RegisterViewModel(userRepository) as T
+            }
             else -> throw IllegalArgumentException("Unknown ViewModel class")
         }
-        else if (modelClass.isAssignableFrom(CurrentStatusViewModel::class.java)) {
-            return CurrentStatusViewModel(workoutRepository) as T
-        }
-        else if (modelClass.isAssignableFrom(LoginViewModel::class.java)) {
-            return LoginViewModel(userRepository) as T
-        }
-        else if (modelClass.isAssignableFrom(HomeScreenViewModel::class.java)) {
-            return HomeScreenViewModel(userRepository, workoutRepository) as T
-        }
-        else if (modelClass.isAssignableFrom(RegisterViewModel::class.java)) {
-            return RegisterViewModel(userRepository) as T
-        }
-        else
-        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
