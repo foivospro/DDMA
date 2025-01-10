@@ -17,7 +17,7 @@ class RegisterViewModel(private val userRepository: UserRepository) : ViewModel(
             return false
 
         }
-        val user = User(name = username, email = email, passwordHash = password)
+        val user = User(name = username, email = email, passwordHash = password, age = null, weight = null, height = null)
         val isRegistered = withContext(Dispatchers.IO) {
             userRepository.registerUser(user = user)
         }

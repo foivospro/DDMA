@@ -1,5 +1,6 @@
 package com.example.gymappdemo.Navigation
 
+
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
@@ -43,11 +44,11 @@ import com.example.gymappdemo.ui.screens.UserProfileScreen
 import com.example.gymappdemo.ui.viewmodel.AppViewModelFactory
 import com.example.gymappdemo.ui.viewmodels.CurrentStatusViewModel
 import com.example.gymappdemo.ui.viewmodels.ExercisePickerViewModel
+import com.example.gymappdemo.ui.viewmodels.MyProfileViewModel
 import com.example.gymappdemo.ui.viewmodels.HomeViewModel
 import com.example.gymappdemo.ui.viewmodels.SetRepsViewModel
 import com.example.gymappdemo.ui.viewmodels.LoginViewModel
 import com.example.gymappdemo.ui.viewmodels.RegisterViewModel
-
 enum class GymAppScreen {
     Home,
     ExercisePicker,
@@ -60,7 +61,12 @@ enum class GymAppScreen {
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun AppNavHost(isAuthenticated: Boolean) {
+
+fun AppNavHost(
+    isAuthenticated: Boolean,
+    isDarkMode: Boolean,
+    onDarkModeToggle: (Boolean) -> Unit
+) {
     val navController = rememberNavController()
     val context = LocalContext.current
     val factory = AppViewModelFactory(
@@ -81,13 +87,9 @@ fun AppNavHost(isAuthenticated: Boolean) {
     val setRepsViewModel: SetRepsViewModel = viewModel(factory = factory)
     val loginViewModel: LoginViewModel = viewModel(factory = factory)
     val registerViewModel: RegisterViewModel = viewModel(factory = factory)
+    val myProfileViewModel: MyProfileViewModel = viewModel(factory = factory)
 
-    // List of routes where the BottomNavigationBar should not be shown
-    val hideBottomBarScreens = listOf(
-        GymAppScreen.Login.name,
-        GymAppScreen.Register.name,
-        GymAppScreen.ProfileSettings.name
-    )
+
 
     // State to track if the current destination should hide the BottomNavigationBar
     var shouldShowBottomBar by remember { mutableStateOf(true) }
@@ -106,11 +108,24 @@ fun AppNavHost(isAuthenticated: Boolean) {
         ) {
             // Home Screen
             composable(route = GymAppScreen.Home.name) {
+                shouldShowBottomBar = true
                 HomeScreen(
                     navController = navController,
                     viewModel = homeViewModel,
                     currentStatusViewModel = currentStatusViewModel
                 )
+            }
+            // Exercise Picker Screen in NavHost
+            composable(route = GymAppScreen.ExercisePicker.name) {
+                ExercisePickerScreen(exercisePickerViewModel, navController = navController, sessionId = 1)
+            }
+            // MyProfile Screen
+            composable(route = GymAppScreen.MyProfile.name) {
+                shouldShowBottomBar = true
+                UserProfileScreen(
+                    navController = navController,
+                    viewModel = myProfileViewModel,
+                    userId = 1 )// You can pass a dynamic userId here
             }
 
             // ExercisePicker Screen
@@ -160,21 +175,12 @@ fun AppNavHost(isAuthenticated: Boolean) {
                     }
                 )
             }
-
-            // MyProfile Screen
-            composable(route = GymAppScreen.MyProfile.name) {
-                shouldShowBottomBar = true
-                UserProfileScreen(navController = navController)
-            }
-            // Profile Settings Screen - Hide bottom bar
             composable(route = GymAppScreen.ProfileSettings.name) {
                 shouldShowBottomBar = false
                 EditProfileScreen(
-                    false,
-                    {},
-                    onBackPressed = {
-                        navController.navigateUp() // Go back to MyProfileScreen
-                    }
+                    isDarkMode = isDarkMode,
+                    onDarkModeToggle = onDarkModeToggle,  // Passing the callback here
+                    onBackPressed = { navController.navigateUp() }
                 )
             }
             // Login Screen - Hide bottom bar
@@ -194,6 +200,7 @@ fun AppNavHost(isAuthenticated: Boolean) {
                 RegisterScreen(
                     registerViewModel = registerViewModel,
                     navController = navController)
+
             }
         }
     }

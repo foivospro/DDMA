@@ -73,9 +73,5 @@ class UserRepository(private val userDao: UserDao, private val context: Context)
                 instance ?: UserRepository(userDao, context).also { instance = it }
             }
         }
-
-        fun insertUser(user: User) {
-
-        }
     }
 }
