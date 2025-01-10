@@ -1,6 +1,5 @@
 package com.example.gymappdemo.ui.screens
 
-import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.Spring
@@ -9,12 +8,10 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -23,13 +20,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
@@ -38,14 +34,18 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -55,292 +55,242 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.gymappdemo.R
-import com.example.gymappdemo.ui.theme.GymAppDemoTheme
+import com.example.gymappdemo.data.entities.Exercise
 import com.example.gymappdemo.ui.viewmodels.ExercisePickerViewModel
+import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
-fun ExercisesList(
-    viewModel: ExercisePickerViewModel,
+fun ExercisePickerScreen(
+    viewModel: ExercisePickerViewModel = viewModel(),
     navController: NavController,
+    sessionId: Int,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     modifier: Modifier = Modifier
 ) {
+    // Create a SnackbarHostState
+    val snackbarHostState = remember { SnackbarHostState() }
     var query by rememberSaveable { mutableStateOf("") }
     var active by rememberSaveable { mutableStateOf(false) }
     val muscleGroups = listOf("Upper Body", "Lower Body", "Cardio")
     val exercises by viewModel.exercises.collectAsState()
+    val selectedExercises by viewModel.selectedExercises.collectAsState()
     var selectedMuscleGroup by remember { mutableStateOf<String?>(null) }
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(contentPadding)
-        ) {
-            // Search Bar
-            SearchBar(
-                query = query,
-                onQueryChange = { query = it },
-                onSearch = { active = false },
-                active = active,
-                onActiveChange = { active = it },
-                placeholder = { Text("Search...") },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                trailingIcon = { Icon(Icons.Default.MoreVert, contentDescription = null) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-            ) {
-                if (active) {
-                    Column(
-                        modifier = Modifier
-                            .verticalScroll(rememberScrollState())
-                            .padding(16.dp)
-                    ) {
-                        val suggestions = listOf("Suggestion 1", "Suggestion 2", "Suggestion 3")
-                        suggestions.forEach { suggestion ->
-                            ListItem(
-                                headlineContent = { Text(suggestion) },
-                                modifier = Modifier.clickable {
-                                    query = suggestion
-                                    active = false
-                                }
-                            )
-                        }
-                    }
-                }
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-                    .align(Alignment.CenterHorizontally),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                for (muscleGroup in muscleGroups) {
-                    val isSelected = muscleGroup == selectedMuscleGroup
-                    FilterChip(
-                        onClick = {
-                            selectedMuscleGroup = if (isSelected) null else muscleGroup
-                        },
-                        label = { Text(muscleGroup) },
-                        selected = false,
-                        modifier = Modifier
-                            .padding(start = 16.dp),
-                        leadingIcon = {
-                            Icon(
-                                painter = painterResource(R.drawable.filter_alt),
-                                contentDescription = null
-                            )
-                        },
-                        shape = RoundedCornerShape(50), // Pill-shaped design
-                        colors = FilterChipDefaults.filterChipColors(
-                            containerColor = MaterialTheme.colorScheme.onSecondary, // Default background
-                            selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                        ),
-                        border = FilterChipDefaults.filterChipBorder(
-                            borderColor = MaterialTheme.colorScheme.outline,
-                            selectedBorderColor = MaterialTheme.colorScheme.primary,
-                            disabledBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.25f)
-                        )
-                    )
-                }
-            }
-            // Filtered Exercise List
-            val filteredExercises = if (selectedMuscleGroup != null) {
-                exercises.filter { it.muscleGroup == selectedMuscleGroup }
-            } else {
-                exercises // Show all exercises if no muscle group is selected
-            }
 
-
-            LazyColumn(
-                contentPadding = contentPadding,
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = modifier.fillMaxSize()
-            ) {
-                if (filteredExercises.isEmpty()) {
-                    item {
-                        Text(
-                            text = "No exercises match your search.",
-                            modifier = Modifier.padding(16.dp),
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                    }
-                } else {
-                    itemsIndexed(filteredExercises) { index, exercise ->
-                        AnimatedVisibility(
-                            visible = true,
-                            enter = slideInVertically(
-                                animationSpec = spring(
-                                    stiffness = Spring.StiffnessVeryLow,
-                                    dampingRatio = Spring.DampingRatioLowBouncy
-                                ),
-                                initialOffsetY = { it * (index + 1) } // Staggered entrance
-                            ),
-                            exit = fadeOut()
-                        ) {
-                            val iconResId = viewModel.getIconResource(exercise.icon)
-                            ExerciseCard(
-                                iconResource = iconResId,
-                                description = exercise.description,
-                                name = exercise.name,
-                                modifier = Modifier
-                                    .padding(horizontal = 16.dp, vertical = 8.dp)
-                            )
-                        }
-                    }
-                }
+    // Observe error messages to show Snackbar
+    LaunchedEffect(Unit) {
+        viewModel.errorMessage.collectLatest { errorMessage ->
+            if (errorMessage.isNotEmpty()) {
+                snackbarHostState.showSnackbar(errorMessage)
+                viewModel.setErrorMessage("") // Reset the error message after showing
             }
-        }
-        FloatingActionButton(
-            onClick = { navController.navigate("CurrentStatus") },
-            shape = CircleShape,
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary,
-            modifier = Modifier
-                .align(Alignment.BottomStart) // Align to the bottom-end of the Box
-                .padding(16.dp) // Padding from edges
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.arrow_back),
-                contentDescription = "Add Exercise"
-            )
         }
     }
 
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Select Exercises") }
+            )
+        },
+        content = { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+            ) {
+                // Search Bar
+                SearchBar(
+                    query = query,
+                    onQueryChange = { query = it },
+                    onSearch = { active = false },
+                    active = active,
+                    onActiveChange = { active = it },
+                    placeholder = { Text("Search...") },
+                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                    trailingIcon = { Icon(Icons.Default.MoreVert, contentDescription = null) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                ) {
+                    if (active) {
+                        Column(
+                            modifier = Modifier
+                                .verticalScroll(rememberScrollState())
+                                .padding(16.dp)
+                        ) {
+                            val suggestions = listOf("Bench Press", "Squat", "Deadlift")
+                            suggestions.forEach { suggestion ->
+                                ListItem(
+                                    headlineContent = { Text(suggestion) },
+                                    modifier = Modifier.clickable {
+                                        query = suggestion
+                                        active = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+
+                // Muscle Groups Filter Chips
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    muscleGroups.forEach { muscleGroup ->
+                        val isSelected = muscleGroup == selectedMuscleGroup
+                        FilterChip(
+                            onClick = {
+                                selectedMuscleGroup = if (isSelected) null else muscleGroup
+                            },
+                            label = { Text(muscleGroup) },
+                            selected = isSelected,
+                            modifier = Modifier.padding(start = 8.dp),
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.FilterAlt,
+                                    contentDescription = null
+                                )
+                            },
+                            shape = RoundedCornerShape(50),
+                            colors = FilterChipDefaults.filterChipColors(
+                                containerColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.onSecondary,
+                                selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                            ),
+                            border = FilterChipDefaults.filterChipBorder(
+                                borderColor = MaterialTheme.colorScheme.outline,
+                                selectedBorderColor = MaterialTheme.colorScheme.primary,
+                                disabledBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.25f)
+                            )
+                        )
+                    }
+                }
+
+                // Filtered Exercises based on search query and muscle group
+                val filteredExercises = exercises.filter { exercise ->
+                    (selectedMuscleGroup == null || exercise.muscleGroup.equals(
+                        selectedMuscleGroup,
+                        ignoreCase = true
+                    )) &&
+                            (query.isBlank() || exercise.name.contains(query, ignoreCase = true))
+                }
+
+                // Exercise List
+                LazyColumn(
+                    contentPadding = PaddingValues(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    if (filteredExercises.isEmpty()) {
+                        item {
+                            Text(
+                                text = "No exercises match your search.",
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .fillMaxWidth(),
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = Color.Gray,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    } else {
+                        itemsIndexed(filteredExercises) { index, exercise ->
+                            AnimatedVisibility(
+                                visible = true,
+                                enter = slideInVertically(
+                                    animationSpec = spring(
+                                        stiffness = Spring.StiffnessVeryLow,
+                                        dampingRatio = Spring.DampingRatioLowBouncy
+                                    ),
+                                    initialOffsetY = { it * (index + 1) }
+                                ),
+                                exit = fadeOut()
+                            ) {
+                                ExerciseCard(
+                                    exercise = exercise,
+                                    navController = navController,
+                                    currentSessionId = sessionId,
+                                    viewModel = viewModel
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+    )
 }
 
 @Composable
 fun ExerciseCard(
-    @DrawableRes iconResource: Int,
-    description: String,
-    name: String,
-    modifier: Modifier = Modifier,
-    onStartClick: () -> Unit = {} // Callback for the button
+    exercise: Exercise,
+    navController: NavController,
+    currentSessionId: Int,
+    viewModel: ExercisePickerViewModel,
+    modifier: Modifier = Modifier
 ) {
     Card(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        modifier = modifier,
-        shape = RoundedCornerShape(24.dp) // Rounded corners for the card
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp, vertical = 4.dp),
+        shape = RoundedCornerShape(12.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
-                .sizeIn(minHeight = 72.dp)
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-
-            // Image and Button Column
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxHeight()
-            ) {
-                Icon(
-                    painter = painterResource(iconResource),
-                    contentDescription = name,
-                    modifier = Modifier
-                        .size(56.dp) // Adjust size for better fit
-                        .clip(RoundedCornerShape(8.dp)),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Button(
-                    onClick = onStartClick,
-                    modifier = Modifier
-                        .sizeIn(minWidth = 80.dp, minHeight = 24.dp)
-                ) {
-                    Text("Add", style = MaterialTheme.typography.labelSmall)
-                }
-            }
-            Spacer(modifier = Modifier.width(40.dp))
-            // Text Column
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = name,
-                    style = MaterialTheme.typography.displaySmall
-                )
-                Text(
-                    text = description,
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
-        }
-    }
-}
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun SearchBarSample() {
-    var query by rememberSaveable { mutableStateOf("") }
-    var active by rememberSaveable { mutableStateOf(false) }
-
-    Scaffold { scaffoldPadding ->
-        Box(Modifier.fillMaxSize()) {
-            SearchBar(
-                query = query,
-                onQueryChange = { query = it },
-                onSearch = { active = false },
-                active = active,
-                onActiveChange = { active = it },
-                placeholder = { Text("Search...") },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                trailingIcon = { Icon(Icons.Default.MoreVert, contentDescription = null) },
+            // Exercise Icon
+            Icon(
+                painter = painterResource(id = viewModel.getIconResource(exercise.icon)),
+                contentDescription = exercise.name,
                 modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(scaffoldPadding)
+                    .size(56.dp)
+                    .clip(RoundedCornerShape(8.dp)),
+                tint = MaterialTheme.colorScheme.primary
+            )
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            // Exercise Details
+            Column(
+                modifier = Modifier.weight(1f)
             ) {
-                if (active) {
-                    Column(
-                        modifier = Modifier
-                            .verticalScroll(rememberScrollState())
-                            .padding(16.dp)
-                    ) {
-                        // Example suggestions
-                        val suggestions = listOf("Suggestion 1", "Suggestion 2", "Suggestion 3")
-                        suggestions.forEach { suggestion ->
-                            ListItem(
-                                headlineContent = { Text(suggestion) },
-                                modifier = Modifier.clickable {
-                                    query = suggestion
-                                    active = false
-                                }
-                            )
-                        }
-                    }
-                }
+                Text(
+                    text = exercise.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = exercise.description,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray
+                )
             }
 
-            LazyColumn(
-                contentPadding = PaddingValues(top = 96.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.align(Alignment.TopStart)
+            // Add Button
+            Button(
+                onClick = {
+                    navController.navigate("SetReps/${exercise.id}/$currentSessionId")
+                },
+                modifier = Modifier
+                    .sizeIn(minWidth = 80.dp, minHeight = 36.dp)
             ) {
-                val items = List(100) { "Item $it" }
-                items(items) { item ->
-                    Text(
-                        text = item,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp)
-                    )
-                }
+                Text("Add", style = MaterialTheme.typography.labelSmall)
             }
         }
-    }
-}
-
-@Preview()
-@Composable
-fun HeroPreview() {
-    GymAppDemoTheme {
     }
 }

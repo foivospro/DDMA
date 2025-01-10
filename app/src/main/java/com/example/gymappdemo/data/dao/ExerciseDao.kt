@@ -1,22 +1,28 @@
 package com.example.gymappdemo.data.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.gymappdemo.data.entities.Exercise
 
+
 @Dao
 interface ExerciseDao {
-    @Insert
-    suspend fun insert(exercise: Exercise): Long
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(exercises: List<Exercise>)
 
-    suspend fun insertAll(exercises: List<Exercise>) {
-        exercises.forEach { insert(it) }
-    }
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(exercise: Exercise)
+
+    @Delete
+    suspend fun deleteExercise(exercise: Exercise)
+
+    @Query("SELECT * FROM exercises WHERE id = :exerciseId")
+    suspend fun getExerciseById(exerciseId: Int): Exercise?
 
     @Query("SELECT * FROM exercises")
     suspend fun getAllExercises(): List<Exercise>
-
-    @Query("SELECT * FROM exercises WHERE id = :id")
-    suspend fun getExerciseById(id: Int): Exercise
 }
+

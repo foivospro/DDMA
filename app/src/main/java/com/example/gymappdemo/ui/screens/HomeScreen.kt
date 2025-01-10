@@ -1,9 +1,12 @@
 package com.example.gymappdemo.ui.screens
 
-import HomeScreenViewModel
+import android.os.Build
+import android.util.Log
 import androidx.annotation.DrawableRes
+import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,20 +40,25 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import com.example.gymappdemo.Navigation.GymAppScreen
 import com.example.gymappdemo.R
-import com.example.gymappdemo.ui.theme.GymAppDemoTheme
+import com.example.gymappdemo.ui.viewmodels.CurrentStatusViewModel
+import com.example.gymappdemo.ui.viewmodels.HomeViewModel
 
-
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen(
-    homeScreenViewModel: HomeScreenViewModel,
-    navController: NavController) {
-    val username by homeScreenViewModel.username.collectAsState()
+    navController: NavController,
+    viewModel: HomeViewModel,
+    currentStatusViewModel: CurrentStatusViewModel
+) {
+    val isWorkoutActive by viewModel.isWorkoutActive.collectAsState()
+    val currentSessionId by viewModel.currentSessionId.collectAsState()
+    val username by viewModel.username.collectAsState()
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -80,54 +88,73 @@ fun HomeScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
             }
+        item {
+            Text(
+                text = "Workout History",
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
 
-            // Workout History Section
-            item {
+            Divider(color = Color.Gray, thickness = 1.dp, modifier = Modifier.padding(bottom = 16.dp))
+
+            WorkoutHistory()
+        }
+
+        // Workout Summary Section
+        item {
+            Spacer(modifier = Modifier.height(24.dp))
+
+            WorkoutSummary()
+        }
+
+        // Start New Workout / Continue Workout Button
+        item {
+            Spacer(modifier = Modifier.height(64.dp))
+
+            Button(onClick = {
+                    if (!isWorkoutActive) {
+                        viewModel.startNewWorkout(
+                            userId = 1, // αυτο πρεπει να το αλλαξουμε με το πραγματικό
+                            onSessionCreated = { session ->
+                                currentStatusViewModel.setSessionId(session.id)
+                                navController.navigate("CurrentStatus/${session.id}")
+                            },
+                            onError = { error ->
+                                Log.e("HomeScreen", "Failed to start new workout: $error")
+                            }
+                        )
+                    } else {
+                        currentSessionId?.let { sessionId ->
+                            navController.navigate("CurrentStatus/$sessionId")
+                        }
+                    }
+                }, modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp), shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )) {
                 Text(
-                    text = "Workout History",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    text = if (isWorkoutActive) "Continue Workout" else "Start New Workout",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
                 )
-
-                Divider(color = Color.Gray, thickness = 1.dp, modifier = Modifier.padding(bottom = 16.dp))
-
-                WorkoutHistory()
             }
 
-            // Workout Summary Section
-            item {
-                Spacer(modifier = Modifier.height(24.dp))
-
-                WorkoutSummary()
-            }
-
-            // Start New Workout Button
-            item {
-                Spacer(modifier = Modifier.height(64.dp))
-
-                Button(
-                    onClick = { navController.navigate("QuickStartRoutinesUI")},
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    )
-                ) {
-                    Text(
-                        text = "Start New Workout",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
+            if (isWorkoutActive) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Έχει ήδη ενεργή προπόνηση.",
+                    color = Color.Red,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }
-
+}
 
 @Composable
 fun WorkoutHistory() {
@@ -283,12 +310,3 @@ data class Workout(
 )
 
 data class NavigationItem(val label: String, val icon: ImageVector)
-
-@Preview(showBackground = true)
-@Composable
-fun HomeScreenPreview() {
-    GymAppDemoTheme {
-        val mockNavController = rememberNavController() // Mock controller for preview
-        //HomeScreen(navController = mockNavController)
-    }
-}

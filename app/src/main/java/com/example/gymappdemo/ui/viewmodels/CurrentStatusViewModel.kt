@@ -1,35 +1,58 @@
 package com.example.gymappdemo.ui.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.gymappdemo.data.entities.Exercise
+import com.example.gymappdemo.data.entities.ExerciseWithSets
 import com.example.gymappdemo.data.repositories.WorkoutRepository
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import com.example.gymappdemo.data.entities.Set
 
 class CurrentStatusViewModel(
     private val workoutRepository: WorkoutRepository
 ) : ViewModel() {
 
-    private val _timerState = MutableStateFlow(0) // Tracks elapsed time in seconds
+    private val _currentSessionId = MutableStateFlow<Int?>(null)
+    val currentSessionId: StateFlow<Int?> = _currentSessionId.asStateFlow()
+
+    private val _currentExercises = MutableStateFlow<List<ExerciseWithSets>>(emptyList())
+    val currentExercises: StateFlow<List<ExerciseWithSets>> = _currentExercises.asStateFlow()
+
+    private val _timerState = MutableStateFlow(0) // Δευτερόλεπτα
+    val timerState: StateFlow<Int> = _timerState.asStateFlow()
+
     private val _caloriesState = MutableStateFlow(0)
-
-    private val _currentExercises = MutableStateFlow(emptyList<Exercise>())
-
-    val timerState: StateFlow<Int> = _timerState
-    val caloriesState: StateFlow<Int> = _caloriesState
-    val currentExercises: StateFlow<List<Exercise>> = _currentExercises
+    val caloriesState: StateFlow<Int> = _caloriesState.asStateFlow()
 
     private var isTimerRunning = false
+    private var timerJob: Job? = null
+
+    private val _isWorkoutActive = MutableStateFlow(false)
+    val isWorkoutActive: StateFlow<Boolean> = _isWorkoutActive.asStateFlow()
+
+    fun loadExercises(sessionId: Int) {
+        viewModelScope.launch {
+            try {
+                val exercisesWithSets = workoutRepository.getExercisesWithSets(sessionId)
+                Log.d("CurrentStatusViewModel", "Exercises with sets for session $sessionId: $exercisesWithSets")
+                _currentExercises.value = exercisesWithSets
+            } catch (e: Exception) {
+                Log.e("CurrentStatusViewModel", "Error loading exercises: ${e.message}")
+            }
+        }
+    }
 
     fun startTimer() {
         if (!isTimerRunning) {
             isTimerRunning = true
-            viewModelScope.launch {
+            timerJob = viewModelScope.launch {
                 while (isTimerRunning) {
-                    delay(1000L) // 1 second delay
+                    delay(1000L)
                     _timerState.value += 1
                     _caloriesState.value = _timerState.value / 6
                 }
@@ -39,5 +62,65 @@ class CurrentStatusViewModel(
 
     fun stopTimer() {
         isTimerRunning = false
+        timerJob?.cancel()
+    }
+
+    fun resetTimer() {
+        stopTimer()
+        _timerState.value = 0
+        _caloriesState.value = 0
+    }
+
+    fun setSessionId(sessionId: Int) {
+        _currentSessionId.value = sessionId
+        loadExercises(sessionId)
+        Log.d("CurrentViewModel", "SessionId updated to: $sessionId")
+    }
+
+
+    fun removeSetAndSessionExercise(setId: Int) {
+        viewModelScope.launch {
+            try {
+                val sessionExerciseId = workoutRepository.getSessionExerciseIdBySetId(setId)
+                workoutRepository.deleteSet(setId)
+                val remainingSets = workoutRepository.getSetsBySessionExerciseId(sessionExerciseId)
+                if (remainingSets.isEmpty()) {
+                    workoutRepository.deleteSessionExercise(sessionExerciseId)
+                }
+                _currentExercises.value = workoutRepository.getExercisesWithSets(sessionExerciseId)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun deleteExercise(exerciseId: Int) {
+        viewModelScope.launch {
+            try {
+                // Διαγραφή όλων των sets που σχετίζονται με την άσκηση
+                val sets = workoutRepository.getSetsForExercise(exerciseId)
+                sets.forEach { set ->
+                    workoutRepository.deleteSet(set.id)
+                }
+                // Διαγραφή της άσκησης
+                workoutRepository.deleteSessionExercise(exerciseId)
+                // Ενημέρωση της λίστας ασκήσεων
+                loadExercises(_currentSessionId.value!!)
+            } catch (e: Exception) {
+                Log.e("CurrentStatusViewModel", "Error deleting exercise: ${e.message}")
+            }
+        }
+    }
+
+    fun updateSet(updatedSet: Set) {
+        viewModelScope.launch {
+            try {
+                workoutRepository.updateSet(updatedSet)
+                loadExercises(_currentSessionId.value!!)
+            } catch (e: Exception) {
+                Log.e("CurrentStatusViewModel", "Error updating set: ${e.message}")
+            }
+        }
     }
 }
+

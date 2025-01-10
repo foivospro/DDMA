@@ -11,6 +11,10 @@ class UserRepository(private val userDao: UserDao, private val context: Context)
         context.getSharedPreferences("user_preferences", Context.MODE_PRIVATE)
     }
 
+    suspend fun insertUser(user: User): Long {
+        return userDao.insertUser(user)
+    }
+
     suspend fun getUser(userId: Int): User? {
         return userDao.getUserById(userId)
     }
@@ -70,5 +74,8 @@ class UserRepository(private val userDao: UserDao, private val context: Context)
             }
         }
 
+        fun insertUser(user: User) {
+
+        }
     }
 }
