@@ -42,16 +42,13 @@ import com.example.gymappdemo.data.entities.Set
 
 @Composable
 fun SetRepsScreen(
-    sessionExerciseId: Int,
+    exerciseId: Int,
+    sessionId: Int,
     setRepsViewModel: SetRepsViewModel = viewModel(),
     navController: NavController,
     onSaveClicked: () -> Unit
 ) {
     val workoutSets by setRepsViewModel.temporarySets.collectAsState(initial = emptyList())
-
-    LaunchedEffect(sessionExerciseId) {
-        setRepsViewModel.loadSets(sessionExerciseId)
-    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -64,8 +61,21 @@ fun SetRepsScreen(
             ) {
                 Button(
                     onClick = {
-                        setRepsViewModel.saveSetsToDb(sessionExerciseId)
-                        navController.navigate("CurrentStatus/$sessionExerciseId")
+                        // Save the exercise and get the generated sessionExerciseId
+                        setRepsViewModel.addExerciseToSession(
+                            sessionId = sessionId,
+                            exerciseId = exerciseId,
+                            onSuccess = { sessionExerciseId ->
+                                // Save the sets after successfully saving the exercise
+                                setRepsViewModel.saveSetsToDb(sessionExerciseId)
+                                // Navigate to CurrentStatus
+                                navController.navigate("CurrentStatus/$sessionId")
+                            },
+                            onError = { error ->
+                                // Display a Snackbar or Log the error
+
+                            }
+                        )
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -120,7 +130,7 @@ fun SetRepsScreen(
                 item {
                     ElevatedButton(
                         onClick = {
-                            setRepsViewModel.addTemporarySet(sessionExerciseId)
+                            setRepsViewModel.addTemporarySet(-1)
                         },
                         modifier = Modifier.fillMaxWidth(),
                         shape = MaterialTheme.shapes.medium

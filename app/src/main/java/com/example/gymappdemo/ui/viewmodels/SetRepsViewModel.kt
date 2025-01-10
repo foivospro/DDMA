@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.gymappdemo.data.entities.Exercise
+import com.example.gymappdemo.data.entities.SessionExercise
 import com.example.gymappdemo.data.repositories.WorkoutRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,10 +34,10 @@ class SetRepsViewModel(private val repository: WorkoutRepository) : ViewModel() 
         }
     }
 
-    fun addTemporarySet(sessionExerciseId: Int) {
+    fun addTemporarySet(dummySessionExerciseId: Int) {
         val newSet = Set(
             id = (temporarySets.value.maxOfOrNull { it.id } ?: 0) + 1,
-            sessionExerciseId = sessionExerciseId,
+            sessionExerciseId = dummySessionExerciseId, // Dummy ID
             reps = 1,
             weight = 0.0,
             notes = ""
@@ -73,5 +75,32 @@ class SetRepsViewModel(private val repository: WorkoutRepository) : ViewModel() 
 
             }
         }
+    }
+
+
+    fun addExerciseToSession(
+        sessionId: Int,
+        exerciseId: Int,
+        onSuccess: (Int) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val sessionExercise = SessionExercise(
+                    sessionId = sessionId,
+                    exerciseId = exerciseId,
+                    order = getNextExerciseOrder(sessionId)
+                )
+                val sessionExerciseId = repository.insertSessionExercise(sessionExercise).toInt()
+                onSuccess(sessionExerciseId)
+            } catch (e: Exception) {
+                onError(e.message ?: "Unknown error")
+            }
+        }
+    }
+
+    private suspend fun getNextExerciseOrder(sessionId: Int): Int {
+        val sessionExercises = repository.getSessionExercisesBySessionId(sessionId)
+        return (sessionExercises.maxOfOrNull { it.order } ?: 0) + 1
     }
 }

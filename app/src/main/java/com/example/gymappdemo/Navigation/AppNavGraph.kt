@@ -101,14 +101,18 @@ fun AppNavHost() {
 
             // SetReps Screen
             composable(
-                route = "SetReps/{sessionExerciseId}",
-                arguments = listOf(navArgument("sessionExerciseId") { type = NavType.IntType })
+                route = "SetReps/{exerciseId}/{sessionId}",
+                arguments = listOf(
+                    navArgument("exerciseId") { type = NavType.IntType },
+                    navArgument("sessionId") { type = NavType.IntType }
+                )
             ) { backStackEntry ->
-                val sessionExerciseId = backStackEntry.arguments?.getInt("sessionExerciseId")
-                sessionExerciseId?.let {
-
+                val exerciseId = backStackEntry.arguments?.getInt("exerciseId")
+                val sessionId = backStackEntry.arguments?.getInt("sessionId")
+                if (exerciseId != null && sessionId != null) {
                     SetRepsScreen(
-                        sessionExerciseId = it,
+                        exerciseId = exerciseId,
+                        sessionId = sessionId,
                         setRepsViewModel = setRepsViewModel,
                         navController = navController,
                         onSaveClicked = { navController.navigateUp() }

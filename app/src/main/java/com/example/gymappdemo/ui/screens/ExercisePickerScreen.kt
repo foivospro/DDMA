@@ -96,30 +96,7 @@ fun ExercisePickerScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Select Exercises") },
-                actions = {
-                    // Add Exercises Button
-                    TextButton(
-                        onClick = {
-                            selectedExercises.forEach { exercise ->
-                                viewModel.addExerciseToSession(
-                                    sessionId = sessionId,
-                                    exercise = exercise,
-                                    onSuccess = { sessionExerciseId ->
-                                        // Navigate to SetReps screen
-                                        navController.navigate("SetReps/$sessionExerciseId")
-                                    },
-                                    onError = { errorMessage ->
-                                        // Snackbar will be shown via LaunchedEffect
-                                    }
-                                )
-                            }
-                        },
-                        enabled = selectedExercises.isNotEmpty()
-                    ) {
-                        Text("Add (${selectedExercises.size})")
-                    }
-                }
+                title = { Text("Select Exercises") }
             )
         },
         content = { paddingValues ->
@@ -307,17 +284,7 @@ fun ExerciseCard(
             // Add Button
             Button(
                 onClick = {
-                    viewModel.addExerciseToSession(
-                        sessionId = currentSessionId,
-                        exercise = exercise,
-                        onSuccess = { sessionExerciseId ->
-                            // Navigate to SetReps screen with the sessionExerciseId
-                            navController.navigate("SetReps/$sessionExerciseId")
-                        },
-                        onError = { errorMessage ->
-                            // Snackbar will be shown via LaunchedEffect in Scaffold
-                        }
-                    )
+                    navController.navigate("SetReps/${exercise.id}/$currentSessionId")
                 },
                 modifier = Modifier
                     .sizeIn(minWidth = 80.dp, minHeight = 36.dp)
