@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
@@ -66,6 +67,21 @@ fun CurrentStatus(
     val calories by viewModel.caloriesState.collectAsState()
     val exercisesWithSets by viewModel.currentExercises.collectAsState()
     var setToEdit by remember { mutableStateOf<Set?>(null) }
+    var setToAdd by remember { mutableStateOf<Int?>(null) }
+    val error by viewModel.errorState.collectAsState()
+
+    if (error != null) {
+        AlertDialog(
+            onDismissRequest = { viewModel.clearError() },
+            title = { Text("Error") },
+            text = { Text(error!!) },
+            confirmButton = {
+                Button(onClick = { viewModel.clearError() }) {
+                    Text("OK")
+                }
+            }
+        )
+    }
 
     if (setToEdit != null) {
         EditSetDialog(
@@ -74,6 +90,21 @@ fun CurrentStatus(
             onSave = { updatedSet ->
                 viewModel.updateSet(updatedSet)
                 setToEdit = null
+            }
+        )
+    }
+
+    if (setToAdd != null) {
+        AddSetDialog(
+            onDismiss = { setToAdd = null },
+            onSave = { repetitions, weight ->
+                viewModel.addSetToExercise(
+                    sessionExerciseId = setToAdd!!,
+                    repetitions = repetitions,
+                    weight = weight,
+
+                )
+                setToAdd = null
             }
         )
     }
@@ -162,19 +193,70 @@ fun CurrentStatus(
                                 ExerciseWithSetsCard(
                                     exerciseWithSets = exerciseWithSets,
                                     onRemoveSet = { setId ->
-                                        viewModel.removeSetAndSessionExercise(setId)
+                                        viewModel.removeSetFromExercise(setId)
                                     },
                                     onDeleteExercise = { exerciseId ->
                                         viewModel.deleteExercise(exerciseId)
                                     },
                                     onEditSet = { set ->
                                         setToEdit = set
+                                    },
+                                    onAddSet = { sessionExerciseId ->
+                                        setToAdd = sessionExerciseId
                                     }
                                 )
                             }
                         }
                     }
                 }
+            }
+        }
+    )
+}
+
+@Composable
+fun AddSetDialog(
+    onDismiss: () -> Unit,
+    onSave: (Int, Double) -> Unit
+) {
+    var repetitions by remember { mutableStateOf("") }
+    var weight by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = "Προσθήκη Νέου Set") },
+        text = {
+            Column {
+                OutlinedTextField(
+                    value = repetitions,
+                    onValueChange = { repetitions = it },
+                    label = { Text("Επαναλήψεις") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
+                OutlinedTextField(
+                    value = weight,
+                    onValueChange = { weight = it },
+                    label = { Text("Βάρος (kg)") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    val reps = repetitions.toIntOrNull()
+                    val wt = weight.toDoubleOrNull()
+                    if (reps != null && reps > 0 && wt != null && wt >= 0f) {
+                        onSave(reps, wt)
+                    }
+                }
+            ) {
+                Text("Προσθήκη")
+            }
+        },
+        dismissButton = {
+            Button(onClick = onDismiss) {
+                Text("Ακύρωση")
             }
         }
     )
@@ -234,6 +316,8 @@ fun TimerAndCalories(
 ) {
     var isStarted by remember { mutableStateOf(true) }
 
+    val formattedTime = formatTime(timer)
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -276,7 +360,7 @@ fun TimerAndCalories(
             )
         }
 
-        // Timer Display
+        // Timer Display με μορφοποίηση
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = "Time",
@@ -284,11 +368,23 @@ fun TimerAndCalories(
                 color = colorScheme.onBackground
             )
             Text(
-                text = "$timer",
+                text = formattedTime, // Χρησιμοποίησε το μορφοποιημένο χρόνο
                 style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
                 color = colorScheme.primary
             )
         }
+    }
+}
+
+fun formatTime(seconds: Int): String {
+    val hrs = seconds / 3600
+    val mins = (seconds % 3600) / 60
+    val secs = seconds % 60
+
+    return if (hrs > 0) {
+        String.format("%d:%02d:%02d", hrs, mins, secs)
+    } else {
+        String.format("%d:%02d", mins, secs)
     }
 }
 
@@ -297,7 +393,8 @@ fun ExerciseWithSetsCard(
     exerciseWithSets: ExerciseWithSets,
     onRemoveSet: (Int) -> Unit,
     onDeleteExercise: (Int) -> Unit,
-    onEditSet: (Set) -> Unit
+    onEditSet: (Set) -> Unit,
+    onAddSet: (Int) -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -329,13 +426,22 @@ fun ExerciseWithSetsCard(
                         color = colorScheme.onBackground
                     )
                 }
-                // Κουμπί για διαγραφή της άσκησης
-                IconButton(onClick = { onDeleteExercise(exerciseWithSets.exercise.id) }) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "Διαγραφή Άσκησης",
-                        tint = Color.Red
-                    )
+                Row {
+                    IconButton(onClick = { onAddSet(exerciseWithSets.sessionExercise.id) }) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Προσθήκη Set",
+                            tint = Color(0xFF0AAD0A)
+                        )
+                    }
+                    IconButton(onClick = { onDeleteExercise(exerciseWithSets.sessionExercise.id) }) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "Διαγραφή Άσκησης",
+                            tint = Color.Red
+                        )
+                    }
+
                 }
             }
 
@@ -351,6 +457,7 @@ fun ExerciseWithSetsCard(
         }
     }
 }
+
 
 
 @Composable
@@ -371,7 +478,7 @@ fun SetCard(set: Set, onRemove: () -> Unit, onEdit: (Set) -> Unit) {
                 Icon(
                     imageVector = Icons.Default.Edit,
                     contentDescription = "Edit Set",
-                    tint = Color.Red
+                    tint = Color.DarkGray
                 )
             }
             IconButton(onClick = onRemove) {

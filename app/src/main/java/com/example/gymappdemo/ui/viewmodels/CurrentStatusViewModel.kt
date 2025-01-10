@@ -35,6 +35,9 @@ class CurrentStatusViewModel(
     private val _isWorkoutActive = MutableStateFlow(false)
     val isWorkoutActive: StateFlow<Boolean> = _isWorkoutActive.asStateFlow()
 
+    private val _errorState = MutableStateFlow<String?>(null)
+    val errorState: StateFlow<String?> = _errorState.asStateFlow()
+
     fun loadExercises(sessionId: Int) {
         viewModelScope.launch {
             try {
@@ -77,39 +80,64 @@ class CurrentStatusViewModel(
         Log.d("CurrentViewModel", "SessionId updated to: $sessionId")
     }
 
+    fun addSetToExercise(sessionExerciseId: Int, repetitions: Int, weight: Double) {
+        viewModelScope.launch {
+            try {
+                val newSet = Set(
+                    id = 0,
+                    sessionExerciseId = sessionExerciseId,
+                    reps = repetitions,
+                    weight = weight,
+                    notes = ""
+                )
+                workoutRepository.insertSet(newSet)
+                Log.d("CurrentStatusViewModel", "Set added successfully to exercise $sessionExerciseId")
 
-    fun removeSetAndSessionExercise(setId: Int) {
+                // Ενημέρωση της λίστας ασκήσεων
+                loadExercises(_currentSessionId.value!!)
+            } catch (e: Exception) {
+                Log.e("CurrentStatusViewModel", "Error adding set: ${e.message}")
+                _errorState.value = "Failed to add set: ${e.message}"
+            }
+        }
+    }
+
+    fun removeSetFromExercise(setId: Int) {
         viewModelScope.launch {
             try {
                 val sessionExerciseId = workoutRepository.getSessionExerciseIdBySetId(setId)
                 workoutRepository.deleteSet(setId)
-                val remainingSets = workoutRepository.getSetsBySessionExerciseId(sessionExerciseId)
-                if (remainingSets.isEmpty()) {
-                    workoutRepository.deleteSessionExercise(sessionExerciseId)
-                }
-                _currentExercises.value = workoutRepository.getExercisesWithSets(sessionExerciseId)
+                _currentExercises.value = workoutRepository.getExercisesWithSets(_currentSessionId.value!!)
             } catch (e: Exception) {
+                Log.e("CurrentStatusViewModel", "Error removing set: ${e.message}")
                 e.printStackTrace()
             }
         }
     }
 
-    fun deleteExercise(exerciseId: Int) {
+    fun deleteExercise(sessionExerciseId: Int) {
         viewModelScope.launch {
             try {
                 // Διαγραφή όλων των sets που σχετίζονται με την άσκηση
-                val sets = workoutRepository.getSetsForExercise(exerciseId)
+                val sets = workoutRepository.getSetsForExercise(sessionExerciseId)
                 sets.forEach { set ->
                     workoutRepository.deleteSet(set.id)
                 }
                 // Διαγραφή της άσκησης
-                workoutRepository.deleteSessionExercise(exerciseId)
+                workoutRepository.deleteSessionExercise(sessionExerciseId)
+                Log.d("CurrentStatusViewModel", "Exercise $sessionExerciseId deleted successfully.")
                 // Ενημέρωση της λίστας ασκήσεων
                 loadExercises(_currentSessionId.value!!)
             } catch (e: Exception) {
                 Log.e("CurrentStatusViewModel", "Error deleting exercise: ${e.message}")
+                _errorState.value = "Failed to delete exercise: ${e.message}"
             }
         }
+    }
+
+
+    fun clearError() {
+        _errorState.value = null
     }
 
     fun updateSet(updatedSet: Set) {
@@ -123,4 +151,5 @@ class CurrentStatusViewModel(
         }
     }
 }
+
 

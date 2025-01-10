@@ -81,6 +81,9 @@ class WorkoutRepository private constructor(
     suspend fun updateSet(set: Set) {
         setDao.update(set)
     }
+    suspend fun insertSet(set: Set) {
+        setDao.insert(set)
+    }
 
     suspend fun deleteSet(setId: Int) {
         setDao.delete(setId)
