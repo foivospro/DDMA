@@ -20,16 +20,6 @@ interface SessionExerciseDao {
     suspend fun getSessionExercisesBySessionId(sessionId: Int): List<SessionExercise>
 
     @Transaction
-    @Query("""
-        SELECT 
-            exercises.*,
-            session_exercises.id AS session_id,
-            session_exercises.sessionId AS session_sessionId,
-            session_exercises.exerciseId AS session_exerciseId,
-            session_exercises.[order] AS session_order
-        FROM session_exercises
-        INNER JOIN exercises ON session_exercises.exerciseId = exercises.id
-        WHERE session_exercises.sessionId = :sessionId
-    """)
+    @Query("SELECT * FROM session_exercises WHERE sessionId = :sessionId")
     suspend fun getExercisesWithSetsBySession(sessionId: Int): List<ExerciseWithSets>
 }

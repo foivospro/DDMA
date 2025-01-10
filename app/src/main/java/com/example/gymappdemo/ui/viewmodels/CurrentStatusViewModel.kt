@@ -36,8 +36,13 @@ class CurrentStatusViewModel(
 
     fun loadExercises(sessionId: Int) {
         viewModelScope.launch {
-            val exercisesWithSets = workoutRepository.getExercisesWithSets(sessionId)
-            _currentExercises.value = exercisesWithSets
+            try {
+                val exercisesWithSets = workoutRepository.getExercisesWithSets(sessionId)
+                Log.d("CurrentStatusViewModel", "Exercises with sets for session $sessionId: $exercisesWithSets")
+                _currentExercises.value = exercisesWithSets
+            } catch (e: Exception) {
+                Log.e("CurrentStatusViewModel", "Error loading exercises: ${e.message}")
+            }
         }
     }
 

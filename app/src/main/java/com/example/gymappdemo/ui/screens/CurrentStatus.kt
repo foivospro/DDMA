@@ -1,5 +1,6 @@
 package com.example.gymappdemo.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -131,13 +132,23 @@ fun CurrentStatus(
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        items(exercisesWithSets) { exerciseWithSets ->
-                            ExerciseWithSetsCard(
-                                exerciseWithSets = exerciseWithSets,
-                                onRemoveSet = { setId ->
-                                    viewModel.removeSetAndSessionExercise(setId)
-                                }
-                            )
+                        if (exercisesWithSets.isEmpty()) {
+                            item {
+                                Text("No exercises available", modifier = Modifier.padding(16.dp))
+                            }
+                        } else {
+                            items(exercisesWithSets) { exerciseWithSets ->
+                                Log.d(
+                                    "CurrentStatus",
+                                    "Displaying exercise: ${exerciseWithSets.exercise.name}, sets: ${exerciseWithSets.sets}"
+                                )
+                                ExerciseWithSetsCard(
+                                    exerciseWithSets = exerciseWithSets,
+                                    onRemoveSet = { setId ->
+                                        viewModel.removeSetAndSessionExercise(setId)
+                                    }
+                                )
+                            }
                         }
                     }
                 }

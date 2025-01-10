@@ -62,17 +62,25 @@ class SetRepsViewModel(private val repository: WorkoutRepository) : ViewModel() 
         Log.d("SetRepsViewModel", "_temporarySets contains: ${_temporarySets.value}")
         viewModelScope.launch {
             try {
-                _temporarySets.value.forEach { set ->
+                // Ενημέρωση του sessionExerciseId και μηδενισμός του id
+                val updatedSets = _temporarySets.value.map { set ->
+                    set.copy(id = 0, sessionExerciseId = sessionExerciseId) // Μηδενισμός του id
+                }
+                Log.d("SetRepsViewModel", "Updated sets: $updatedSets")
+
+                // Αποθήκευση στη βάση δεδομένων
+                updatedSets.forEach { set ->
                     Log.d("SetRepsViewModel", "Saving set: $set with sessionExerciseId: $sessionExerciseId")
-                    repository.addSet(set.copy(sessionExerciseId = sessionExerciseId))
+                    repository.addSet(set)
                     Log.d("SetRepsViewModel", "Set saved successfully for sessionExerciseId: $sessionExerciseId")
                 }
+
+                // Καθαρισμός της λίστας temporary sets
                 _temporarySets.value = emptyList()
 
                 Log.d("SetRepsViewModel", "All sets saved successfully.")
             } catch (e: Exception) {
                 Log.e("SetRepsViewModel", "Error saving sets: ${e.message}")
-
             }
         }
     }
