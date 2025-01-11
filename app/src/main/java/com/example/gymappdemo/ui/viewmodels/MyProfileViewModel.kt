@@ -55,4 +55,9 @@ class MyProfileViewModel(private val userRepository: UserRepository) : ViewModel
             _user.value = updatedUser // Update the state
         }
     }
+
+    fun logout() {
+        // Call UserRepository's method to clear the logged-in user data
+        userRepository.clearLoggedInUser()
+    }
 }

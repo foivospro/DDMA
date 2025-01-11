@@ -121,8 +121,7 @@ fun AppNavHost(
                 ExercisePickerScreen(exercisePickerViewModel, navController = navController, sessionId = 1)
             }
             // MyProfile Screen
-            composable(route = GymAppScreen.MyProfile.name) {backStackEntry ->
-                val userId = backStackEntry.arguments?.getString("userId")?.toIntOrNull() ?: 1
+            composable(route = GymAppScreen.MyProfile.name) {
                 shouldShowBottomBar = true
                 UserProfileScreen(
                     navController = navController,

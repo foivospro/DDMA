@@ -449,13 +449,13 @@ fun EnhancedTextField(
 
 // Validation Function
 fun validatePassword(password: String): String? {
-    val lengthValid = password.length >= 10
+    val lengthValid = password.length >= 6
     val capitalValid = password.any { it.isUpperCase() }
     val numberValid = password.any { it.isDigit() }
     val symbolValid = password.any { !it.isLetterOrDigit() }
 
     return when {
-        !lengthValid -> "Password must be at least 10 characters long."
+        !lengthValid -> "Password must be at least 6 characters long."
         !capitalValid -> "Password must contain at least one uppercase letter."
         !numberValid -> "Password must contain at least one number."
         !symbolValid -> "Password must contain at least one special character."

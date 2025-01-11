@@ -3,15 +3,24 @@ package com.example.gymappdemo.ui.screens
 
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,29 +43,77 @@ fun UserProfileScreen(
     // Observe user data
     val user = viewModel.user.collectAsState().value
 
-    // If the user is not yet loaded, show loading
+    // If the user is guest or log in
     if (user == null) {
-        CircularProgressIndicator()
+        GuestUserPrompt(navController)
     } else {
+        var showLogoutDialog by remember { mutableStateOf(false) }
+
+        // Handle logout confirmation
+        if (showLogoutDialog) {
+            AlertDialog(
+                onDismissRequest = { showLogoutDialog = false }, // Close the dialog on dismiss
+                title = { Text("Log Out") },
+                text = { Text("Are you sure you want to log out?") },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            // Handle logout logic (clear session, user data, etc.)
+                            // Navigate to login screen
+                            navController.navigate("login") // Change to your login screen route
+                            viewModel.logout()
+                            showLogoutDialog = false // Close the dialog
+                        }
+                    ) {
+                        Text("Yes")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showLogoutDialog = false }) {
+                        Text("No")
+                    }
+                }
+            )
+        }
         Scaffold(
             topBar = {
                 CenterAlignedTopAppBar(
                     title = {
-                        Text(
-                            "My Personal",
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(), // Ensure the row takes the full width
+                            horizontalArrangement = Arrangement.SpaceBetween, // Spread items across the row (title at start, icon at end)
+                            verticalAlignment = Alignment.CenterVertically // Vertically center items in the row
+                        ) {
+                            Text(
+                                "My Profile",
+                                style = MaterialTheme.typography.headlineMedium,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                                contentDescription = "Profile",
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .padding(start = 8.dp)
+                                    .clickable {
+                                        showLogoutDialog = true
+                                    }
+                            )
+                        }
                     }
                 )
             }
         ) { padding ->
             Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState())
+
             ) {
                 // User Picture
                 Box(
@@ -192,6 +249,8 @@ fun UserProfileScreen(
 
                     Spacer(modifier = Modifier.height(20.dp))
 
+
+
                     UserDetailCard(label = "Height", value = height)
                     UserDetailCard(label = "Weight", value = weight)
                     UserDetailCard(label = "Age", value = age)
@@ -227,7 +286,7 @@ fun UserDetailCard(label: String, value: String) {
         Card(
             modifier = Modifier
                 .padding(8.dp)
-                .size(120.dp),
+                .size(100.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
         ) {
@@ -268,7 +327,7 @@ fun UserDetailCard(label: String, value: String) {
         Card(
             modifier = Modifier
                 .padding(8.dp)
-                .size(120.dp),
+                .size(100.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
         ) {
@@ -295,6 +354,59 @@ fun UserDetailCard(label: String, value: String) {
         }
     }
 }
+
+@Composable
+fun GuestUserPrompt(navController: NavController) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
+        contentAlignment = Alignment.Center
+    ) {
+        Card(
+            modifier = Modifier
+                .padding(16.dp)
+                .wrapContentSize(),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .wrapContentSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "You are logged in as a Guest",
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                Text(
+                    text = "To access full features, please log in to your account.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+                Button(
+                    onClick = { navController.navigate("login") },
+                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Text(
+                        text = "Log In",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
+            }
+        }
+    }
+}
+
 
 
 
