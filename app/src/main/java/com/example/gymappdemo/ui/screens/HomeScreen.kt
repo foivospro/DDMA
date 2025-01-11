@@ -6,7 +6,6 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,7 +42,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.gymappdemo.Navigation.GymAppScreen
 import com.example.gymappdemo.R
 import com.example.gymappdemo.ui.viewmodels.CurrentStatusViewModel
 import com.example.gymappdemo.ui.viewmodels.HomeViewModel
@@ -108,7 +106,7 @@ fun HomeScreen(
             WorkoutSummary()
         }
 
-        // Start New Workout / Continue Workout Button
+        // Start com.example.gymappdemo.data.network.New Workout / Continue Workout Button
         item {
             Spacer(modifier = Modifier.height(64.dp))
 
@@ -136,7 +134,7 @@ fun HomeScreen(
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 )) {
                 Text(
-                    text = if (isWorkoutActive) "Continue Workout" else "Start New Workout",
+                    text = if (isWorkoutActive) "Continue Workout" else "Start com.example.gymappdemo.data.network.New Workout",
                     style = MaterialTheme.typography.titleMedium,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
