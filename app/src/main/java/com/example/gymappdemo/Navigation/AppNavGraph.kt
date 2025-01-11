@@ -22,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavType
@@ -120,12 +121,12 @@ fun AppNavHost(
                 ExercisePickerScreen(exercisePickerViewModel, navController = navController, sessionId = 1)
             }
             // MyProfile Screen
-            composable(route = GymAppScreen.MyProfile.name) {
+            composable(route = GymAppScreen.MyProfile.name) {backStackEntry ->
+                val userId = backStackEntry.arguments?.getString("userId")?.toIntOrNull() ?: 1
                 shouldShowBottomBar = true
                 UserProfileScreen(
                     navController = navController,
-                    viewModel = myProfileViewModel,
-                    userId = 1 )// You can pass a dynamic userId here
+                    viewModel = myProfileViewModel)
             }
 
             // ExercisePicker Screen
@@ -175,13 +176,15 @@ fun AppNavHost(
                     }
                 )
             }
+
+            // Profile Settings Screen
             composable(route = GymAppScreen.ProfileSettings.name) {
                 shouldShowBottomBar = false
                 EditProfileScreen(
                     isDarkMode = isDarkMode,
                     onDarkModeToggle = onDarkModeToggle,  // Passing the callback here
-                    onBackPressed = { navController.navigateUp() }
-                )
+                    onBackPressed = { navController.navigateUp()},
+                    viewModel = myProfileViewModel)
             }
             // Login Screen - Hide bottom bar
             composable(route = GymAppScreen.Login.name) {

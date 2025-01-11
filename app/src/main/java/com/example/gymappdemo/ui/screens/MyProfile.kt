@@ -2,10 +2,8 @@ package com.example.gymappdemo.ui.screens
 
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,7 +11,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.gymappdemo.Navigation.GymAppScreen
@@ -30,17 +28,11 @@ import com.example.gymappdemo.ui.viewmodels.MyProfileViewModel
 @Composable
 fun UserProfileScreen(
     navController: NavController,
-    viewModel: MyProfileViewModel, // Inject the ViewModel
-    userId: Int = 2 // Example user ID, pass this dynamically as needed
+    viewModel: MyProfileViewModel // Inject the ViewModel
 ) {
 
     // Observe user data
     val user = viewModel.user.collectAsState().value
-
-    // Fetch user profile when the composable is loaded
-    LaunchedEffect(userId) {
-        viewModel.fetchUserProfile(userId)
-    }
 
     // If the user is not yet loaded, show loading
     if (user == null) {
@@ -106,7 +98,7 @@ fun UserProfileScreen(
                         textStyle = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface),
                         singleLine = true,
                         shape = RoundedCornerShape(8.dp),
-                        colors = TextFieldDefaults.textFieldColors(
+                        colors = TextFieldDefaults.colors(
                             disabledTextColor = MaterialTheme.colorScheme.onSurface,
                             disabledIndicatorColor = Color.Transparent
                         ),
@@ -144,7 +136,7 @@ fun UserProfileScreen(
                         textStyle = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface),
                         singleLine = true,
                         shape = RoundedCornerShape(8.dp),
-                        colors = TextFieldDefaults.textFieldColors(
+                        colors = TextFieldDefaults.colors(
                             disabledTextColor = MaterialTheme.colorScheme.onSurface,
                             disabledIndicatorColor = Color.Transparent
                         ),
@@ -158,27 +150,72 @@ fun UserProfileScreen(
                     )
                 }
 
+                Spacer(modifier = Modifier.height(15.dp))
+
+                val height = user?.height?.toString() ?: ""
+                val weight = user?.weight?.toString() ?: ""
+                val age = user?.age?.toString() ?: ""
+
+                var messenger = "Enter your "
+                if (height.isNullOrEmpty() || height == "0") {
+                    messenger += "Height, "
+                }
+                if (weight.isNullOrEmpty() || weight == "0") {
+                    messenger += "Weight, "
+                }
+                if (age.isNullOrEmpty() || age == "0") {
+                    messenger += "Age"
+                }
+
+                messenger += " in settings"
+
+
+                if (height.isNullOrEmpty() || height == "0"
+                    || weight.isNullOrEmpty() || weight == "0"
+                    || age.isNullOrEmpty() || age == "0") {
+                    Text(
+                        text = messenger,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(8.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+
                 // Height, Weight, Age
                 Row(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    UserDetailCard(label = "Height", value = "${user.height}cm")
-                    UserDetailCard(label = "Weight", value = "${user.weight}kg")
-                    UserDetailCard(label = "Age", value = "${user.age}y")
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    UserDetailCard(label = "Height", value = height)
+                    UserDetailCard(label = "Weight", value = weight)
+                    UserDetailCard(label = "Age", value = age)
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))
 
                 // Settings Button
-                Text(
-                    text = "Edit Profile",
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.tertiary,
-                    modifier = Modifier.clickable {
+                Button(
+                    onClick = {
                         navController.navigate(GymAppScreen.ProfileSettings.name)
-                    }
-                )
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
+                    shape = MaterialTheme.shapes.medium, // Customize the button shape
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                ) {
+                    Text(
+                        text = "Settings",
+                        style = MaterialTheme.typography.titleSmall
+                    )
+                }
             }
         }
     }
@@ -186,33 +223,75 @@ fun UserProfileScreen(
 
 @Composable
 fun UserDetailCard(label: String, value: String) {
-    Card(
-        modifier = Modifier
-            .padding(8.dp)
-            .size(100.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-    ) {
-        Column(
+    if (value.isNullOrEmpty() || value == "0") {
+        Card(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .padding(8.dp)
+                .size(120.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
         ) {
-            Text(
-                text = value,
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.bodyLarge, // Use Body Large style
-                color = MaterialTheme.colorScheme.primary //MaterialTheme.colorScheme.onSurface
+            if (label == "Height"){
+                Icon(
+                    painter = painterResource(com.example.gymappdemo.R.drawable.height),
+                    contentDescription = "Icon for Height",
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(20.dp), // Optional padding around the icon
+                    tint = MaterialTheme.colorScheme.primary // Set the icon color to primary
+                )
 
-            )
-            Text(
-                text = label,
+            } else if (label == "Weight"){
+                Icon(
+                    painter = painterResource(com.example.gymappdemo.R.drawable.weight2),
+                    contentDescription = "Icon for Weight",
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(20.dp), // Optional padding around the icon
+                    tint = MaterialTheme.colorScheme.primary // Set the icon color to primary
+                )
 
-                style = MaterialTheme.typography.bodySmall, // Use Body Small style
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            } else {
+                Icon(
+                    painter = painterResource(com.example.gymappdemo.R.drawable.calendar),
+                    contentDescription = "Icon for Age",
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(20.dp), // Optional padding around the icon
+                    tint = MaterialTheme.colorScheme.primary // Set the icon color to primary
+                )
+            }
+        }
+
+
+    } else {
+        Card(
+            modifier = Modifier
+                .padding(8.dp)
+                .size(120.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = value,
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.headlineMedium, // Use Body Large style
+                    color = MaterialTheme.colorScheme.primary //MaterialTheme.colorScheme.onSurface
+                )
+
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.bodyLarge, // Use Body Small style
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
     }
 }

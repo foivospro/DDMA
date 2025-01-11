@@ -14,36 +14,25 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
-import androidx.compose.ui.text.input.TextFieldValue
 
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.graphics.Color.Companion.Black
+
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.ui.res.painterResource
-import androidx.compose.material.icons.filled.ArrowBack
+
 import androidx.compose.material.icons.Icons
 import androidx.compose.ui.graphics.Color.Companion.Gray
-import androidx.compose.material3.Icon
 
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -64,7 +53,10 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -72,8 +64,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextOverflow
 import com.example.gymappdemo.R
-import com.example.gymappdemo.ui.theme.GymAppDemoTheme
+import com.example.gymappdemo.data.entities.User
+import com.example.gymappdemo.ui.viewmodels.MyProfileViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -81,20 +75,48 @@ import com.example.gymappdemo.ui.theme.GymAppDemoTheme
 fun EditProfileScreen(
     isDarkMode: Boolean,
     onDarkModeToggle: (Boolean) -> Unit,
-    onBackPressed: () -> Unit
+    onBackPressed: () -> Unit,
+    //userId: Int,
+    viewModel: MyProfileViewModel
 ) {
+    // Observe user data from the ViewModel
+    val user by viewModel.user.collectAsState()
+
+    // Fetch user data when the composable is loaded
+
+
+    // State variables for editable fields (initialize with existing data or default values)
+    var username by remember { mutableStateOf(user?.name ?: "sex") }
+    var email by remember { mutableStateOf(user?.email ?: "") }
+    var age by remember { mutableIntStateOf(user?.age ?: 20) }
+    var height by remember { mutableIntStateOf(user?.height ?: 170) }
+    var weight by remember { mutableIntStateOf(user?.weight ?: 75) }
+    var password by remember { mutableStateOf(user?.passwordHash ?: "") }
+
     // State variables for profile picture
     var profilePicture by remember { mutableStateOf<Bitmap?>(null) }
 
+    // Update local state variables when userState changes
+    LaunchedEffect(user) {
+        username = user?.name ?: ""
+        email = user?.email ?: ""
+        age = user?.age ?: 20
+        height = user?.height ?: 170
+        weight = user?.weight ?: 75
+        password = user?.passwordHash ?: ""
+    }
 
-    // State variables for editable fields
-    var username by remember { mutableStateOf("JohnDoe") }
-    var email by remember { mutableStateOf("johndoe@example.com") }
+    // State to track the initial user data
+    val initialUserState = user
 
-    // State variables for Age, Height, Weight
-    var age by remember { mutableStateOf(20) }
-    var height by remember { mutableStateOf(170) }
-    var weight by remember { mutableStateOf(70) }
+    // Derived state to check if any changes have been made
+    val hasChanges = username != initialUserState?.name ||
+            email != initialUserState?.email ||
+            age != initialUserState?.age ||
+            height != initialUserState?.height ||
+            weight != initialUserState?.weight ||
+            password != initialUserState?.passwordHash
+
 
     Scaffold(
         topBar = {
@@ -122,7 +144,7 @@ fun EditProfileScreen(
                     .size(100.dp)
                     .align(Alignment.CenterHorizontally)
                     .clip(CircleShape)
-                    .border(2.dp, Color.Gray, CircleShape)
+                    .border(2.dp, Gray, CircleShape)
                     .clickable {
                         // Show a dialog with options
                         showImageOptions = true
@@ -172,7 +194,7 @@ fun EditProfileScreen(
             // Editable Fields
             UserProfileField(
                 title = "Username",
-                value = username,
+                value =  username,
                 onValueChange = { username = it }
             )
 
@@ -182,19 +204,15 @@ fun EditProfileScreen(
                 onValueChange = { email = it }
             )
 
-            // Password Field with Validation
-            var passwordVisible by remember { mutableStateOf(false) }
-
-            // State variables for editable fields
-            var password by remember { mutableStateOf("Password1") }
             var passwordError by remember { mutableStateOf<String?>(null) }
+            var passwordVisible by remember { mutableStateOf(false) }
 
             UserProfileField(
                 title = "Password",
                 value = password,
-                onValueChange = { newPassword ->
-                    password = newPassword
-                    passwordError = validatePassword(newPassword) // Perform validation
+                onValueChange = {
+                    password = it
+                    passwordError = validatePassword(password)
                 },
                 isPassword = true,
                 isPasswordVisible = passwordVisible,
@@ -213,14 +231,14 @@ fun EditProfileScreen(
                 verticalAlignment = Alignment.CenterVertically
             ){
                 StyledNumberPickerField(
-                    label = "Height (cm)",
+                    label = "Height(cm)",
                     value = height,
                     onValueChange = { height = it },
                     range = 50..250
                 )
 
                 StyledNumberPickerField(
-                    label = "Weight (kg)",
+                    label = "Weight(kg)",
                     value = weight,
                     onValueChange = { weight = it },
                     range = 10..200
@@ -284,12 +302,23 @@ fun EditProfileScreen(
 
             // Save Button
             Button(
-                onClick = { /* Save changes logic */ },
+                onClick = {
+                    val updatedUser = User(
+                        id = user?.id ?: 0, // Use the existing user ID
+                        name = username,
+                        email = email,
+                        age = age,
+                        height = height,
+                        weight = weight,
+                        passwordHash = password
+                    )
+                    viewModel.updateUser(updatedUser)
+                    onBackPressed()
+                },
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .padding(top = 16.dp),
-                enabled = passwordError == null // Disable button if there is a password error
-
+                enabled = passwordError == null && hasChanges // Enable only if no password error and changes are made
             ) {
                 Text("Save Changes")
             }
@@ -333,7 +362,6 @@ fun UserProfileField(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EnhancedTextField(
     title: String,
@@ -400,7 +428,7 @@ fun EnhancedTextField(
                     tint = MaterialTheme.colorScheme.primary
                 )
             },
-            colors = TextFieldDefaults.textFieldColors(
+            colors = TextFieldDefaults.colors(
                 focusedIndicatorColor = if (errorMessage != null) Color.Red else Color.Transparent,
                 unfocusedIndicatorColor = if (errorMessage != null) Color.Red else Color.Transparent,
                 errorIndicatorColor = Color.Red
@@ -460,7 +488,9 @@ fun StyledNumberPickerField(
                     color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 18.sp, // Set a specific font size for the label
                     fontWeight = FontWeight.Bold // Make the label bolder
-                )
+                ),
+                maxLines = 1, // Limit text to a single line
+                overflow = TextOverflow.Ellipsis
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -470,14 +500,19 @@ fun StyledNumberPickerField(
                 onClick = {
                     if (value < range.last) onValueChange(value + 1)
                 },
+                enabled = value < range.last,
                 modifier = Modifier
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
+                    .background(
+                        if (value < range.last) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                        else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
+                    )
             ) {
                 Icon(
                     Icons.Default.Add,
                     contentDescription = "Increase",
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = if (value < range.last) MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                 )
             }
 
@@ -497,28 +532,22 @@ fun StyledNumberPickerField(
                 onClick = {
                     if (value > range.first) onValueChange(value - 1)
                 },
+                enabled = value > range.first,
                 modifier = Modifier
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
+                    .background(
+                        if (value > range.first) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                        else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
+                    )
             ) {
                 Icon(
                     Icons.Default.Remove,
                     contentDescription = "Decrease",
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = if (value > range.first) MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                 )
             }
         }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewEditProfileScreen() {
-    GymAppDemoTheme {
-        EditProfileScreen(
-            isDarkMode = false,
-            onDarkModeToggle = {},
-            onBackPressed = {})
-            //onImagePicked= {}) // Accept the callback here
-    }
-}
