@@ -16,6 +16,7 @@ import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,12 +26,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.gymappdemo.Navigation.GymAppScreen
+import com.example.gymappdemo.data.repositories.UserRepository
 import com.example.gymappdemo.ui.viewmodels.MyProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,10 +48,15 @@ fun UserProfileScreen(
     // Observe user data
     val user = viewModel.user.collectAsState().value
 
+
+
     // If the user is guest or log in
     if (user == null) {
         GuestUserPrompt(navController)
     } else {
+        LaunchedEffect(user) {
+            viewModel.loadProfilePicture(user.id)
+        }
         var showLogoutDialog by remember { mutableStateOf(false) }
 
         // Handle logout confirmation
@@ -122,8 +132,13 @@ fun UserProfileScreen(
                         .padding(8.dp)
                 ) {
                     Image(
-                        painter = painterResource(com.example.gymappdemo.R.drawable.default_profile),
+                        if (user.profilePicture != null) {
+                            rememberAsyncImagePainter(user.profilePicture.toUri())
+                        } else {
+                            painterResource(com.example.gymappdemo.R.drawable.default_profile)
+                        },
                         contentDescription = "User Profile Picture",
+                        contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .fillMaxSize()
                             .clip(CircleShape)

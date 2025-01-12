@@ -10,5 +10,6 @@ data class User(
     val passwordHash: String,
     val age: Int?,
     val height: Int?,
-    val weight: Int?
+    val weight: Int?,
+    val profilePicture: String? = null
 )

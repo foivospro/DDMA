@@ -28,7 +28,7 @@ import kotlinx.coroutines.runBlocking
         SessionExercise::class,
         Set::class
     ],
-    version = 6,
+    version = 7,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -155,7 +155,8 @@ abstract class AppDatabase : RoomDatabase() {
                         passwordHash = "JohnbigDoe12!",
                         age = 30,
                         height = 175,
-                        weight = 70
+                        weight = 70,
+                        profilePicture = null
                     ),
                     User(
                         name = "Jane Smith",
@@ -163,7 +164,8 @@ abstract class AppDatabase : RoomDatabase() {
                         passwordHash = "#TheQueen123",
                         age = 25,
                         height = 165,
-                        weight = 60
+                        weight = 60,
+                        profilePicture = null
 
                     )
                 )

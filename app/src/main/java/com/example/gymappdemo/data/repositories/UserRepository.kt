@@ -44,6 +44,11 @@ class UserRepository(private val userDao: UserDao, private val context: Context)
         userDao.update(user)
     }
 
+    suspend fun getUserProfilePicture(userId: Int): String? {
+        val user = userDao.getUserById(userId)
+        return user?.profilePicture
+    }
+
     // Save the logged-in user's email to preferences
     fun saveLoggedInUserEmail(email: String) {
         sharedPreferences.edit().putString("logged_in_user_email", email).apply()
@@ -55,6 +60,12 @@ class UserRepository(private val userDao: UserDao, private val context: Context)
         return email?.let {
             userDao.getUserByEmail(it)?.id
         }
+    }
+
+    suspend fun getUserProfilePictureUri(userId: Int): String? {
+        // Replace with actual logic to get the profile picture URI from the database
+        val user = userDao.getUserById(userId)
+        return user?.profilePicture // Assuming you have the URI field in the User entity
     }
 
 

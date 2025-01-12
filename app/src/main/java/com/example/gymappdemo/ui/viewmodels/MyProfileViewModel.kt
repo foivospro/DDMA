@@ -1,5 +1,10 @@
 package com.example.gymappdemo.ui.viewmodels
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gymappdemo.data.entities.User
@@ -9,6 +14,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import androidx.compose.runtime.State
+import java.io.ByteArrayOutputStream
+
 
 class MyProfileViewModel(private val userRepository: UserRepository) : ViewModel() {
 
@@ -19,6 +27,9 @@ class MyProfileViewModel(private val userRepository: UserRepository) : ViewModel
     // StateFlow to hold the username (optional if needed for separate use cases)
     private val _username = MutableStateFlow("Guest")
     val username: StateFlow<String> = _username
+
+    private val _profilePictureUri = mutableStateOf<String?>(null)
+    val profilePictureUri: State<String?> = _profilePictureUri
 
     init {
         viewModelScope.launch {
@@ -59,5 +70,12 @@ class MyProfileViewModel(private val userRepository: UserRepository) : ViewModel
     fun logout() {
         // Call UserRepository's method to clear the logged-in user data
         userRepository.clearLoggedInUser()
+    }
+
+    fun loadProfilePicture(userId: Int) {
+        viewModelScope.launch {
+            // Ensure this function is implemented and returns the correct URI
+            _profilePictureUri.value = userRepository.getUserProfilePictureUri(userId)
+        }
     }
 }
