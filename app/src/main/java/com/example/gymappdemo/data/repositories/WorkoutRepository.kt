@@ -67,6 +67,10 @@ class WorkoutRepository private constructor(
         return sessionExerciseDao.getExercisesWithSetsBySession(sessionId)
     }
 
+    suspend fun getExerciseById(exerciseId: Int): Exercise? {
+        return exerciseDao.getExerciseById(exerciseId)
+    }
+
     // Set Operations
     suspend fun getSetsForExercise(sessionExerciseId: Int): List<Set> {
         return setDao.getSetsForExercise(sessionExerciseId)
