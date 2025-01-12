@@ -1,10 +1,6 @@
 package com.example.gymappdemo.ui.viewmodels
 
-import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gymappdemo.data.entities.User
@@ -14,8 +10,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import androidx.compose.runtime.State
-import java.io.ByteArrayOutputStream
 
 
 class MyProfileViewModel(private val userRepository: UserRepository) : ViewModel() {
@@ -28,12 +22,13 @@ class MyProfileViewModel(private val userRepository: UserRepository) : ViewModel
     private val _username = MutableStateFlow("Guest")
     val username: StateFlow<String> = _username
 
-    private val _profilePictureUri = mutableStateOf<String?>(null)
-    val profilePictureUri: State<String?> = _profilePictureUri
+    private val _profilePictureUri = MutableStateFlow<Uri?>(null)
+    val profilePictureUri: MutableStateFlow<Uri?> = _profilePictureUri
 
     init {
         viewModelScope.launch {
             fetchLoggedInUser()
+            loadProfilePicture(_user.value?.id ?: 0)
         }
     }
 
@@ -77,5 +72,8 @@ class MyProfileViewModel(private val userRepository: UserRepository) : ViewModel
             // Ensure this function is implemented and returns the correct URI
             _profilePictureUri.value = userRepository.getUserProfilePictureUri(userId)
         }
+    }
+     fun changeUri(uri: Uri?){
+        _profilePictureUri.value = uri
     }
 }

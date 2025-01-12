@@ -1,4 +1,5 @@
 package com.example.gymappdemo.data.entities
+import android.net.Uri
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -11,5 +12,5 @@ data class User(
     val age: Int?,
     val height: Int?,
     val weight: Int?,
-    val profilePicture: String? = null
+    val profilePicture: Uri? = null
 )

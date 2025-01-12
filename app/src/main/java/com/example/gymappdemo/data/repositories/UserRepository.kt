@@ -2,6 +2,7 @@ package com.example.gymappdemo.data.repositories
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.net.Uri
 import com.example.gymappdemo.data.dao.UserDao
 import com.example.gymappdemo.data.entities.User
 
@@ -44,7 +45,7 @@ class UserRepository(private val userDao: UserDao, private val context: Context)
         userDao.update(user)
     }
 
-    suspend fun getUserProfilePicture(userId: Int): String? {
+    suspend fun getUserProfilePicture(userId: Int): Uri? {
         val user = userDao.getUserById(userId)
         return user?.profilePicture
     }
@@ -62,7 +63,7 @@ class UserRepository(private val userDao: UserDao, private val context: Context)
         }
     }
 
-    suspend fun getUserProfilePictureUri(userId: Int): String? {
+    suspend fun getUserProfilePictureUri(userId: Int): Uri? {
         // Replace with actual logic to get the profile picture URI from the database
         val user = userDao.getUserById(userId)
         return user?.profilePicture // Assuming you have the URI field in the User entity

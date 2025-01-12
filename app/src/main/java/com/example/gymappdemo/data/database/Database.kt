@@ -1,9 +1,9 @@
 package com.example.gymappdemo.data.database
 
 import android.content.Context
-import android.util.Log
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import com.example.gymappdemo.data.dao.ExerciseDao
 import com.example.gymappdemo.data.dao.GymSessionDao
 import com.example.gymappdemo.data.dao.SessionExerciseDao
@@ -14,11 +14,9 @@ import com.example.gymappdemo.data.entities.GymSession
 import com.example.gymappdemo.data.entities.SessionExercise
 import com.example.gymappdemo.data.entities.Set
 import com.example.gymappdemo.data.entities.User
-import com.example.gymappdemo.data.repositories.UserRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 @Database(
     entities = [
@@ -31,6 +29,7 @@ import kotlinx.coroutines.runBlocking
     version = 7,
     exportSchema = false
 )
+@TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 
     // DAOs

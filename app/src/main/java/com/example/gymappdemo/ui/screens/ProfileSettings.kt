@@ -1,45 +1,30 @@
 package com.example.gymappdemo.ui.screens
 
-import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.net.Uri
+
+import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-
-
-import androidx.compose.ui.unit.dp
-
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-
-import androidx.compose.material.icons.Icons
-import androidx.compose.ui.graphics.Color.Companion.Gray
-
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Key
@@ -54,11 +39,18 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -66,18 +58,23 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.gymappdemo.R
 import com.example.gymappdemo.data.entities.User
 import com.example.gymappdemo.ui.viewmodels.MyProfileViewModel
-import java.io.ByteArrayOutputStream
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -89,6 +86,8 @@ fun EditProfileScreen(
     //userId: Int,
     viewModel: MyProfileViewModel
 ) {
+    val flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+    val context = LocalContext.current
     // Observe user data from the ViewModel
     val user by viewModel.user.collectAsState()
 
@@ -102,7 +101,7 @@ fun EditProfileScreen(
     var height by remember { mutableIntStateOf(user?.height ?: 170) }
     var weight by remember { mutableIntStateOf(user?.weight ?: 75) }
     var password by remember { mutableStateOf(user?.passwordHash ?: "") }
-    var profilePicture by remember { mutableStateOf(user?.profilePicture) }
+    val profilePicture by viewModel.profilePictureUri.collectAsState()
 
     // Update local state variables when userState changes
     LaunchedEffect(user) {
@@ -112,7 +111,6 @@ fun EditProfileScreen(
         height = user?.height ?: 170
         weight = user?.weight ?: 75
         password = user?.passwordHash ?: ""
-        profilePicture = user?.profilePicture
     }
 
     // State to track the initial user data
@@ -155,7 +153,9 @@ fun EditProfileScreen(
             val singlePhotoPickerLauncher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.PickVisualMedia(),
                 onResult = { uri ->
-                    profilePicture = uri.toString() // Directly use the URI
+                    if (uri != null) {
+                        viewModel.changeUri(uri)
+                    }
                 }
             )
 
@@ -205,7 +205,7 @@ fun EditProfileScreen(
                     dismissButton = {
                         TextButton(onClick = {
                             // Logic to remove the image
-                            profilePicture = null
+                            viewModel.changeUri(null)
                             showImageOptions = false
                         }) {
                             Text("Remove Picture")
@@ -330,11 +330,12 @@ fun EditProfileScreen(
                     )
                 }
             }
-
-            // Save Button
-            // Save Button
             Button(
                 onClick = {
+                    profilePicture?.let {
+                        context.contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION )
+                    }
+
                     val updatedUser = User(
                         id = user?.id ?: 0, // Use the existing user ID
                         name = username,
@@ -345,6 +346,7 @@ fun EditProfileScreen(
                         passwordHash = password,
                         profilePicture = profilePicture
                     )
+
                     viewModel.updateUser(updatedUser)
                     onBackPressed()
                 },
@@ -355,12 +357,9 @@ fun EditProfileScreen(
             ) {
                 Text("Save Changes")
             }
+
         }
     }
-}
-
-fun pickImageFromGallery() {
-   // pickImageLauncher.launch("image/*")
 }
 
 @Composable
