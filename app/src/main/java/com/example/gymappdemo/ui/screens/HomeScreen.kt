@@ -6,7 +6,6 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,7 +44,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.gymappdemo.Navigation.GymAppScreen
 import com.example.gymappdemo.R
 import com.example.gymappdemo.ui.viewmodels.CurrentStatusViewModel
 import com.example.gymappdemo.ui.viewmodels.HomeViewModel
@@ -60,7 +58,7 @@ fun HomeScreen(
     val isWorkoutActive by viewModel.isWorkoutActive.collectAsState()
     val currentSessionId by viewModel.currentSessionId.collectAsState()
     val username by viewModel.username.collectAsState()
-
+    val userId by viewModel.userId.collectAsState()
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -102,14 +100,13 @@ fun HomeScreen(
             WorkoutSummary()
         }
 
-        // Start New Workout / Continue Workout Button
         item {
             Spacer(modifier = Modifier.height(64.dp))
-
+            Log.d("DBCHECK","user with UserId: $userId")
             Button(onClick = {
                     if (!isWorkoutActive) {
                         viewModel.startNewWorkout(
-                            userId = 1, // αυτο πρεπει να το αλλαξουμε με το πραγματικό
+                            userId = userId,
                             onSessionCreated = { session ->
                                 currentStatusViewModel.setSessionId(session.id)
                                 navController.navigate("CurrentStatus/${session.id}")

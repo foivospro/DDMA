@@ -44,7 +44,7 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
-        fun getInstance(context: android.content.Context): AppDatabase {
+        fun getInstance(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = androidx.room.Room.databaseBuilder(
                     context.applicationContext,
@@ -62,7 +62,7 @@ abstract class AppDatabase : RoomDatabase() {
 
     private class PrepopulateCallback(
         private val context: Context
-    ): RoomDatabase.Callback() {
+    ): Callback() {
         override fun onCreate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
             super.onCreate(db)
             // Populate the database with hardcoded exercises

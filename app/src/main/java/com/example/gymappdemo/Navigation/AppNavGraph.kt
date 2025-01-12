@@ -1,12 +1,13 @@
 package com.example.gymappdemo.Navigation
 
 
+import NewsScreen
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Newspaper
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -39,17 +40,19 @@ import com.example.gymappdemo.ui.screens.ExercisePickerScreen
 import com.example.gymappdemo.ui.screens.HomeScreen
 import com.example.gymappdemo.ui.screens.LoginScreen
 import com.example.gymappdemo.ui.screens.NavigationItem
-import com.example.gymappdemo.ui.screens.SetRepsScreen
 import com.example.gymappdemo.ui.screens.RegisterScreen
+import com.example.gymappdemo.ui.screens.SetRepsScreen
 import com.example.gymappdemo.ui.screens.UserProfileScreen
 import com.example.gymappdemo.ui.viewmodel.AppViewModelFactory
 import com.example.gymappdemo.ui.viewmodels.CurrentStatusViewModel
 import com.example.gymappdemo.ui.viewmodels.ExercisePickerViewModel
-import com.example.gymappdemo.ui.viewmodels.MyProfileViewModel
 import com.example.gymappdemo.ui.viewmodels.HomeViewModel
-import com.example.gymappdemo.ui.viewmodels.SetRepsViewModel
 import com.example.gymappdemo.ui.viewmodels.LoginViewModel
+import com.example.gymappdemo.ui.viewmodels.MyProfileViewModel
+import com.example.gymappdemo.ui.viewmodels.NewsViewModel
 import com.example.gymappdemo.ui.viewmodels.RegisterViewModel
+import com.example.gymappdemo.ui.viewmodels.SetRepsViewModel
+
 enum class GymAppScreen {
     Home,
     ExercisePicker,
@@ -57,7 +60,8 @@ enum class GymAppScreen {
     ProfileSettings,
     CurrentStatus,
     Login,
-    Register
+    Register,
+    News
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -89,7 +93,7 @@ fun AppNavHost(
     val loginViewModel: LoginViewModel = viewModel(factory = factory)
     val registerViewModel: RegisterViewModel = viewModel(factory = factory)
     val myProfileViewModel: MyProfileViewModel = viewModel(factory = factory)
-
+    val newsViewModel: NewsViewModel = viewModel(factory = factory)
 
 
     // State to track if the current destination should hide the BottomNavigationBar
@@ -204,9 +208,13 @@ fun AppNavHost(
                     navController = navController)
 
             }
+            composable(route = GymAppScreen.News.name) {
+                shouldShowBottomBar = true
+                NewsScreen(newsViewModel)
+            }
+        }
         }
     }
-}
 
 @Composable
 fun BottomNavigationBar(navController: NavController) {
@@ -215,7 +223,7 @@ fun BottomNavigationBar(navController: NavController) {
     // Menu elements
     val items = listOf(
         NavigationItem("Home", Icons.Filled.Home),
-        NavigationItem("Favorites", Icons.Filled.Favorite),
+        NavigationItem("News", Icons.Filled.Newspaper),
         NavigationItem("Profile", Icons.Filled.Person)
     )
 
@@ -243,7 +251,7 @@ fun BottomNavigationBar(navController: NavController) {
                             launchSingleTop = true
                             restoreState = true
                         }
-                        "Favorites" -> navController.navigate(GymAppScreen.MyProfile.name) {
+                        "News" -> navController.navigate(route = GymAppScreen.News.name) {
                             popUpTo(navController.graph.startDestinationId) {
                                 saveState = true
                             }
