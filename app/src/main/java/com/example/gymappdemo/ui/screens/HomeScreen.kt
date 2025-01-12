@@ -56,7 +56,7 @@ fun HomeScreen(
     val isWorkoutActive by viewModel.isWorkoutActive.collectAsState()
     val currentSessionId by viewModel.currentSessionId.collectAsState()
     val username by viewModel.username.collectAsState()
-
+    val userId by viewModel.userId.collectAsState()
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -106,14 +106,13 @@ fun HomeScreen(
             WorkoutSummary()
         }
 
-        // Start com.example.gymappdemo.data.network.New Workout / Continue Workout Button
         item {
             Spacer(modifier = Modifier.height(64.dp))
-
+            Log.d("DBCHECK","user with UserId: $userId")
             Button(onClick = {
                     if (!isWorkoutActive) {
                         viewModel.startNewWorkout(
-                            userId = 1, // αυτο πρεπει να το αλλαξουμε με το πραγματικό
+                            userId = userId,
                             onSessionCreated = { session ->
                                 currentStatusViewModel.setSessionId(session.id)
                                 navController.navigate("CurrentStatus/${session.id}")
@@ -134,7 +133,7 @@ fun HomeScreen(
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 )) {
                 Text(
-                    text = if (isWorkoutActive) "Continue Workout" else "Start com.example.gymappdemo.data.network.New Workout",
+                    text = if (isWorkoutActive) "Continue Workout" else "Start New Workout",
                     style = MaterialTheme.typography.titleMedium,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold

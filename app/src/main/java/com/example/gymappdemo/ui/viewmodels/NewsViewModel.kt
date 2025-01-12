@@ -33,8 +33,9 @@ class NewsViewModel : ViewModel() {
                     fromDate = getDates(),
                     sortBy = "publishedAt",
                     apiKey = "e77cba1ddfbf40618da7d163d4d33946",
-                    pageSize = 2,
-                    page = 1
+                    pageSize = 10,
+                    page = 1,
+                    language = "en"
                 )
                 NewsUiState.Success(response.articles)
             } catch (e: Exception) {
