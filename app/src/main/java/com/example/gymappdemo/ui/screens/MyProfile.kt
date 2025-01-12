@@ -16,12 +16,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
@@ -32,6 +33,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -59,11 +61,10 @@ import coil.compose.AsyncImage
 import com.example.gymappdemo.Navigation.GymAppScreen
 import com.example.gymappdemo.ui.viewmodels.MyProfileViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserProfileScreen(
     navController: NavController,
-    viewModel: MyProfileViewModel // Inject the ViewModel
+    viewModel: MyProfileViewModel
 ) {
 
     // Observe user data
@@ -107,35 +108,6 @@ fun UserProfileScreen(
             )
         }
         Scaffold(
-            topBar = {
-                CenterAlignedTopAppBar(
-                    title = {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(), // Ensure the row takes the full width
-                            horizontalArrangement = Arrangement.SpaceBetween, // Spread items across the row (title at start, icon at end)
-                            verticalAlignment = Alignment.CenterVertically // Vertically center items in the row
-                        ) {
-                            Text(
-                                "My Profile",
-                                style = MaterialTheme.typography.headlineMedium,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ExitToApp,
-                                contentDescription = "Profile",
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier
-                                    .size(40.dp)
-                                    .padding(start = 8.dp)
-                                    .clickable {
-                                        showLogoutDialog = true
-                                    }
-                            )
-                        }
-                    }
-                )
-            }
         ) { padding ->
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -146,6 +118,34 @@ fun UserProfileScreen(
                     .verticalScroll(rememberScrollState())
 
             ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Προφίλ",
+                        style = MaterialTheme.typography.headlineMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        ),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+
+                    IconButton(
+                        onClick = { navController.popBackStack() },
+                        modifier = Modifier.align(Alignment.CenterStart)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Πίσω",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+
                 // User Picture
                 Box(
                     modifier = Modifier

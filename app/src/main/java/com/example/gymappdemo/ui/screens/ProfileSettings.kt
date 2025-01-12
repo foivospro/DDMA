@@ -214,14 +214,6 @@ fun EditProfileScreen(
                 )
             }
 
-            Text (
-                text = profilePicture?.toString() ?: "No Profile Picture",
-                style = MaterialTheme.typography.labelLarge,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
-            )
-
-
             // Editable Fields
             UserProfileField(
                 title = "Username",
