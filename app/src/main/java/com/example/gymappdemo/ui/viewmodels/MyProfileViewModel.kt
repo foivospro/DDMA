@@ -26,12 +26,14 @@ class MyProfileViewModel(private val userRepository: UserRepository) : ViewModel
     val profilePictureUri: MutableStateFlow<Uri?> = _profilePictureUri
 
     init {
+        updateViewModel()
+    }
+    fun updateViewModel() {
         viewModelScope.launch {
             fetchLoggedInUser()
             loadProfilePicture(_user.value?.id ?: 0)
         }
     }
-
     private suspend fun fetchLoggedInUser() {
         // Fetch email from SharedPreferences using a background thread
         val email = withContext(Dispatchers.IO) {

@@ -45,6 +45,8 @@ import androidx.navigation.NavController
 import com.example.gymappdemo.Navigation.GymAppScreen
 import com.example.gymappdemo.R
 import com.example.gymappdemo.ui.theme.GymAppDemoTheme
+import com.example.gymappdemo.ui.viewmodels.HomeViewModel
+import com.example.gymappdemo.ui.viewmodels.MyProfileViewModel
 import com.example.gymappdemo.ui.viewmodels.RegisterViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -52,6 +54,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun RegisterScreen(
     registerViewModel: RegisterViewModel,
+    homeViewModel: HomeViewModel,
+    myProfileViewModel: MyProfileViewModel,
     navController: NavController
 ) {
     // States for email, password, confirm password, and visibility
@@ -228,6 +232,9 @@ fun RegisterScreen(
                             if (isRegistered) {
                                 showSuccessfulRegister = true
                                 delay(1000)
+                                registerViewModel.saveLoggedInUser(email)
+                                homeViewModel.updateViewModel()
+                                myProfileViewModel.updateViewModel()
                                 navController.navigate(GymAppScreen.Home.name)
                             } else {
                                 showErrorRegister = true

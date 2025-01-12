@@ -16,14 +16,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -52,14 +49,19 @@ import androidx.navigation.NavController
 import com.example.gymappdemo.Navigation.GymAppScreen
 import com.example.gymappdemo.R
 import com.example.gymappdemo.ui.theme.GymAppDemoTheme
+import com.example.gymappdemo.ui.viewmodels.HomeViewModel
 import com.example.gymappdemo.ui.viewmodels.LoginViewModel
+import com.example.gymappdemo.ui.viewmodels.MyProfileViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(onLoginSuccess: () -> Unit,
                 navController: NavController,
-                viewModel: LoginViewModel) {
+                loginViewModel: LoginViewModel,
+                homeViewModel: HomeViewModel,
+                myProfileViewModel: MyProfileViewModel
+) {
     // States for email, password, and password visibility
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -174,11 +176,13 @@ fun LoginScreen(onLoginSuccess: () -> Unit,
             // Login Button
             Button(
                 onClick = {
-                    viewModel.viewModelScope.launch {
-                        val user = viewModel.login(email, password)
+                    loginViewModel.viewModelScope.launch {
+                        val user = loginViewModel.login(email, password)
                         if (user!=null) {
                             showSuccessfulLogin = true
-                            delay(1000)
+                            homeViewModel.updateViewModel()
+                            myProfileViewModel.updateViewModel()
+                            delay(500)
                             navController.navigate(GymAppScreen.Home.name)
                         } else {
                             showErrorLogin = true
