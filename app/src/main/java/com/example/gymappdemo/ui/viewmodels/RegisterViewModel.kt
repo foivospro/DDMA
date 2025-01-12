@@ -26,5 +26,8 @@ class RegisterViewModel(private val userRepository: UserRepository) : ViewModel(
         }
         return isRegistered
     }
+     fun saveLoggedInUser(email: String) {
+        userRepository.saveLoggedInUserEmail(email)
+    }
 
 }

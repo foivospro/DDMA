@@ -33,6 +33,9 @@ class HomeViewModel(
     val username: StateFlow<String> get() = _username
 
     init {
+        updateViewModel()
+    }
+    fun updateViewModel() {
         viewModelScope.launch {
             fetchUsername()
             _userId.value = fetchUserId()
