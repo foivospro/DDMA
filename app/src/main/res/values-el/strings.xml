@@ -115,8 +115,11 @@
     <string name="decrease_reps">Μείωση Επαναλήψεων</string>
     <string name="increase_reps">Αύξηση Επαναλήψεων</string>
     <string name="remove_set">Αφαίρεση Σετ</string>
-
+    <string name="no_addition_yet">Δεν έχει προστεθεί κάποια άσκηση ακόμα</string>
     <string name="home">Αρχική</string>
     <string name="news">Νέα</string>
     <string name="profile">Προφίλ</string>
+    <string name="add_exercise">Προσθήκη Άσκησης</string>
+    <string name="finish_workout">Τερματισμός Προπόνησης</string>
+    <string name="workout">Προπόνηση"</string>
 </resources>

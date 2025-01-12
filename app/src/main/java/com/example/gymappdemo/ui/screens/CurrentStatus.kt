@@ -1,6 +1,5 @@
 package com.example.gymappdemo.ui.screens
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,7 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -28,7 +26,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -118,27 +115,12 @@ fun CurrentStatus(
     }
 
     Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { navController.navigate("ExercisePicker/$sessionId") },
-                shape = CircleShape,
-                containerColor = colorScheme.primary,
-                contentColor = colorScheme.onPrimary
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.add),
-                    contentDescription = stringResource(R.string.add)
-                )
-            }
-        },
         bottomBar = {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                Text(stringResource(R.string.termination_workout))
-
                 Button(
                     onClick = { navController.navigate("ExercisePicker/$sessionId") },
                     modifier = Modifier
@@ -155,11 +137,13 @@ fun CurrentStatus(
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.add),
-                            contentDescription = "Προσθήκη Άσκησης",
+                            contentDescription = stringResource(id = R.string.add_exercise),
                             modifier = Modifier.size(24.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = "Προσθήκη Άσκησης", fontSize = 18.sp)
+                        Text(
+                            text = stringResource(id = R.string.add_exercise),
+                            fontSize = 18.sp)
                     }
                 }
 
@@ -180,7 +164,9 @@ fun CurrentStatus(
                         contentColor = Color.White
                     )
                 ) {
-                    Text("Τερματισμός Workout")
+                    Text(
+                        text = stringResource(R.string.finish_workout),
+                    )
                 }
             }
         },
@@ -206,7 +192,7 @@ fun CurrentStatus(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "Προπόνηση",
+                            text = stringResource(id =R.string.workout),
                             style = MaterialTheme.typography.headlineMedium.copy(
                                 fontWeight = FontWeight.Bold,
                                 color = colorScheme.primary
@@ -221,7 +207,7 @@ fun CurrentStatus(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.ArrowBack,
-                                contentDescription = "Πίσω",
+                                contentDescription = stringResource(R.string.back),
                                 tint = colorScheme.primary
                             )
                         }
@@ -247,9 +233,6 @@ fun CurrentStatus(
                     ) {
                         if (exercisesWithSets.isEmpty()) {
                             item {
-
-                                Text(stringResource(R.string.no_exercises_available), modifier = Modifier.padding(16.dp))
-
                                 Card(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -258,7 +241,7 @@ fun CurrentStatus(
                                     shape = RoundedCornerShape(12.dp)
                                 ) {
                                     Text(
-                                        text = "Δεν έχει προστεθεί κάποια άσκηση ακόμα.",
+                                        text = stringResource(R.string.no_addition_yet),
                                         style = MaterialTheme.typography.bodyMedium.copy(fontSize = 18.sp),
                                         color = colorScheme.onSurfaceVariant,
                                         textAlign = TextAlign.Center,
@@ -270,10 +253,6 @@ fun CurrentStatus(
                             }
                         } else {
                             items(exercisesWithSets) { exerciseWithSets ->
-                                Log.d(
-                                    "CurrentStatus",
-                                    "Displaying exercise: ${exerciseWithSets.exercise.name}, sets: ${exerciseWithSets.sets}"
-                                )
                                 ExerciseWithSetsCard(
                                     exerciseWithSets = exerciseWithSets,
                                     onRemoveSet = { setId ->

@@ -118,8 +118,11 @@
     <string name="decrease_reps">Decrease Reps</string>
     <string name="increase_reps">Increase Reps</string>
     <string name="remove_set">Remove Set</string>
-
+    <string name="no_addition_yet">No exercise added yet</string>
     <string name="home">Home</string>
     <string name="news">News</string>
     <string name="profile">Profile</string>
+    <string name="add_exercise">Add Exercise</string>
+    <string name="finish_workout">Finish Workout</string>
+    <string name="workout">Workout"</string>
 </resources>
