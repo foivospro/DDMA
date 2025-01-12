@@ -22,8 +22,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavType
@@ -31,6 +31,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.gymappdemo.R
 import com.example.gymappdemo.data.database.AppDatabase
 import com.example.gymappdemo.data.repositories.UserRepository
 import com.example.gymappdemo.data.repositories.WorkoutRepository
@@ -39,7 +40,6 @@ import com.example.gymappdemo.ui.screens.EditProfileScreen
 import com.example.gymappdemo.ui.screens.ExercisePickerScreen
 import com.example.gymappdemo.ui.screens.HomeScreen
 import com.example.gymappdemo.ui.screens.LoginScreen
-import com.example.gymappdemo.ui.screens.NavigationItem
 import com.example.gymappdemo.ui.screens.RegisterScreen
 import com.example.gymappdemo.ui.screens.SetRepsScreen
 import com.example.gymappdemo.ui.screens.UserProfileScreen
@@ -56,7 +56,7 @@ import com.example.gymappdemo.ui.viewmodels.SetRepsViewModel
 enum class GymAppScreen {
     Home,
     ExercisePicker,
-    MyProfile, 
+    MyProfile,
     ProfileSettings,
     CurrentStatus,
     Login,
@@ -213,18 +213,19 @@ fun AppNavHost(
                 NewsScreen(newsViewModel)
             }
         }
-        }
     }
+}
 
 @Composable
 fun BottomNavigationBar(navController: NavController) {
+    val context = LocalContext.current
     var selectedItem by remember { mutableStateOf(0) }
 
     // Menu elements
     val items = listOf(
-        NavigationItem("Home", Icons.Filled.Home),
-        NavigationItem("News", Icons.Filled.Newspaper),
-        NavigationItem("Profile", Icons.Filled.Person)
+        NavigationItem(context.getString(R.string.home), Icons.Filled.Home),
+        NavigationItem(context.getString(R.string.news), Icons.Filled.Newspaper),
+        NavigationItem(context.getString(R.string.profile), Icons.Filled.Person)
     )
 
     NavigationBar(
@@ -244,21 +245,21 @@ fun BottomNavigationBar(navController: NavController) {
                 onClick = {
                     selectedItem = index
                     when (item.label) {
-                        "Home" -> navController.navigate(GymAppScreen.Home.name) {
+                        context.getString(R.string.home) -> navController.navigate(GymAppScreen.Home.name) {
                             popUpTo(navController.graph.startDestinationId) {
                                 saveState = true
                             }
                             launchSingleTop = true
                             restoreState = true
                         }
-                        "News" -> navController.navigate(route = GymAppScreen.News.name) {
+                        context.getString(R.string.news) -> navController.navigate(route = GymAppScreen.News.name) {
                             popUpTo(navController.graph.startDestinationId) {
                                 saveState = true
                             }
                             launchSingleTop = true
                             restoreState = true
                         }
-                        "Profile" -> navController.navigate(GymAppScreen.MyProfile.name) {
+                        context.getString(R.string.profile) -> navController.navigate(GymAppScreen.MyProfile.name) {
                             popUpTo(navController.graph.startDestinationId) {
                                 saveState = true
                             }
@@ -277,3 +278,4 @@ fun BottomNavigationBar(navController: NavController) {
         }
     }
 }
+data class NavigationItem(val label: String, val icon: ImageVector)

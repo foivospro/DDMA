@@ -26,18 +26,19 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.gymappdemo.ui.viewmodels.SetRepsViewModel
+import com.example.gymappdemo.R
 import com.example.gymappdemo.data.entities.Set
+import com.example.gymappdemo.ui.viewmodels.SetRepsViewModel
 
 
 @Composable
@@ -81,7 +82,8 @@ fun SetRepsScreen(
                         .fillMaxWidth()
                         .height(56.dp)
                 ) {
-                    Text("Αποθήκευση")
+                    Text(
+                        text = stringResource(id = R.string.save))
                 }
             }
         },
@@ -95,7 +97,7 @@ fun SetRepsScreen(
                 .padding(innerPadding)
         ) {
             Text(
-                text = "Ρύθμιση Άσκησης",
+                text = stringResource(id = R.string.exercise_settings),
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
@@ -137,11 +139,11 @@ fun SetRepsScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Add,
-                            contentDescription = "Add Set"
+                            contentDescription = stringResource(id = R.string.add_set)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Προσθήκη Set",
+                            text = stringResource(id = R.string.add_set),
                             style = MaterialTheme.typography.labelLarge
                         )
                     }
@@ -172,7 +174,7 @@ fun WorkoutSetCard(
                 .padding(16.dp)
         ) {
             Text(
-                text = "Set #${setItem.id}",
+                text = stringResource(id = R.string.set_item, setItem.id.toString()),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -186,40 +188,40 @@ fun WorkoutSetCard(
             ) {
                 Column {
                     Text(
-                        text = "Βάρος (kg)",
+                        text = stringResource(id = R.string.weight_kg_2),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Row {
                         IconButton(onClick = { onWeightChange(setItem.weight - 0.5) }) {
-                            Icon(Icons.Default.Remove, contentDescription = "Decrease Weight")
+                            Icon(Icons.Default.Remove, contentDescription = stringResource(id = R.string.decrease_weight))
                         }
                         Text(
                             text = setItem.weight.toString(),
                             style = MaterialTheme.typography.bodyLarge
                         )
                         IconButton(onClick = { onWeightChange(setItem.weight + 0.5) }) {
-                            Icon(Icons.Default.Add, contentDescription = "Increase Weight")
+                            Icon(Icons.Default.Add, contentDescription = stringResource(id = R.string.increase_weight))
                         }
                     }
                 }
 
                 Column {
                     Text(
-                        text = "Επαναλήψεις",
+                        text = stringResource(id = R.string.reps),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Row {
                         IconButton(onClick = { onRepsChange(setItem.reps - 1) }) {
-                            Icon(Icons.Default.Remove, contentDescription = "Decrease Reps")
+                            Icon(Icons.Default.Remove, contentDescription = stringResource(id = R.string.decrease_reps))
                         }
                         Text(
                             text = setItem.reps.toString(),
                             style = MaterialTheme.typography.bodyLarge
                         )
                         IconButton(onClick = { onRepsChange(setItem.reps + 1) }) {
-                            Icon(Icons.Default.Add, contentDescription = "Increase Reps")
+                            Icon(Icons.Default.Add, contentDescription = stringResource(id = R.string.increase_reps))
                         }
                     }
                 }
@@ -227,7 +229,7 @@ fun WorkoutSetCard(
                 IconButton(onClick = onRemove) {
                     Icon(
                         imageVector = Icons.Default.Delete,
-                        contentDescription = "Remove Set",
+                        contentDescription = stringResource(id = R.string.remove_set),
                         tint = MaterialTheme.colorScheme.error
                     )
                 }

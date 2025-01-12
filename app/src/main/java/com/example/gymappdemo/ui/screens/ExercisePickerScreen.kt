@@ -42,7 +42,6 @@ import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -56,11 +55,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.gymappdemo.R
 import com.example.gymappdemo.data.entities.Exercise
 import com.example.gymappdemo.ui.viewmodels.ExercisePickerViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -78,7 +80,10 @@ fun ExercisePickerScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     var query by rememberSaveable { mutableStateOf("") }
     var active by rememberSaveable { mutableStateOf(false) }
-    val muscleGroups = listOf("Upper Body", "Lower Body", "Cardio")
+    val muscleGroups = listOf(
+        stringResource(id = R.string.upper_body),
+        stringResource(id = R.string.lower_body),
+        stringResource(id = R.string.cardio))
     val exercises by viewModel.exercises.collectAsState()
     val selectedExercises by viewModel.selectedExercises.collectAsState()
     var selectedMuscleGroup by remember { mutableStateOf<String?>(null) }
@@ -96,7 +101,9 @@ fun ExercisePickerScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Select Exercises") }
+                title = { Text(
+                    text = stringResource(R.string.select_exercises_title),
+                ) }
             )
         },
         content = { paddingValues ->
@@ -112,7 +119,9 @@ fun ExercisePickerScreen(
                     onSearch = { active = false },
                     active = active,
                     onActiveChange = { active = it },
-                    placeholder = { Text("Search...") },
+                    placeholder = { Text(
+                        stringResource(id =R.string.search_placeholder))
+                                  },
                     leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                     trailingIcon = { Icon(Icons.Default.MoreVert, contentDescription = null) },
                     modifier = Modifier
@@ -239,6 +248,8 @@ fun ExerciseCard(
     viewModel: ExercisePickerViewModel,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+    val language = context.resources.configuration.locales[0].language
     Card(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         modifier = modifier
@@ -275,7 +286,11 @@ fun ExerciseCard(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = exercise.description,
+                    text = when {
+                        language == "en" -> exercise.descriptionEn
+                        language == "es" -> exercise.descriptionEl
+                        else -> exercise.muscleGroup
+                    },
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.Gray
                 )
@@ -289,7 +304,9 @@ fun ExerciseCard(
                 modifier = Modifier
                     .sizeIn(minWidth = 80.dp, minHeight = 36.dp)
             ) {
-                Text("Add", style = MaterialTheme.typography.labelSmall)
+                Text(
+                    stringResource(id = R.string.add),
+                    style = MaterialTheme.typography.labelSmall)
             }
         }
     }

@@ -41,17 +41,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.gymappdemo.Navigation.GymAppScreen
 import com.example.gymappdemo.R
-import com.example.gymappdemo.ui.theme.GymAppDemoTheme
 import com.example.gymappdemo.ui.viewmodels.LoginViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -60,52 +59,49 @@ import kotlinx.coroutines.launch
 fun LoginScreen(onLoginSuccess: () -> Unit,
                 navController: NavController,
                 viewModel: LoginViewModel) {
-    // States for email, password, and password visibility
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isPasswordVisible by remember { mutableStateOf(false) }
     var showError by remember { mutableStateOf(false) }
     var showErrorLogin by remember { mutableStateOf(false) }
     var showSuccessfulLogin by remember { mutableStateOf(false) }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
-        contentAlignment = Alignment.Center // Center the content vertically and horizontally
+        contentAlignment = Alignment.Center
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center, // Center the content vertically within the Column
+            verticalArrangement = Arrangement.Center,
             modifier = Modifier
                 .padding(horizontal = 32.dp)
                 .fillMaxWidth()
                 .offset(y = (-40).dp)
         ) {
-            // Logo or Image
             Image(
                 painter = painterResource(id = R.drawable.start_new_workout_icon),
-                contentDescription = "App Logo",
+                contentDescription = stringResource(R.string.welcome),
                 modifier = Modifier
                     .size(100.dp)
                     .padding(bottom = 16.dp),
                 contentScale = ContentScale.Fit
             )
 
-            // Title
             Text(
-                text = "Καλωσήρθες!",
+                text = stringResource(R.string.welcome),
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 ),
-                modifier = Modifier.padding(bottom = 24.dp) // Increased bottom padding for better spacing
+                modifier = Modifier.padding(bottom = 24.dp)
             )
 
-            // Email Input Field without KeyboardOptions
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Email") },
+                label = { Text(stringResource(R.string.email)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp),
@@ -114,11 +110,10 @@ fun LoginScreen(onLoginSuccess: () -> Unit,
                 isError = showError && email.isEmpty()
             )
 
-            // Password Input Field without KeyboardOptions
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("Κωδικός") },
+                label = { Text(stringResource(R.string.password)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp),
@@ -134,17 +129,16 @@ fun LoginScreen(onLoginSuccess: () -> Unit,
                         }
                         Icon(
                             imageVector = icon,
-                            contentDescription = if (isPasswordVisible) "Hide password" else "Show password"
+                            contentDescription = if (isPasswordVisible) stringResource(R.string.hide_password) else stringResource(R.string.show_password)
                         )
                     }
                 },
                 isError = showError && password.isEmpty()
             )
 
-            // Error Message
             if (showError) {
                 Text(
-                    text = "Παρακαλώ συμπληρώστε όλα τα πεδία.",
+                    text = stringResource(R.string.please_fill_all_fields),
                     color = Color.Red,
                     fontSize = 14.sp,
                     modifier = Modifier.padding(top = 4.dp)
@@ -152,7 +146,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit,
             }
             if (showErrorLogin) {
                 Text(
-                    text = "Λάθος συνδυασμός κωδικού και email. Παρακαλώ δοκιμάστε ξανά.",
+                    text = stringResource(R.string.incorrect_credentials),
                     color = Color.Red,
                     fontSize = 12.sp,
                     modifier = Modifier.padding(top = 4.dp)
@@ -162,21 +156,20 @@ fun LoginScreen(onLoginSuccess: () -> Unit,
                 showErrorLogin = false
                 showError = false
                 Text(
-                    text = "Επιτυχής σύνδεση!",
+                    text = stringResource(R.string.successful_login),
                     color = Color.Green,
                     fontSize = 12.sp,
                     modifier = Modifier.padding(top = 4.dp)
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp)) // Increased spacing before buttons
+            Spacer(modifier = Modifier.height(24.dp))
 
-            // Login Button
             Button(
                 onClick = {
                     viewModel.viewModelScope.launch {
                         val user = viewModel.login(email, password)
-                        if (user!=null) {
+                        if (user != null) {
                             showSuccessfulLogin = true
                             delay(1000)
                             navController.navigate(GymAppScreen.Home.name)
@@ -188,19 +181,18 @@ fun LoginScreen(onLoginSuccess: () -> Unit,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
-                shape = RoundedCornerShape(8.dp )
+                shape = RoundedCornerShape(8.dp)
             ) {
-                Text(text = "Σύνδεση", fontSize = 16.sp)
+                Text(text = stringResource(R.string.login), fontSize = 16.sp)
             }
 
-            Spacer(modifier = Modifier.height(12.dp)) // Spacing between buttons
+            Spacer(modifier = Modifier.height(12.dp))
 
-            // Google Login Button
             Button(
                 onClick = {
                     // Add logic for Google sign-in
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4285F4)), // Google Blue
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4285F4)),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
@@ -208,23 +200,22 @@ fun LoginScreen(onLoginSuccess: () -> Unit,
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        imageVector = Icons.Default.Person, // Replace with Google icon if available
+                        imageVector = Icons.Default.Person,
                         contentDescription = "Google Logo",
                         modifier = Modifier.size(24.dp),
                         tint = Color.White
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Σύνδεση μέσω Google",
+                        text = stringResource(R.string.login_with_google),
                         color = Color.White,
                         fontSize = 16.sp
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp)) // Spacing before the divider
+            Spacer(modifier = Modifier.height(24.dp))
 
-            // Divider with "Ή"
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
@@ -237,7 +228,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit,
                     modifier = Modifier.weight(1f)
                 )
                 Text(
-                    text = " Ή ",
+                    text = stringResource(R.string.or),
                     color = Color.Gray,
                     modifier = Modifier.padding(horizontal = 8.dp)
                 )
@@ -248,7 +239,6 @@ fun LoginScreen(onLoginSuccess: () -> Unit,
                 )
             }
 
-            // Continue as Guest Button
             OutlinedButton(
                 onClick = {
                     navController.navigate(GymAppScreen.Home.name)
@@ -260,34 +250,27 @@ fun LoginScreen(onLoginSuccess: () -> Unit,
                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
             ) {
                 Text(
-                    text = "Συνέχεια ως Επισκέπτης",
+                    text = stringResource(R.string.continue_as_guest),
                     color = MaterialTheme.colorScheme.primary,
                     fontSize = 16.sp
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp)) // Spacing before the registration prompt
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // Registration Prompt
             Row {
                 Text(
-                    text = "Δεν έχεις λογαριασμό; ",
+                    text = stringResource(R.string.no_account),
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Text(
-                    text = "Εγγραφή",
+                    text = stringResource(R.string.register),
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.clickable {
-                        navController.navigate(GymAppScreen.Register.name) }
+                        navController.navigate(GymAppScreen.Register.name)
+                    }
                 )
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenPreview() {
-    GymAppDemoTheme {
     }
 }

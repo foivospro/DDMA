@@ -1,12 +1,21 @@
 package com.example.gymappdemo.ui.screens
 
 
-import androidx.compose.runtime.Composable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,7 +24,21 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,11 +49,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.gymappdemo.Navigation.GymAppScreen
+import com.example.gymappdemo.R
 import com.example.gymappdemo.ui.viewmodels.MyProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,8 +78,8 @@ fun UserProfileScreen(
         if (showLogoutDialog) {
             AlertDialog(
                 onDismissRequest = { showLogoutDialog = false }, // Close the dialog on dismiss
-                title = { Text("Log Out") },
-                text = { Text("Are you sure you want to log out?") },
+                title = { Text(stringResource(R.string.log_out)) },
+                text = { Text(stringResource(R.string.log_out_confirmation)) },
                 confirmButton = {
                     TextButton(
                         onClick = {
@@ -65,12 +90,12 @@ fun UserProfileScreen(
                             showLogoutDialog = false // Close the dialog
                         }
                     ) {
-                        Text("Yes")
+                        Text(stringResource(R.string.yes))
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { showLogoutDialog = false }) {
-                        Text("No")
+                        Text(stringResource(R.string.no))
                     }
                 }
             )
@@ -85,14 +110,14 @@ fun UserProfileScreen(
                             verticalAlignment = Alignment.CenterVertically // Vertically center items in the row
                         ) {
                             Text(
-                                "My Profile",
+                                stringResource(R.string.my_profile),
                                 style = MaterialTheme.typography.headlineMedium,
                                 color = MaterialTheme.colorScheme.primary
                             )
 
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ExitToApp,
-                                contentDescription = "Profile",
+                                contentDescription = stringResource(R.string.profile_icon),
                                 tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier
                                     .size(40.dp)
@@ -123,7 +148,7 @@ fun UserProfileScreen(
                 ) {
                     Image(
                         painter = painterResource(com.example.gymappdemo.R.drawable.default_profile),
-                        contentDescription = "User Profile Picture",
+                        contentDescription = stringResource(R.string.profile_icon),
                         modifier = Modifier
                             .fillMaxSize()
                             .clip(CircleShape)
@@ -139,7 +164,7 @@ fun UserProfileScreen(
                         .padding(vertical = 8.dp)
                 ) {
                     Text(
-                        "Username",
+                        stringResource(R.string.username),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -162,7 +187,7 @@ fun UserProfileScreen(
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Person,
-                                contentDescription = "Profile Icon",
+                                contentDescription = stringResource(R.string.profile_icon),
                                 tint = MaterialTheme.colorScheme.primary
                             )
                         }
@@ -177,7 +202,7 @@ fun UserProfileScreen(
                         .padding(vertical = 8.dp)
                 ) {
                     Text(
-                        "Email",
+                        stringResource(R.string.email),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -200,7 +225,7 @@ fun UserProfileScreen(
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Mail,
-                                contentDescription = "Mail Icon",
+                                contentDescription = stringResource(R.string.mail_icon),
                                 tint = MaterialTheme.colorScheme.primary
                             )
                         }
@@ -213,25 +238,11 @@ fun UserProfileScreen(
                 val weight = user?.weight?.toString() ?: ""
                 val age = user?.age?.toString() ?: ""
 
-                var messenger = "Enter your "
-                if (height.isNullOrEmpty() || height == "0") {
-                    messenger += "Height, "
-                }
-                if (weight.isNullOrEmpty() || weight == "0") {
-                    messenger += "Weight, "
-                }
-                if (age.isNullOrEmpty() || age == "0") {
-                    messenger += "Age"
-                }
-
-                messenger += " in settings"
-
-
-                if (height.isNullOrEmpty() || height == "0"
-                    || weight.isNullOrEmpty() || weight == "0"
-                    || age.isNullOrEmpty() || age == "0") {
+                if (height.isEmpty() || height == "0" ||
+                    weight.isEmpty() || weight == "0" ||
+                    age.isEmpty() || age == "0") {
                     Text(
-                        text = messenger,
+                        text = stringResource(R.string.enter_details_in_settings),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.primary,
                         textAlign = TextAlign.Center,
@@ -246,14 +257,9 @@ fun UserProfileScreen(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-
-                    Spacer(modifier = Modifier.height(20.dp))
-
-
-
-                    UserDetailCard(label = "Height", value = height)
-                    UserDetailCard(label = "Weight", value = weight)
-                    UserDetailCard(label = "Age", value = age)
+                    UserDetailCard(label = stringResource(R.string.height), value = height)
+                    UserDetailCard(label = stringResource(R.string.weight), value = weight)
+                    UserDetailCard(label = stringResource(R.string.age), value = age)
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -271,7 +277,7 @@ fun UserProfileScreen(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                 ) {
                     Text(
-                        text = "Settings",
+                        text = stringResource(R.string.settings),
                         style = MaterialTheme.typography.titleSmall
                     )
                 }
@@ -282,7 +288,7 @@ fun UserProfileScreen(
 
 @Composable
 fun UserDetailCard(label: String, value: String) {
-    if (value.isNullOrEmpty() || value == "0") {
+    if (value.isEmpty() || value == "0") {
         Card(
             modifier = Modifier
                 .padding(8.dp)
@@ -290,39 +296,21 @@ fun UserDetailCard(label: String, value: String) {
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
         ) {
-            if (label == "Height"){
-                Icon(
-                    painter = painterResource(com.example.gymappdemo.R.drawable.height),
-                    contentDescription = "Icon for Height",
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(20.dp), // Optional padding around the icon
-                    tint = MaterialTheme.colorScheme.primary // Set the icon color to primary
-                )
-
-            } else if (label == "Weight"){
-                Icon(
-                    painter = painterResource(com.example.gymappdemo.R.drawable.weight2),
-                    contentDescription = "Icon for Weight",
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(20.dp), // Optional padding around the icon
-                    tint = MaterialTheme.colorScheme.primary // Set the icon color to primary
-                )
-
-            } else {
-                Icon(
-                    painter = painterResource(com.example.gymappdemo.R.drawable.calendar),
-                    contentDescription = "Icon for Age",
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(20.dp), // Optional padding around the icon
-                    tint = MaterialTheme.colorScheme.primary // Set the icon color to primary
-                )
+            val iconRes = when (label) {
+                stringResource(R.string.height) -> com.example.gymappdemo.R.drawable.height
+                stringResource(R.string.weight) -> com.example.gymappdemo.R.drawable.weight2
+                else -> com.example.gymappdemo.R.drawable.calendar
             }
+
+            Icon(
+                painter = painterResource(iconRes),
+                contentDescription = "$label Icon",
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(20.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
         }
-
-
     } else {
         Card(
             modifier = Modifier
@@ -341,13 +329,13 @@ fun UserDetailCard(label: String, value: String) {
                 Text(
                     text = value,
                     fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.headlineMedium, // Use Body Large style
-                    color = MaterialTheme.colorScheme.primary //MaterialTheme.colorScheme.onSurface
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.primary
                 )
 
                 Text(
                     text = label,
-                    style = MaterialTheme.typography.bodyLarge, // Use Body Small style
+                    style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
@@ -378,14 +366,14 @@ fun GuestUserPrompt(navController: NavController) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "You are logged in as a Guest",
+                    text = stringResource(R.string.guest_logged_in),
                     style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
                 Text(
-                    text = "To access full features, please log in to your account.",
+                    text = stringResource(R.string.log_in_to_access_features),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
@@ -397,7 +385,7 @@ fun GuestUserPrompt(navController: NavController) {
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
                     Text(
-                        text = "Log In",
+                        text = stringResource(R.string.log_in),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onPrimary
                     )
@@ -406,6 +394,7 @@ fun GuestUserPrompt(navController: NavController) {
         }
     }
 }
+
 
 
 
