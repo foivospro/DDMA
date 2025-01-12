@@ -74,77 +74,90 @@ abstract class AppDatabase : RoomDatabase() {
                 val exercises = listOf(
                     Exercise(
                         name = "Bench",
-                        description = "A compound exercise targeting the chest, shoulders, and triceps by pressing a weight away from the chest while lying on a bench.",
+                        descriptionEn = "A compound exercise targeting the chest, shoulders, and triceps by pressing a weight away from the chest while lying on a bench.",
+                        descriptionEl = "Μια σύνθετη άσκηση που στοχεύει το στήθος, τους ώμους και τους τρικεφάλους πιέζοντας ένα βάρος μακριά από το στήθος ενώ ξαπλώνετε σε έναν πάγκο.",
                         icon = "bench",
                         muscleGroup = "Upper Body"
                     ),
                     Exercise(
                         name = "Biceps",
-                        description = "Isolation exercises that target the biceps muscles, such as curls using dumbbells, barbells, or cables.",
+                        descriptionEn = "Isolation exercises that target the biceps muscles, such as curls using dumbbells, barbells, or cables.",
+                        descriptionEl = "Ασκήσεις απομόνωσης που στοχεύουν στους δικέφαλους μύες, όπως κάμψεις με αλτήρες, μπάρες ή καλώδια.",
                         icon = "biceps",
                         muscleGroup = "Upper Body"
                     ),
                     Exercise(
                         name = "Cycling",
-                        description = "A cardio exercise that improves heart health and leg endurance, typically performed on a stationary bike or outdoors.",
+                        descriptionEn = "A cardio exercise that improves heart health and leg endurance, typically performed on a stationary bike or outdoors.",
+                        descriptionEl = "Μια αερόβια άσκηση που βελτιώνει την υγεία της καρδιάς και την αντοχή των ποδιών, συνήθως με στατικό ποδήλατο ή σε εξωτερικούς χώρους.",
                         icon = "cycling",
                         muscleGroup = "Cardio"
                     ),
                     Exercise(
                         name = "Deadlift",
-                        description = "A full-body compound lift that primarily strengthens the lower back, hamstrings, and glutes by lifting a weight from the ground to hip level.",
+                        descriptionEn = "A full-body compound lift that primarily strengthens the lower back, hamstrings, and glutes by lifting a weight from the ground to hip level.",
+                        descriptionEl = "Μια σύνθετη άρση για ολόκληρο το σώμα που ενισχύει κυρίως την κάτω πλάτη, τους οπίσθιους μηριαίους και τους γλουτούς, σηκώνοντας ένα βάρος από το έδαφος μέχρι το ύψος των γοφών.",
                         icon = "deadlift",
                         muscleGroup = "Lower Body"
                     ),
                     Exercise(
                         name = "Dips",
-                        description = "A bodyweight exercise that targets the chest, triceps, and shoulders by lowering and raising the body using parallel bars.",
+                        descriptionEn = "A bodyweight exercise that targets the chest, triceps, and shoulders by lowering and raising the body using parallel bars.",
+                        descriptionEl = "Μια άσκηση με το βάρος του σώματος που στοχεύει στο στήθος, τους τρικεφάλους και τους ώμους, κατεβάζοντας και ανεβάζοντας το σώμα χρησιμοποιώντας παράλληλες μπάρες.",
                         icon = "dips",
                         muscleGroup = "Upper Body"
                     ),
                     Exercise(
                         name = "Pull-ups",
-                        description = "A compound upper body exercise that targets the lats, biceps, and shoulders by pulling the body up to a bar using a pronated grip.",
+                        descriptionEn = "A compound upper body exercise that targets the lats, biceps, and shoulders by pulling the body up to a bar using a pronated grip.",
+                        descriptionEl = "Μια σύνθετη άσκηση για το πάνω μέρος του σώματος που στοχεύει στους πλατείς ραχιαίους, τους δικέφαλους και τους ώμους, τραβώντας το σώμα προς τα πάνω σε μια μπάρα με ανάποδη λαβή.",
                         icon = "pullups",
                         muscleGroup = "Upper Body"
                     ),
                     Exercise(
                         name = "Romanian Deadlift",
-                        description = "A variation of the deadlift focusing on hamstring and glute engagement by lowering the weight with a slight bend in the knees.",
+                        descriptionEn = "A variation of the deadlift focusing on hamstring and glute engagement by lowering the weight with a slight bend in the knees.",
+                        descriptionEl = "Μια παραλλαγή της άρσης θανάτου που εστιάζει στην ενεργοποίηση των οπίσθιων μηριαίων και των γλουτών, χαμηλώνοντας το βάρος με ελαφριά κάμψη στα γόνατα.",
                         icon = "rdl",
                         muscleGroup = "Lower Body"
                     ),
                     Exercise(
                         name = "Rows",
-                        description = "A pulling exercise that targets the back muscles, particularly the lats and rhomboids, performed with dumbbells, a barbell, or a cable machine.",
+                        descriptionEn = "A pulling exercise that targets the back muscles, particularly the lats and rhomboids, performed with dumbbells, a barbell, or a cable machine.",
+                        descriptionEl = "Μια άσκηση έλξης που στοχεύει στους μύες της πλάτης, ιδιαίτερα στους πλατείς ραχιαίους και στους ρομβοειδείς, που εκτελείται με αλτήρες, μπάρα ή μηχάνημα με καλώδια.",
                         icon = "rows",
                         muscleGroup = "Upper Body"
                     ),
                     Exercise(
                         name = "Snatch",
-                        description = "An advanced Olympic lift that involves explosively lifting a barbell from the ground to overhead in one motion, targeting the entire body.",
+                        descriptionEn = "An advanced Olympic lift that involves explosively lifting a barbell from the ground to overhead in one motion, targeting the entire body.",
+                        descriptionEl = "Μια προχωρημένη Ολυμπιακή άρση που περιλαμβάνει την εκρηκτική ανύψωση μιας μπάρας από το έδαφος πάνω από το κεφάλι με μία κίνηση, στοχεύοντας ολόκληρο το σώμα.",
                         icon = "snatch",
                         muscleGroup = "Lower Body"
                     ),
                     Exercise(
                         name = "Squat",
-                        description = "A foundational compound exercise that targets the quads, hamstrings, and glutes by lowering and raising the body with or without weights.",
+                        descriptionEn = "A foundational compound exercise that targets the quads, hamstrings, and glutes by lowering and raising the body with or without weights.",
+                        descriptionEl = "Μια θεμελιώδης σύνθετη άσκηση που στοχεύει στους τετρακέφαλους, τους οπίσθιους μηριαίους και τους γλουτούς, κατεβάζοντας και ανεβάζοντας το σώμα με ή χωρίς βάρη.",
                         icon = "squat",
                         muscleGroup = "Lower Body"
                     ),
                     Exercise(
                         name = "Tricep Extensions",
-                        description = "An isolation exercise that targets the triceps, often performed using dumbbells, cables, or a barbell.",
+                        descriptionEn = "An isolation exercise that targets the triceps, often performed using dumbbells, cables, or a barbell.",
+                        descriptionEl = "Μια άσκηση απομόνωσης που στοχεύει στους τρικεφάλους, συχνά εκτελείται με αλτήρες, καλώδια ή μπάρα.",
                         icon = "triceps",
                         muscleGroup = "Upper Body"
                     ),
                     Exercise(
                         name = "Tricep Dips",
-                        description = "A bodyweight exercise that focuses on the triceps, performed using a bench or parallel bars to lower and raise the body.",
+                        descriptionEn = "A bodyweight exercise that focuses on the triceps, performed using a bench or parallel bars to lower and raise the body.",
+                        descriptionEl = "Μια άσκηση με το βάρος του σώματος που εστιάζει στους τρικεφάλους, εκτελείται χρησιμοποιώντας πάγκο ή παράλληλες μπάρες για να κατεβάσετε και να ανεβάσετε το σώμα.",
                         icon = "triceps2",
                         muscleGroup = "Upper Body"
                     )
                 )
+
                 exerciseDao.insertAll(exercises)
                 // Insert Default Users
                 val users = listOf(

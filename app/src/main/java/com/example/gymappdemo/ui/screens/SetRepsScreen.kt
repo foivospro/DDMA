@@ -43,6 +43,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -51,10 +52,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.gymappdemo.ui.viewmodels.SetRepsViewModel
+import com.example.gymappdemo.R
 import com.example.gymappdemo.data.entities.Set
+import com.example.gymappdemo.ui.viewmodels.SetRepsViewModel
 import com.example.gymappdemo.utils.IconResourceMapper.getIconResource
-
 
 
 @Composable
@@ -106,7 +107,8 @@ fun SetRepsScreen(
                         .fillMaxWidth()
                         .height(56.dp)
                 ) {
-                    Text("Αποθήκευση")
+                    Text(
+                        text = stringResource(id = R.string.save))
                 }
             }
         },
@@ -224,12 +226,12 @@ fun SetRepsScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Add,
-                            contentDescription = "Προσθήκη Set",
+                            contentDescription = stringResource(id = R.string.add_set),
                             tint = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Προσθήκη Set",
+                            text = stringResource(id = R.string.add_set),
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
@@ -267,131 +269,192 @@ fun WorkoutSetCard(
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Set #${setItem.id}",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                IconButton(
-                    onClick = onRemove,
-                    modifier = Modifier.size(24.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "Remove Set",
-                        tint = MaterialTheme.colorScheme.error
-                    )
-                }
-            }
+            Text(
+                text = stringResource(id = R.string.set_item, setItem.id.toString()),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
 
             Spacer(modifier = Modifier.height(8.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "Βάρος (kg)",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    text = "Επαναλήψεις",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(
-                        onClick = { onWeightChange((setItem.weight - 0.5).coerceAtLeast(0.0)) },
-                        modifier = Modifier.size(24.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Remove,
-                            contentDescription = "Μείωση Βάρους",
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-
-                    OutlinedTextField(
-                        value = weightInput,
-                        onValueChange = { newValue ->
-                            if (newValue.matches(Regex("^\\d*\\.?\\d*$"))) {
-                                weightInput = newValue
-                                newValue.toDoubleOrNull()?.let { validWeight ->
-                                    onWeightChange(validWeight)
-                                }
-                            }
-                        },
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Decimal,
-                            imeAction = ImeAction.Done
-                        ),
-                        singleLine = true,
-                        textStyle = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier
-                            .width(75.dp)
-                            .height(55.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = MaterialTheme.colorScheme.primary,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                        )
+                Column {
+                    Text(
+                        text = stringResource(id = R.string.weight_kg_2),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                    Row {
+                        IconButton(onClick = { onWeightChange(setItem.weight - 0.5) }) {
+                            Icon(
+                                Icons.Default.Remove,
+                                contentDescription = stringResource(id = R.string.decrease_weight)
+                            )
+                        }
+                        Text(
+                            text = setItem.weight.toString(),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        IconButton(onClick = { onWeightChange(setItem.weight + 0.5) }) {
+                            Icon(
+                                Icons.Default.Add,
+                                contentDescription = stringResource(id = R.string.increase_weight)
+                            )
+                        }
+                    }
+                }
 
+                Column {
+                    Text(
+                        text = stringResource(id = R.string.reps),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Row {
+                        IconButton(onClick = { onRepsChange(setItem.reps - 1) }) {
+                            Icon(
+                                Icons.Default.Remove,
+                                contentDescription = stringResource(id = R.string.decrease_reps)
+                            )
+                        }
+                        Text(
+                            text = setItem.reps.toString(),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        IconButton(onClick = { onRepsChange(setItem.reps + 1) }) {
+                            Icon(
+                                Icons.Default.Add,
+                                contentDescription = stringResource(id = R.string.increase_reps)
+                            )
+                        }
+                    }
+                }
+
+                IconButton(onClick = onRemove) {
+                    Text(
+                        text = "Set #${setItem.id}",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
                     IconButton(
-                        onClick = { onWeightChange(setItem.weight + 0.5) },
+                        onClick = onRemove,
                         modifier = Modifier.size(24.dp)
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = "Αύξηση Βάρους",
-                            tint = MaterialTheme.colorScheme.primary
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = stringResource(id = R.string.remove_set),
+                            tint = MaterialTheme.colorScheme.error
                         )
                     }
                 }
+
+                Spacer(modifier = Modifier.height(8.dp))
                 Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "Βάρος (kg)",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = "Επαναλήψεις",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton(
-                        onClick = { onRepsChange((setItem.reps - 1).coerceAtLeast(1)) },
-                        modifier = Modifier.size(24.dp)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Remove,
-                            contentDescription = "Μείωση Επαναλήψεων",
-                            tint = MaterialTheme.colorScheme.primary
+                        IconButton(
+                            onClick = { onWeightChange((setItem.weight - 0.5).coerceAtLeast(0.0)) },
+                            modifier = Modifier.size(24.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Remove,
+                                contentDescription = "Μείωση Βάρους",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+
+                        OutlinedTextField(
+                            value = weightInput,
+                            onValueChange = { newValue ->
+                                if (newValue.matches(Regex("^\\d*\\.?\\d*$"))) {
+                                    weightInput = newValue
+                                    newValue.toDoubleOrNull()?.let { validWeight ->
+                                        onWeightChange(validWeight)
+                                    }
+                                }
+                            },
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Decimal,
+                                imeAction = ImeAction.Done
+                            ),
+                            singleLine = true,
+                            textStyle = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier
+                                .width(75.dp)
+                                .height(55.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                            )
                         )
+
+                        IconButton(
+                            onClick = { onWeightChange(setItem.weight + 0.5) },
+                            modifier = Modifier.size(24.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "Αύξηση Βάρους",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
                     }
-
-                    Text(
-                        text = setItem.reps.toString(),
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(horizontal = 8.dp)
-                    )
-
-                    IconButton(
-                        onClick = { onRepsChange(setItem.reps + 1) },
-                        modifier = Modifier.size(24.dp)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = "Αύξηση Επαναλήψεων",
-                            tint = MaterialTheme.colorScheme.primary
+                        IconButton(
+                            onClick = { onRepsChange((setItem.reps - 1).coerceAtLeast(1)) },
+                            modifier = Modifier.size(24.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Remove,
+                                contentDescription = "Μείωση Επαναλήψεων",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+
+                        Text(
+                            text = setItem.reps.toString(),
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.padding(horizontal = 8.dp)
                         )
+
+                        IconButton(
+                            onClick = { onRepsChange(setItem.reps + 1) },
+                            modifier = Modifier.size(24.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "Αύξηση Επαναλήψεων",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
                     }
                 }
             }

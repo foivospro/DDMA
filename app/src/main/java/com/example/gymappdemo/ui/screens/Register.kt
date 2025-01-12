@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -87,7 +88,7 @@ fun RegisterScreen(
                 // Logo or Image
                 Image(
                     painter = painterResource(id = R.drawable.start_new_workout_icon),
-                    contentDescription = "App Logo",
+                    contentDescription = stringResource(id = R.string.app_logo),
                     modifier = Modifier
                         .size(100.dp)
                         .padding(bottom = 16.dp),
@@ -98,7 +99,7 @@ fun RegisterScreen(
             item {
                 // Title
                 Text(
-                    text = "Δημιουργία Λογαριασμού",
+                    text = stringResource(id = R.string.create_account),
                     style = MaterialTheme.typography.headlineMedium.copy(
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
@@ -112,7 +113,9 @@ fun RegisterScreen(
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
-                    label = { Text("Email") },
+                    label = { Text(
+                        text = stringResource(id = R.string.email)
+                    ) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 8.dp),
@@ -127,7 +130,9 @@ fun RegisterScreen(
                 OutlinedTextField(
                     value = username,
                     onValueChange = { username = it },
-                    label = { Text("Όνομα Χρήστη") },
+                    label = { Text(
+                        stringResource(id = R.string.username)
+                    ) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 8.dp),
@@ -142,7 +147,9 @@ fun RegisterScreen(
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
-                    label = { Text("Κωδικός") },
+                    label = { Text(
+                        text = stringResource(id = R.string.password)
+                    ) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 8.dp),
@@ -158,7 +165,7 @@ fun RegisterScreen(
                             }
                             Icon(
                                 imageVector = icon,
-                                contentDescription = if (isPasswordVisible) "Hide password" else "Show password"
+                                contentDescription = if (isPasswordVisible) stringResource(id = R.string.hide_password) else stringResource(id = R.string.show_password)
                             )
                         }
                     },
@@ -171,7 +178,9 @@ fun RegisterScreen(
                 OutlinedTextField(
                     value = confirmPassword,
                     onValueChange = { confirmPassword = it },
-                    label = { Text("Επιβεβαίωση Κωδικού") },
+                    label = { Text(
+                        text = stringResource(id = R.string.confirm_password)
+                    ) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 8.dp),
@@ -187,7 +196,7 @@ fun RegisterScreen(
                             }
                             Icon(
                                 imageVector = icon,
-                                contentDescription = if (isConfirmPasswordVisible) "Hide password" else "Show password"
+                                contentDescription = if (isConfirmPasswordVisible) stringResource(id = R.string.hide_password) else stringResource(id = R.string.show_password)
                             )
                         }
                     },
@@ -211,7 +220,7 @@ fun RegisterScreen(
                 showErrorRegister = false
                 showError = false
                 Text(
-                    text = "Επιτυχής σύνδεση!",
+                    text = stringResource(id = R.string.successful_registration),
                     color = Color.Green,
                     fontSize = 12.sp,
                     modifier = Modifier.padding(top = 4.dp)
@@ -246,7 +255,9 @@ fun RegisterScreen(
                         .height(50.dp),
                     shape = RoundedCornerShape(8.dp)
                 ) {
-                    Text(text = "Εγγραφή", fontSize = 16.sp)
+                    Text(
+                        text = stringResource(id = R.string.register),
+                        fontSize = 16.sp)
                 }
             }
 
@@ -258,11 +269,11 @@ fun RegisterScreen(
                 // Already have an account
                 Row {
                     Text(
-                        text = "Έχεις ήδη λογαριασμό; ",
+                        text = stringResource(id = R.string.no_account),
                         color = MaterialTheme.colorScheme.onBackground
                     )
                     Text(
-                        text = "Σύνδεση",
+                        text = stringResource(id = R.string.login),
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.clickable { navController.navigate(GymAppScreen.Login.name) }
                     )

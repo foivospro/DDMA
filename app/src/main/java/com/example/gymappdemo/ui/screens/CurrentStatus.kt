@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -27,6 +28,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -45,18 +47,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.gymappdemo.Navigation.GymAppScreen
 import com.example.gymappdemo.R
 import com.example.gymappdemo.data.entities.ExerciseWithSets
 import com.example.gymappdemo.data.entities.Set
 import com.example.gymappdemo.ui.viewmodels.CurrentStatusViewModel
-import com.example.gymappdemo.Navigation.GymAppScreen
-
 
 @Composable
 fun CurrentStatus(
@@ -75,11 +77,11 @@ fun CurrentStatus(
     if (error != null) {
         AlertDialog(
             onDismissRequest = { viewModel.clearError() },
-            title = { Text("Error") },
+            title = { Text(stringResource(R.string.error)) },
             text = { Text(error!!) },
             confirmButton = {
                 Button(onClick = { viewModel.clearError() }) {
-                    Text("OK")
+                    Text(stringResource(R.string.ok))
                 }
             }
         )
@@ -104,7 +106,7 @@ fun CurrentStatus(
                     sessionExerciseId = setToAdd!!,
                     repetitions = repetitions,
                     weight = weight,
-                    )
+                )
                 setToAdd = null
             }
         )
@@ -116,12 +118,27 @@ fun CurrentStatus(
     }
 
     Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { navController.navigate("ExercisePicker/$sessionId") },
+                shape = CircleShape,
+                containerColor = colorScheme.primary,
+                contentColor = colorScheme.onPrimary
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.add),
+                    contentDescription = stringResource(R.string.add)
+                )
+            }
+        },
         bottomBar = {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
+                Text(stringResource(R.string.termination_workout))
+
                 Button(
                     onClick = { navController.navigate("ExercisePicker/$sessionId") },
                     modifier = Modifier
@@ -181,6 +198,7 @@ fun CurrentStatus(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Top
                 ) {
+
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -223,13 +241,15 @@ fun CurrentStatus(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // List of Exercises with Sets
                     LazyColumn(
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                         modifier = Modifier.fillMaxSize()
                     ) {
                         if (exercisesWithSets.isEmpty()) {
                             item {
+
+                                Text(stringResource(R.string.no_exercises_available), modifier = Modifier.padding(16.dp))
+
                                 Card(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -288,19 +308,19 @@ fun AddSetDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = "Προσθήκη Νέου Set") },
+        title = { Text(stringResource(R.string.add_new_set)) },
         text = {
             Column {
                 OutlinedTextField(
                     value = repetitions,
                     onValueChange = { repetitions = it },
-                    label = { Text("Επαναλήψεις") },
+                    label = { Text(stringResource(R.string.repetitions)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
                 OutlinedTextField(
                     value = weight,
                     onValueChange = { weight = it },
-                    label = { Text("Βάρος (kg)") },
+                    label = { Text(stringResource(R.string.weight_kg_2)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
             }
@@ -315,12 +335,12 @@ fun AddSetDialog(
                     }
                 }
             ) {
-                Text("Προσθήκη")
+                Text(stringResource(R.string.add))
             }
         },
         dismissButton = {
             Button(onClick = onDismiss) {
-                Text("Ακύρωση")
+                Text(stringResource(R.string.cancel))
             }
         }
     )
@@ -333,19 +353,19 @@ fun EditSetDialog(set: Set, onDismiss: () -> Unit, onSave: (Set) -> Unit) {
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = "Επεξεργασία Set") },
+        title = { Text(stringResource(R.string.edit_set)) },
         text = {
             Column {
                 OutlinedTextField(
                     value = reps,
                     onValueChange = { reps = it },
-                    label = { Text("Επαναλήψεις") },
+                    label = { Text(stringResource(R.string.repetitions)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
                 OutlinedTextField(
                     value = weight,
                     onValueChange = { weight = it },
-                    label = { Text("Βάρος (kg)") },
+                    label = { Text(stringResource(R.string.weight)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
             }
@@ -360,17 +380,16 @@ fun EditSetDialog(set: Set, onDismiss: () -> Unit, onSave: (Set) -> Unit) {
                     onSave(updatedSet)
                 }
             ) {
-                Text("Αποθήκευση")
+                Text(stringResource(R.string.save))
             }
         },
         dismissButton = {
             Button(onClick = onDismiss) {
-                Text("Ακύρωση")
+                Text(stringResource(R.string.cancel))
             }
         }
     )
 }
-
 
 @Composable
 fun TimerAndCalories(
@@ -404,16 +423,15 @@ fun TimerAndCalories(
                     id = if (isStarted) R.drawable.pause_circle_24dp_e8eaed_fill0_wght400_grad0_opsz24
                     else R.drawable.start_24dp_e8eaed_fill0_wght400_grad0_opsz24
                 ),
-                contentDescription = if (isStarted) "Pause" else "Start",
+                contentDescription = if (isStarted) stringResource(R.string.pause) else stringResource(R.string.start),
                 tint = colorScheme.onPrimary,
                 modifier = Modifier.size(48.dp)
             )
         }
 
-        // Calories Display
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = "Calories",
+                text = stringResource(R.string.calories),
                 style = MaterialTheme.typography.titleMedium,
                 color = colorScheme.onBackground
             )
@@ -424,15 +442,14 @@ fun TimerAndCalories(
             )
         }
 
-        // Timer Display με μορφοποίηση
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = "Time",
+                text = stringResource(R.string.time),
                 style = MaterialTheme.typography.titleMedium,
                 color = colorScheme.onBackground
             )
             Text(
-                text = formattedTime, // Χρησιμοποίησε το μορφοποιημένο χρόνο
+                text = formattedTime,
                 style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
                 color = colorScheme.primary
             )
@@ -494,18 +511,17 @@ fun ExerciseWithSetsCard(
                     IconButton(onClick = { onAddSet(exerciseWithSets.sessionExercise.id) }) {
                         Icon(
                             imageVector = Icons.Default.Add,
-                            contentDescription = "Προσθήκη Set",
+                            contentDescription = stringResource(R.string.add_set),
                             tint = Color(0xFF0AAD0A)
                         )
                     }
                     IconButton(onClick = { onDeleteExercise(exerciseWithSets.sessionExercise.id) }) {
                         Icon(
                             imageVector = Icons.Default.Delete,
-                            contentDescription = "Διαγραφή Άσκησης",
+                            contentDescription = stringResource(R.string.delete_exercise),
                             tint = Color.Red
                         )
                     }
-
                 }
             }
 
@@ -522,8 +538,6 @@ fun ExerciseWithSetsCard(
     }
 }
 
-
-
 @Composable
 fun SetCard(set: Set, onRemove: () -> Unit, onEdit: (Set) -> Unit) {
     Row(
@@ -534,21 +548,21 @@ fun SetCard(set: Set, onRemove: () -> Unit, onEdit: (Set) -> Unit) {
             .padding(vertical = 4.dp)
     ) {
         Column {
-            Text(text = "Reps: ${set.reps}", style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Weight: ${set.weight} kg", style = MaterialTheme.typography.bodyMedium)
+            Text(text = stringResource(R.string.reps, set.reps), style = MaterialTheme.typography.bodyMedium)
+            Text(text = stringResource(R.string.weight_kg, set.weight), style = MaterialTheme.typography.bodyMedium)
         }
         Row {
             IconButton(onClick = { onEdit(set) }) {
                 Icon(
                     imageVector = Icons.Default.Edit,
-                    contentDescription = "Edit Set",
+                    contentDescription = stringResource(R.string.edit_set),
                     tint = Color.DarkGray
                 )
             }
             IconButton(onClick = onRemove) {
                 Icon(
                     imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete Set",
+                    contentDescription = stringResource(R.string.delete_exercise),
                     tint = Color.Red
                 )
             }
