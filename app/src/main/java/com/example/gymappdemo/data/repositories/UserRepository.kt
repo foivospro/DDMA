@@ -49,6 +49,15 @@ class UserRepository(private val userDao: UserDao, private val context: Context)
         sharedPreferences.edit().putString("logged_in_user_email", email).apply()
     }
 
+    // Retrieve the logged-in user's ID from preferences
+    suspend fun getLoggedInUserId(): Int? {
+        val email = getLoggedInUserEmail()
+        return email?.let {
+            userDao.getUserByEmail(it)?.id
+        }
+    }
+
+
     // Retrieve the logged-in user's email from preferences
     fun getLoggedInUserEmail(): String? {
         return sharedPreferences.getString("logged_in_user_email", "Guest")
