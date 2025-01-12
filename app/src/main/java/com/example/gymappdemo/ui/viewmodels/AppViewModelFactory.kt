@@ -6,11 +6,12 @@ import com.example.gymappdemo.data.repositories.UserRepository
 import com.example.gymappdemo.data.repositories.WorkoutRepository
 import com.example.gymappdemo.ui.viewmodels.CurrentStatusViewModel
 import com.example.gymappdemo.ui.viewmodels.ExercisePickerViewModel
-import com.example.gymappdemo.ui.viewmodels.MyProfileViewModel
 import com.example.gymappdemo.ui.viewmodels.HomeViewModel
-import com.example.gymappdemo.ui.viewmodels.SetRepsViewModel
 import com.example.gymappdemo.ui.viewmodels.LoginViewModel
+import com.example.gymappdemo.ui.viewmodels.MyProfileViewModel
+import com.example.gymappdemo.ui.viewmodels.NewsViewModel
 import com.example.gymappdemo.ui.viewmodels.RegisterViewModel
+import com.example.gymappdemo.ui.viewmodels.SetRepsViewModel
 
 class AppViewModelFactory(
     private val workoutRepository: WorkoutRepository,
@@ -46,7 +47,9 @@ class AppViewModelFactory(
             (modelClass.isAssignableFrom(MyProfileViewModel::class.java)) -> {
                 MyProfileViewModel(userRepository) as T
             }
-
+            (modelClass.isAssignableFrom(NewsViewModel::class.java)) -> {
+                NewsViewModel() as T
+            }
             else -> throw IllegalArgumentException("Unknown ViewModel class")
         }
     }

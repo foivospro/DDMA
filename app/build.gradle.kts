@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     id("com.google.devtools.ksp") version "1.9.0-1.0.13"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.0"
 }
 
 android {
@@ -57,6 +58,11 @@ dependencies {
     ksp("androidx.room:room-compiler:2.6.1")
     implementation("io.coil-kt:coil-compose:2.1.0")
     implementation("io.coil-kt:coil-gif:2.1.0")
+
+    implementation("com.squareup.retrofit2:converter-kotlinx-serialization:2.11.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+
     implementation(libs.androidx.compose.animation)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.ui.text.google.fonts)

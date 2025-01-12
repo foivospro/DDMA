@@ -1,7 +1,6 @@
 package com.example.gymappdemo.data.database
 
 import android.content.Context
-import android.util.Log
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.example.gymappdemo.data.dao.ExerciseDao
@@ -14,11 +13,9 @@ import com.example.gymappdemo.data.entities.GymSession
 import com.example.gymappdemo.data.entities.SessionExercise
 import com.example.gymappdemo.data.entities.Set
 import com.example.gymappdemo.data.entities.User
-import com.example.gymappdemo.data.repositories.UserRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 @Database(
     entities = [
@@ -45,7 +42,7 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
-        fun getInstance(context: android.content.Context): AppDatabase {
+        fun getInstance(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = androidx.room.Room.databaseBuilder(
                     context.applicationContext,
@@ -63,7 +60,7 @@ abstract class AppDatabase : RoomDatabase() {
 
     private class PrepopulateCallback(
         private val context: Context
-    ): RoomDatabase.Callback() {
+    ): Callback() {
         override fun onCreate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
             super.onCreate(db)
             // Populate the database with hardcoded exercises
