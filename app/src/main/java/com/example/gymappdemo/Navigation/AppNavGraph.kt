@@ -210,7 +210,10 @@ fun AppNavHost(
             }
             composable(route = GymAppScreen.News.name) {
                 shouldShowBottomBar = true
-                NewsScreen(newsViewModel)
+                NewsScreen(
+                    newsViewModel,
+                    navController = navController,
+                )
             }
         }
         }

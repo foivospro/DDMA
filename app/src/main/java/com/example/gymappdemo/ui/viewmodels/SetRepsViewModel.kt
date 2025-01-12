@@ -19,6 +19,12 @@ class SetRepsViewModel(private val repository: WorkoutRepository) : ViewModel() 
     private val _temporarySets = MutableStateFlow<List<Set>>(emptyList())
     val temporarySets: StateFlow<List<Set>> = _temporarySets
 
+    private val _exerciseName = MutableStateFlow<String>("Άσκηση")
+    val exerciseName: StateFlow<String> = _exerciseName
+
+    private val _exerciseImageUrl = MutableStateFlow<String>("")
+    val exerciseImageUrl: StateFlow<String> = _exerciseImageUrl
+
     val snackbarHostState = SnackbarHostState()
 
     fun loadSets(sessionExerciseId: Int) {
@@ -29,6 +35,24 @@ class SetRepsViewModel(private val repository: WorkoutRepository) : ViewModel() 
             } catch (e: Exception) {
                 Log.e("SetRepsViewModel", "Error loading sets: ${e.message}")
                 snackbarHostState.showSnackbar("Error loading sets: ${e.message}")
+            }
+        }
+    }
+
+    fun loadExerciseDetails(exerciseId: Int) {
+        viewModelScope.launch {
+            try {
+                val exercise = repository.getExerciseById(exerciseId)
+                if (exercise != null) {
+                    _exerciseName.value = exercise.name
+                    _exerciseImageUrl.value = exercise.icon
+                } else {
+                    Log.e("SetRepsViewModel", "Άσκηση δεν βρέθηκε με ID: $exerciseId")
+                    snackbarHostState.showSnackbar("Άσκηση δεν βρέθηκε.")
+                }
+            } catch (e: Exception) {
+                Log.e("SetRepsViewModel", "Σφάλμα φόρτωσης λεπτομερειών άσκησης: ${e.message}")
+                snackbarHostState.showSnackbar("Σφάλμα φόρτωσης λεπτομερειών άσκησης.")
             }
         }
     }

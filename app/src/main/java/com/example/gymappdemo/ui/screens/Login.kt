@@ -193,35 +193,6 @@ fun LoginScreen(onLoginSuccess: () -> Unit,
                 Text(text = "Σύνδεση", fontSize = 16.sp)
             }
 
-            Spacer(modifier = Modifier.height(12.dp)) // Spacing between buttons
-
-            // Google Login Button
-            Button(
-                onClick = {
-                    // Add logic for Google sign-in
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4285F4)), // Google Blue
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.Person, // Replace with Google icon if available
-                        contentDescription = "Google Logo",
-                        modifier = Modifier.size(24.dp),
-                        tint = Color.White
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "Σύνδεση μέσω Google",
-                        color = Color.White,
-                        fontSize = 16.sp
-                    )
-                }
-            }
-
             Spacer(modifier = Modifier.height(24.dp)) // Spacing before the divider
 
             // Divider with "Ή"
