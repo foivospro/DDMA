@@ -29,6 +29,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.gymappdemo.R
@@ -226,7 +227,6 @@ fun AppNavHost(
 @Composable
 fun BottomNavigationBar(navController: NavController) {
     val context = LocalContext.current
-    var selectedItem by remember { mutableStateOf(0) }
 
     // Menu elements
     val items = listOf(
@@ -234,6 +234,9 @@ fun BottomNavigationBar(navController: NavController) {
         NavigationItem(context.getString(R.string.news), Icons.Filled.Newspaper),
         NavigationItem(context.getString(R.string.profile), Icons.Filled.Person)
     )
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
 
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.primary,
@@ -248,9 +251,9 @@ fun BottomNavigationBar(navController: NavController) {
                     )
                 },
                 label = { Text(text = item.label) },
-                selected = selectedItem == index,
+                // Check if the item's label matches the current route
+                selected = currentRoute == GymAppScreen.values()[index].name,
                 onClick = {
-                    selectedItem = index
                     when (item.label) {
                         context.getString(R.string.home) -> navController.navigate(GymAppScreen.Home.name) {
                             popUpTo(navController.graph.startDestinationId) {
@@ -259,7 +262,7 @@ fun BottomNavigationBar(navController: NavController) {
                             launchSingleTop = true
                             restoreState = true
                         }
-                        context.getString(R.string.news) -> navController.navigate(route = GymAppScreen.News.name) {
+                        context.getString(R.string.news) -> navController.navigate(GymAppScreen.News.name) {
                             popUpTo(navController.graph.startDestinationId) {
                                 saveState = true
                             }
