@@ -21,6 +21,11 @@ class WorkoutRepository private constructor(
 ) {
 
     // GymSession Operations
+
+    suspend fun getSessionsForUser(userId: Int): List<GymSession> {
+        return gymSessionDao.getSessionsByUserId(userId)
+    }
+
     suspend fun getSessionById(sessionId: Int): GymSession? {
         return gymSessionDao.getSessionById(sessionId)
     }

@@ -21,6 +21,6 @@ interface GymSessionDao {
     @Query("SELECT * FROM gym_sessions WHERE id = :id")
     suspend fun getSessionById(id: Int): GymSession?
 
-    @Query("SELECT * FROM gym_sessions WHERE userId = :userId ORDER BY date DESC")
-    suspend fun getSessionsByUser(userId: Int): List<GymSession>
+    @Query("SELECT * FROM gym_sessions WHERE userId = :userId")
+    suspend fun getSessionsByUserId(userId: Int): List<GymSession>
 }

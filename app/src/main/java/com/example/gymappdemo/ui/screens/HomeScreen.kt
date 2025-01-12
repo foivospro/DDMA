@@ -2,11 +2,8 @@ package com.example.gymappdemo.ui.screens
 
 import android.os.Build
 import android.util.Log
-import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
-import androidx.annotation.StringRes
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,15 +35,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.gymappdemo.Navigation.GymAppScreen
 import com.example.gymappdemo.R
+import com.example.gymappdemo.data.entities.GymSession
 import com.example.gymappdemo.ui.viewmodels.CurrentStatusViewModel
 import com.example.gymappdemo.ui.viewmodels.HomeViewModel
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -58,6 +56,7 @@ fun HomeScreen(
     val isWorkoutActive by viewModel.isWorkoutActive.collectAsState()
     val currentSessionId by viewModel.currentSessionId.collectAsState()
     val username by viewModel.username.collectAsState()
+    val sessionList by viewModel.userSessions.collectAsState()
 
     LazyColumn(
         modifier = Modifier
@@ -98,14 +97,14 @@ fun HomeScreen(
 
             Divider(color = Color.Gray, thickness = 1.dp, modifier = Modifier.padding(bottom = 16.dp))
 
-            WorkoutHistory()
+            WorkoutHistory(sessionList)
         }
 
         // Workout Summary Section
         item {
             Spacer(modifier = Modifier.height(24.dp))
 
-            WorkoutSummary()
+            WorkoutSummary(sessionList = sessionList)
         }
 
         // Start New Workout / Continue Workout Button
@@ -157,36 +156,16 @@ fun HomeScreen(
 }
 
 @Composable
-fun WorkoutHistory() {
-    val workoutList = listOf(
-        Workout(
-            iconRes = R.drawable.weightlifter,
-            descriptionRes = R.string.biceps,
-            date = "2024-04-20",
-            duration = "45 λεπτά",
-            caloriesBurned = 350
-        ),
-        Workout(
-            iconRes = R.drawable.weightlifter,
-            descriptionRes = R.string.cardio,
-            date = "2024-04-18",
-            duration = "30 λεπτά",
-            caloriesBurned = 250
-        ),
-    )
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-    ) {
-        workoutList.forEach { workout ->
-            WorkoutCard(workout = workout)
+fun WorkoutHistory(sessionList: List<GymSession>) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        sessionList.forEach { session ->
+            GymSessionCard(session)
         }
     }
 }
 
 @Composable
-fun WorkoutCard(workout: Workout) {
+fun GymSessionCard(session: GymSession) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -202,8 +181,8 @@ fun WorkoutCard(workout: Workout) {
             horizontalArrangement = Arrangement.Start
         ) {
             Icon(
-                painter = painterResource(id = workout.iconRes),
-                contentDescription = stringResource(id = workout.descriptionRes),
+                painter = painterResource(id = R.drawable.weightlifter),
+                contentDescription = "Workout Icon",
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
                     .size(64.dp)
@@ -211,24 +190,19 @@ fun WorkoutCard(workout: Workout) {
             )
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = stringResource(id = workout.descriptionRes),
+                    text = "Workout",
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Ημερομηνία: ${workout.date}",
+                    text = "Ημερομηνία: ${session.date}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.Gray
                 )
                 Text(
-                    text = "Διάρκεια: ${workout.duration}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray
-                )
-                Text(
-                    text = "Θερμίδες: ${workout.caloriesBurned} kcal",
+                    text = "Διάρκεια: ${session.duration} λεπτά",
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.Gray
                 )
@@ -238,12 +212,22 @@ fun WorkoutCard(workout: Workout) {
 }
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun WorkoutSummary() {
-    // Dummy Data
-    val totalWorkouts = 10
-    val workoutsPerWeek = listOf(2, 3, 1, 4, 2, 3, 0)
+fun WorkoutSummary(sessionList: List<GymSession>) {
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+
+    val totalWorkouts = sessionList.size
+
+    val workoutsPerWeek = (1..7).map { dayIndex ->
+        sessionList.count { session ->
+            val localDate = LocalDate.parse(session.date, formatter)
+            localDate.dayOfWeek.value == dayIndex
+        }
+    }
+
     val maxBarHeight = 100.dp
+    val maxWorkouts = workoutsPerWeek.maxOrNull() ?: 1
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
@@ -253,14 +237,12 @@ fun WorkoutSummary() {
             color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.padding(bottom = 8.dp)
         )
-
         Text(
             text = "Συνολικά Workouts: $totalWorkouts",
             fontSize = 16.sp,
             color = Color.Gray,
             modifier = Modifier.padding(bottom = 16.dp)
         )
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -268,7 +250,6 @@ fun WorkoutSummary() {
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.Bottom
         ) {
-            val maxWorkouts = workoutsPerWeek.maxOrNull() ?: 1
             workoutsPerWeek.forEach { count ->
                 val barHeight = if (maxWorkouts > 0) {
                     (count.toFloat() / maxWorkouts) * maxBarHeight.value
@@ -283,10 +264,8 @@ fun WorkoutSummary() {
                 )
             }
         }
-
         Row(
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Text(text = "Δευ", fontSize = 12.sp)
@@ -299,14 +278,5 @@ fun WorkoutSummary() {
         }
     }
 }
-
-
-data class Workout(
-    @DrawableRes val iconRes: Int,
-    @StringRes val descriptionRes: Int,
-    val date: String,
-    val duration: String,
-    val caloriesBurned: Int
-)
 
 data class NavigationItem(val label: String, val icon: ImageVector)
