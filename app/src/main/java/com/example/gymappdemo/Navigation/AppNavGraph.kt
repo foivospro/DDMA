@@ -198,19 +198,26 @@ fun AppNavHost(
                     }
                 },
                     navController = navController,
-                    loginViewModel)
+                    loginViewModel = loginViewModel,
+                    homeViewModel = homeViewModel,
+                    myProfileViewModel = myProfileViewModel)
             }
             // Register Screen - Hide bottom bar
             composable(route = GymAppScreen.Register.name) {
                 shouldShowBottomBar = false
                 RegisterScreen(
                     registerViewModel = registerViewModel,
+                    homeViewModel = homeViewModel,
+                    myProfileViewModel = myProfileViewModel,
                     navController = navController)
 
             }
             composable(route = GymAppScreen.News.name) {
                 shouldShowBottomBar = true
-                NewsScreen(newsViewModel)
+                NewsScreen(
+                    newsViewModel,
+                    navController = navController,
+                )
             }
         }
     }

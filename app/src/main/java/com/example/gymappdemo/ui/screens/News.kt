@@ -2,6 +2,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,8 +13,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,8 +29,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.gymappdemo.R
@@ -33,14 +42,17 @@ import com.example.gymappdemo.ui.viewmodels.NewsViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
+
 fun NewsScreen(
     newsViewModel: NewsViewModel,
+    navController: NavController,
     modifier: Modifier = Modifier
 ) {
     when (val newsUiState = newsViewModel.newsUiState) {
         is NewsUiState.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())
         is NewsUiState.Success -> ResultScreen(
             news = newsUiState.news,
+            navController = navController,
             modifier = modifier.fillMaxWidth()
         )
         is NewsUiState.Error -> ErrorScreen(
@@ -60,7 +72,7 @@ fun LoadingScreen(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun ResultScreen(news: List<Article>, modifier: Modifier = Modifier) {
+fun ResultScreen(news: List<Article>,navController: NavController, modifier: Modifier = Modifier,) {
     LazyColumn(
         modifier = modifier.padding(horizontal = 16.dp)
     ) {
@@ -71,6 +83,32 @@ fun ResultScreen(news: List<Article>, modifier: Modifier = Modifier) {
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(vertical = 16.dp)
             )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Αθλητικά Νέα",
+                    style = MaterialTheme.typography.headlineMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    ),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                IconButton(
+                    onClick = { navController.popBackStack() },
+                    modifier = Modifier.align(Alignment.CenterStart)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "Πίσω",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
         }
         // News items
         items(news) { new ->
@@ -78,6 +116,7 @@ fun ResultScreen(news: List<Article>, modifier: Modifier = Modifier) {
         }
     }
 }
+
 
 @Composable
 fun NewsItem(article: Article, modifier: Modifier = Modifier) {

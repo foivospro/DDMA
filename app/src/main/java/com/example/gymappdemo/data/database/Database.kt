@@ -3,6 +3,7 @@ package com.example.gymappdemo.data.database
 import android.content.Context
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import com.example.gymappdemo.data.dao.ExerciseDao
 import com.example.gymappdemo.data.dao.GymSessionDao
 import com.example.gymappdemo.data.dao.SessionExerciseDao
@@ -25,9 +26,10 @@ import kotlinx.coroutines.launch
         SessionExercise::class,
         Set::class
     ],
-    version = 6,
+    version = 7,
     exportSchema = false
 )
+@TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 
     // DAOs
@@ -165,7 +167,8 @@ abstract class AppDatabase : RoomDatabase() {
                         passwordHash = "JohnbigDoe12!",
                         age = 30,
                         height = 175,
-                        weight = 70
+                        weight = 70,
+                        profilePicture = null
                     ),
                     User(
                         name = "Jane Smith",
@@ -173,7 +176,8 @@ abstract class AppDatabase : RoomDatabase() {
                         passwordHash = "#TheQueen123",
                         age = 25,
                         height = 165,
-                        weight = 60
+                        weight = 60,
+                        profilePicture = null
 
                     )
                 )

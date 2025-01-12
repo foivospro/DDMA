@@ -2,6 +2,10 @@ package com.example.gymappdemo.ui.screens
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.content.Intent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -64,12 +68,16 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.example.gymappdemo.R
 import com.example.gymappdemo.data.entities.User
 import com.example.gymappdemo.ui.viewmodels.MyProfileViewModel
@@ -84,9 +92,10 @@ fun EditProfileScreen(
     //userId: Int,
     viewModel: MyProfileViewModel
 ) {
+    val flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+    val context = LocalContext.current
     // Observe user data from the ViewModel
     val user by viewModel.user.collectAsState()
-    val context = LocalContext.current
     // Fetch user data when the composable is loaded
 
 
@@ -97,9 +106,7 @@ fun EditProfileScreen(
     var height by remember { mutableIntStateOf(user?.height ?: 170) }
     var weight by remember { mutableIntStateOf(user?.weight ?: 75) }
     var password by remember { mutableStateOf(user?.passwordHash ?: "") }
-
-    // State variables for profile picture
-    var profilePicture by remember { mutableStateOf<Bitmap?>(null) }
+    val profilePicture by viewModel.profilePictureUri.collectAsState()
 
     // Update local state variables when userState changes
     LaunchedEffect(user) {
@@ -120,7 +127,8 @@ fun EditProfileScreen(
             age != initialUserState?.age ||
             height != initialUserState?.height ||
             weight != initialUserState?.weight ||
-            password != initialUserState?.passwordHash
+            password != initialUserState?.passwordHash ||
+            profilePicture != initialUserState?.profilePicture
 
 
     Scaffold(
@@ -146,24 +154,38 @@ fun EditProfileScreen(
                 .padding(10.dp)
                 .verticalScroll(rememberScrollState())
         ) {
+
+
             // User Picture Placeholder
             var showImageOptions by remember { mutableStateOf(false) }
+
+            val singlePhotoPickerLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.PickVisualMedia(),
+                onResult = { uri ->
+                    if (uri != null) {
+                        viewModel.changeUri(uri)
+                    }
+                }
+            )
+
             Box(
                 modifier = Modifier
                     .size(100.dp)
                     .align(Alignment.CenterHorizontally)
                     .clip(CircleShape)
-                    .border(2.dp, Gray, CircleShape)
+                    .border(2.dp, MaterialTheme.colorScheme.secondary, CircleShape)
                     .clickable {
                         // Show a dialog with options
                         showImageOptions = true
                     }
             ) {
                 if (profilePicture != null) {
-                    Image(
-                        bitmap = profilePicture!!.asImageBitmap(),
-                        contentDescription = stringResource(id =R.string.profile_picture),
-                        modifier = Modifier.fillMaxSize()
+
+                    AsyncImage(
+                        model = profilePicture,
+                        contentDescription = "Profile Picture",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
                     )
                 } else {
                     Image(
@@ -186,7 +208,9 @@ fun EditProfileScreen(
                     confirmButton = {
                         TextButton(onClick = {
                             // Logic to pick a new image
-                            pickImageFromGallery() // Create this function
+                            singlePhotoPickerLauncher.launch(
+                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                            )
                             showImageOptions = false
                         }) {
                             Text(
@@ -197,7 +221,7 @@ fun EditProfileScreen(
                     dismissButton = {
                         TextButton(onClick = {
                             // Logic to remove the image
-                            profilePicture = null
+                            viewModel.changeUri(null)
                             showImageOptions = false
                         }) {
                             Text(
@@ -316,10 +340,12 @@ fun EditProfileScreen(
                     )
                 }
             }
-
-            // Save Button
             Button(
                 onClick = {
+                    profilePicture?.let {
+                        context.contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION )
+                    }
+
                     val updatedUser = User(
                         id = user?.id ?: 0, // Use the existing user ID
                         name = username,
@@ -327,26 +353,25 @@ fun EditProfileScreen(
                         age = age,
                         height = height,
                         weight = weight,
-                        passwordHash = password
+                        passwordHash = password,
+                        profilePicture = profilePicture
                     )
+
                     viewModel.updateUser(updatedUser)
                     onBackPressed()
                 },
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .padding(top = 16.dp),
-                enabled = passwordError == null && hasChanges // Enable only if no password error and changes are made
+                enabled = hasChanges // Enable only if changes have been made
             ) {
                 Text(
                     text = stringResource(id =R.string.save_changes)
                 )
             }
+
         }
     }
-}
-
-fun pickImageFromGallery() {
-   // pickImageLauncher.launch("image/*")
 }
 
 @Composable
@@ -464,7 +489,6 @@ fun EnhancedTextField(
         }
     }
 }
-
 
 // Validation Function
 fun validatePassword(context:Context,password: String): String? {

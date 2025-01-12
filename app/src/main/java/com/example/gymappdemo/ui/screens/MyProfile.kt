@@ -16,12 +16,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
@@ -32,6 +34,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -39,6 +42,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -48,12 +52,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.example.gymappdemo.Navigation.GymAppScreen
 import com.example.gymappdemo.R
 import com.example.gymappdemo.ui.viewmodels.MyProfileViewModel
@@ -62,16 +68,21 @@ import com.example.gymappdemo.ui.viewmodels.MyProfileViewModel
 @Composable
 fun UserProfileScreen(
     navController: NavController,
-    viewModel: MyProfileViewModel // Inject the ViewModel
+    viewModel: MyProfileViewModel
 ) {
 
     // Observe user data
     val user = viewModel.user.collectAsState().value
+    val profilePictureUri = viewModel.profilePictureUri.collectAsState().value
+
 
     // If the user is guest or log in
     if (user == null) {
         GuestUserPrompt(navController)
     } else {
+        LaunchedEffect(user) {
+            viewModel.loadProfilePicture(user.id)
+        }
         var showLogoutDialog by remember { mutableStateOf(false) }
 
         // Handle logout confirmation
@@ -140,6 +151,34 @@ fun UserProfileScreen(
                     .verticalScroll(rememberScrollState())
 
             ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Προφίλ",
+                        style = MaterialTheme.typography.headlineMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        ),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+
+                    IconButton(
+                        onClick = { navController.popBackStack() },
+                        modifier = Modifier.align(Alignment.CenterStart)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Πίσω",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+
                 // User Picture
                 Box(
                     modifier = Modifier
@@ -154,6 +193,32 @@ fun UserProfileScreen(
                             .clip(CircleShape)
                             .border(2.dp, MaterialTheme.colorScheme.secondary, CircleShape)
                     )
+                    if (profilePictureUri != null) {
+                        if (user?.profilePicture != null) {
+                            // Use AsyncImage when profilePictureUri is available
+                            AsyncImage(
+                                model = profilePictureUri, // Pass the URI or URL here
+                                contentDescription = "Profile Picture",
+                                modifier = Modifier
+                                    .size(100.dp)
+                                    .clip(CircleShape)
+                                    .border(2.dp, MaterialTheme.colorScheme.primary, CircleShape),
+                                contentScale = ContentScale.Crop
+                            )
+                        } else {
+                            // Use Image with painterResource for default image
+                            Image(
+                                painter = painterResource(com.example.gymappdemo.R.drawable.default_profile),
+                                contentDescription = "Default Profile Picture",
+                                modifier = Modifier
+                                    .size(100.dp)
+                                    .clip(CircleShape)
+                                    .border(2.dp, MaterialTheme.colorScheme.primary, CircleShape),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                    }
+
                 }
 
                 // User Information (Username & Email)

@@ -51,14 +51,21 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.gymappdemo.Navigation.GymAppScreen
 import com.example.gymappdemo.R
+import com.example.gymappdemo.ui.theme.GymAppDemoTheme
+import com.example.gymappdemo.ui.viewmodels.HomeViewModel
 import com.example.gymappdemo.ui.viewmodels.LoginViewModel
+import com.example.gymappdemo.ui.viewmodels.MyProfileViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(onLoginSuccess: () -> Unit,
                 navController: NavController,
-                viewModel: LoginViewModel) {
+                loginViewModel: LoginViewModel,
+                homeViewModel: HomeViewModel,
+                myProfileViewModel: MyProfileViewModel
+) {
+    // States for email, password, and password visibility
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isPasswordVisible by remember { mutableStateOf(false) }
@@ -167,11 +174,14 @@ fun LoginScreen(onLoginSuccess: () -> Unit,
 
             Button(
                 onClick = {
-                    viewModel.viewModelScope.launch {
-                        val user = viewModel.login(email, password)
-                        if (user != null) {
+
+                    loginViewModel.viewModelScope.launch {
+                        val user = loginViewModel.login(email, password)
+                        if (user!=null) {
                             showSuccessfulLogin = true
-                            delay(1000)
+                            homeViewModel.updateViewModel()
+                            myProfileViewModel.updateViewModel()
+                            delay(500)
                             navController.navigate(GymAppScreen.Home.name)
                         } else {
                             showErrorLogin = true
