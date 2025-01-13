@@ -56,6 +56,7 @@ import com.example.gymappdemo.R
 import com.example.gymappdemo.data.entities.ExerciseWithSets
 import com.example.gymappdemo.data.entities.Set
 import com.example.gymappdemo.ui.viewmodels.CurrentStatusViewModel
+import com.example.gymappdemo.utils.IconResourceMapper
 
 @Composable
 fun CurrentStatus(
@@ -456,6 +457,8 @@ fun ExerciseWithSetsCard(
     onEditSet: (Set) -> Unit,
     onAddSet: (Int) -> Unit
 ) {
+    val iconRes = IconResourceMapper.getIconResource(exerciseWithSets.exercise.name)
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -472,7 +475,7 @@ fun ExerciseWithSetsCard(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        painter = painterResource(id = R.drawable.weightlifter),
+                        painter = painterResource(id = iconRes),
                         contentDescription = exerciseWithSets.exercise.name,
                         tint = colorScheme.primary,
                         modifier = Modifier
