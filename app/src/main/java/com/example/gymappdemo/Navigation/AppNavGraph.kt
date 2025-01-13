@@ -4,11 +4,17 @@ package com.example.gymappdemo.Navigation
 import NewsScreen
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Newspaper
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -22,7 +28,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavType
@@ -233,53 +241,64 @@ fun BottomNavigationBar(navController: NavController) {
         NavigationItem("Profile", Icons.Filled.Person)
     )
 
-    NavigationBar(
-        containerColor = MaterialTheme.colorScheme.primary,
-        contentColor = MaterialTheme.colorScheme.onPrimary
-    ) {
-        items.forEachIndexed { index, item ->
-            NavigationBarItem(
-                icon = {
-                    Icon(
-                        imageVector = item.icon,
-                        contentDescription = item.label
-                    )
-                },
-                label = { Text(text = item.label) },
-                selected = selectedItem == index,
-                onClick = {
-                    selectedItem = index
-                    when (item.label) {
-                        "Home" -> navController.navigate(GymAppScreen.Home.name) {
-                            popUpTo(navController.graph.startDestinationId) {
-                                saveState = true
+    Column {
+        Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f), thickness = 1.dp)
+
+        NavigationBar(
+            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            tonalElevation = 8.dp,
+            modifier = Modifier.height(56.dp)
+        ) {
+            items.forEachIndexed { index, item ->
+                NavigationBarItem(
+                    icon = {
+                        Icon(
+                            imageVector = item.icon,
+                            contentDescription = item.label,
+                            modifier = Modifier
+                                .size(if (selectedItem == index) 36.dp else 30.dp),
+                            tint = if (selectedItem == index) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                        )
+                    },
+                    label = null,
+                    selected = selectedItem == index,
+                    onClick = {
+                        selectedItem = index
+                        when (item.label) {
+                            "Home" -> navController.navigate(GymAppScreen.Home.name) {
+                                popUpTo(navController.graph.startDestinationId) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
                             }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                        "News" -> navController.navigate(route = GymAppScreen.News.name) {
-                            popUpTo(navController.graph.startDestinationId) {
-                                saveState = true
+                            "News" -> navController.navigate(route = GymAppScreen.News.name) {
+                                popUpTo(navController.graph.startDestinationId) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
                             }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                        "Profile" -> navController.navigate(GymAppScreen.MyProfile.name) {
-                            popUpTo(navController.graph.startDestinationId) {
-                                saveState = true
+                            "Profile" -> navController.navigate(GymAppScreen.MyProfile.name) {
+                                popUpTo(navController.graph.startDestinationId) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
                             }
-                            launchSingleTop = true
-                            restoreState = true
                         }
-                    }
-                },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = MaterialTheme.colorScheme.onPrimary,
-                    unselectedIconColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
-                    selectedTextColor = MaterialTheme.colorScheme.onPrimary,
-                    unselectedTextColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f)
+                    },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = MaterialTheme.colorScheme.primary,
+                        unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                        selectedTextColor = MaterialTheme.colorScheme.primary,
+                        unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                        indicatorColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f) // Matches background color
+                    ),
+                    alwaysShowLabel = false
                 )
-            )
+            }
         }
     }
 }
