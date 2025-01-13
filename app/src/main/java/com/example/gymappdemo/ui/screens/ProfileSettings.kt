@@ -1,7 +1,6 @@
 package com.example.gymappdemo.ui.screens
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -10,17 +9,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -43,6 +32,7 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -112,7 +102,6 @@ fun EditProfileScreen(
     var password by remember { mutableStateOf(user?.passwordHash ?: "") }
     val profilePicture by viewModel.profilePictureUri.collectAsState()
 
-
     // Update local state variables when userState changes
     LaunchedEffect(user) {
         username = user?.name ?: ""
@@ -137,228 +126,26 @@ fun EditProfileScreen(
             localAccentColor != currentAccent ||
             localDarkMode != currentDarkMode
 
-
-
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(
-                    text= stringResource(id = R.string.edit_profile)
-                ) },
+                title = {
+                    Text(
+                        text = stringResource(id = R.string.edit_profile),
+                        style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBackPressed) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(
-                            id = R.string.back
-                        ))
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(id = R.string.back)
+                        )
                     }
                 }
             )
-        }
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState())
-        ) {
-
-
-            // User Picture Placeholder
-            var showImageOptions by remember { mutableStateOf(false) }
-
-            val singlePhotoPickerLauncher = rememberLauncherForActivityResult(
-                contract = ActivityResultContracts.PickVisualMedia(),
-                onResult = { uri ->
-                    if (uri != null) {
-                        viewModel.changeUri(uri)
-                    }
-                }
-            )
-
-            Box(
-                modifier = Modifier
-                    .size(120.dp)
-                    .align(Alignment.CenterHorizontally)
-                    .clip(CircleShape)
-                    .border(2.dp, MaterialTheme.colorScheme.secondary, CircleShape)
-                    .clickable {
-                        // Show a dialog with options
-                        showImageOptions = true
-                    }
-            ) {
-                if (profilePicture != null) {
-
-                    AsyncImage(
-                        model = profilePicture,
-                        contentDescription = "Profile Picture",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-                } else {
-                    Image(
-                        painter = painterResource(R.drawable.default_profile),
-                        contentDescription = stringResource(id = R.string.profile_picture),
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
-            }
-
-            if (showImageOptions) {
-                AlertDialog(
-                    onDismissRequest = { showImageOptions = false },
-                    title = { Text(
-                        text = stringResource(id = R.string.default_profile_picture)
-                    )},
-                    text = { Text(
-                        text = stringResource(id = R.string.profile_picture_question)
-                    ) },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            // Logic to pick a new image
-                            singlePhotoPickerLauncher.launch(
-                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                            )
-                            showImageOptions = false
-                        }) {
-                            Text(
-                                text = stringResource(id = R.string.change_picture)
-                            )
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = {
-                            // Logic to remove the image
-                            viewModel.changeUri(null)
-                            showImageOptions = false
-                        }) {
-                            Text(
-                                text = stringResource(id =R.string.remove_picture)
-                            )
-                        }
-                    }
-                )
-            }
-            Spacer(modifier = Modifier.height(12.dp))
-            // Editable Fields
-            UserProfileField(
-                title = stringResource(id =R.string.username),
-                value =  username,
-                onValueChange = { username = it }
-            )
-
-            UserProfileField(
-                title = stringResource(id =R.string.email),
-                value = email,
-                onValueChange = { email = it }
-            )
-
-            var passwordError by remember { mutableStateOf<String?>(null) }
-            var passwordVisible by remember { mutableStateOf(false) }
-
-            UserProfileField(
-                title = stringResource(id =R.string.password),
-                value = password,
-                onValueChange = {
-                    password = it
-                    passwordError = validatePassword(context,password)
-                },
-                isPassword = true,
-                isPasswordVisible = passwordVisible,
-                onPasswordToggle = { passwordVisible = !passwordVisible },
-                errorMessage = passwordError
-            )
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            // Row for Age, Height, Weight fields
-            Row (
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 2.dp),
-                horizontalArrangement = Arrangement.SpaceBetween, // Spread the fields equally
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                StyledNumberPickerField(
-                    label = stringResource(id =R.string.height_cm),
-                    value = height,
-                    onValueChange = { height = it },
-                    range = 50..250
-                )
-
-                StyledNumberPickerField(
-                    label = stringResource(id =R.string.weight_kg_2),
-                    value = weight,
-                    onValueChange = { weight = it },
-                    range = 10..200
-                )
-
-                StyledNumberPickerField(
-                    label = stringResource(id =R.string.age),
-                    value = age,
-                    onValueChange = { age = it },
-                    range = 1..100
-                )
-            }
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            // Dark Mode Switch
-            // Row with the icons
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = stringResource(id =R.string.dark_mode),
-                    style = MaterialTheme.typography.labelLarge,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Sun icon for Light Mode
-                    Icon(
-                        imageVector = Icons.Filled.WbSunny,
-                        contentDescription = stringResource(id =R.string.light_mode),
-                        modifier = Modifier
-                            .size(24.dp)
-                            .clickable {
-                                localDarkMode = false
-                            }
-                    )
-                    Switch(
-                        checked = localDarkMode,
-                        onCheckedChange = { localDarkMode = it }
-                    )
-                    // Moon icon
-                    Icon(
-                        imageVector = Icons.Filled.NightsStay,
-                        contentDescription = stringResource(id =R.string.dark_mode),
-                        modifier = Modifier
-                            .size(24.dp)
-                            .clickable {
-                                localDarkMode = true
-                            }
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Theme Selection Section
-            ThemeSelectionSection(
-                availableThemes = viewModel.getAvailableThemes(),
-                selectedTheme = localAccentColor,
-                onThemeSelected = { chosen ->
-                    localAccentColor = chosen
-                }
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
+        },
+        bottomBar = {
             Button(
                 onClick = {
                     profilePicture?.let {
@@ -385,18 +172,299 @@ fun EditProfileScreen(
                     onBackPressed()
                 },
                 modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(top = 16.dp),
-                enabled = hasChanges && passwordError == null
+                    .fillMaxWidth()
+                    .height(77.dp)
+                    .padding(16.dp),
+                enabled = hasChanges,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ),
+                shape = RoundedCornerShape(12.dp)
             ) {
                 Text(
-                    text = stringResource(id =R.string.save_changes)
+                    text = stringResource(id = R.string.save_changes),
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp
+                    )
                 )
             }
+        }
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(horizontal = 16.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
+
+            // User Picture Placeholder
+            var showImageOptions by remember { mutableStateOf(false) }
+
+            val singlePhotoPickerLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.PickVisualMedia(),
+                onResult = { uri ->
+                    if (uri != null) {
+                        viewModel.changeUri(uri)
+                    }
+                }
+            )
+
+            Box(
+                modifier = Modifier
+                    .size(90.dp)
+                    .align(Alignment.CenterHorizontally)
+                    .clip(CircleShape)
+                    .border(2.dp, MaterialTheme.colorScheme.secondary, CircleShape)
+                    .clickable {
+                        // Show a dialog with options
+                        showImageOptions = true
+                    }
+            ) {
+                if (profilePicture != null) {
+                    AsyncImage(
+                        model = profilePicture,
+                        contentDescription = stringResource(id = R.string.profile_picture),
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(R.drawable.default_profile),
+                        contentDescription = stringResource(id = R.string.profile_picture),
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+            }
+
+            if (showImageOptions) {
+                AlertDialog(
+                    onDismissRequest = { showImageOptions = false },
+                    text = { Text(text = stringResource(id = R.string.profile_picture_question)) },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            // Logic to pick a new image
+                            singlePhotoPickerLauncher.launch(
+                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                            )
+                            showImageOptions = false
+                        }) {
+                            Text(text = stringResource(id = R.string.change_picture))
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = {
+                            // Logic to remove the image
+                            viewModel.changeUri(null)
+                            showImageOptions = false
+                        }) {
+                            Text(text = stringResource(id = R.string.remove_picture))
+                        }
+                    }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Editable Fields
+            // Username Field
+            EditableProfileField(
+                label = stringResource(id = R.string.username),
+                value = username,
+                onValueChange = { username = it },
+                leadingIcon = Icons.Default.Person,
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Email Field
+            EditableProfileField(
+                label = stringResource(id = R.string.email),
+                value = email,
+                onValueChange = { email = it },
+                leadingIcon = Icons.Default.Mail,
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Password Field
+            var passwordError by remember { mutableStateOf<String?>(null) }
+            var passwordVisible by remember { mutableStateOf(false) }
+
+            EditableProfileField(
+                label = stringResource(id = R.string.password),
+                value = password,
+                onValueChange = {
+                    password = it
+                    passwordError = validatePassword(context, password)
+                },
+                leadingIcon = Icons.Default.Key,
+                isPassword = true,
+                isPasswordVisible = passwordVisible,
+                onPasswordToggle = { passwordVisible = !passwordVisible },
+                errorMessage = passwordError,
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Row for Age, Height, Weight fields
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                StyledNumberPickerField(
+                    label = stringResource(id = R.string.height_cm),
+                    value = height,
+                    onValueChange = { height = it },
+                    range = 50..250
+                )
+
+                StyledNumberPickerField(
+                    label = stringResource(id = R.string.weight_kg_2),
+                    value = weight,
+                    onValueChange = { weight = it },
+                    range = 10..200
+                )
+
+                StyledNumberPickerField(
+                    label = stringResource(id = R.string.age),
+                    value = age,
+                    onValueChange = { age = it },
+                    range = 1..100
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Dark Mode Switch
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = stringResource(id = R.string.dark_mode),
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                    fontSize = 18.sp
+                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Sun icon for Light Mode
+                    Icon(
+                        imageVector = Icons.Filled.WbSunny,
+                        contentDescription = stringResource(id = R.string.light_mode),
+                        modifier = Modifier
+                            .size(20.dp) // Μείωση του μεγέθους από 24dp σε 20dp
+                            .clickable {
+                                localDarkMode = false
+                            }
+                    )
+                    Switch(
+                        checked = localDarkMode,
+                        onCheckedChange = { localDarkMode = it }
+                    )
+                    // Moon icon
+                    Icon(
+                        imageVector = Icons.Filled.NightsStay,
+                        contentDescription = stringResource(id = R.string.dark_mode),
+                        modifier = Modifier
+                            .size(20.dp) // Μείωση του μεγέθους από 24dp σε 20dp
+                            .clickable {
+                                localDarkMode = true
+                            }
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Theme Selection Section
+            ThemeSelectionSection(
+                availableThemes = viewModel.getAvailableThemes(),
+                selectedTheme = localAccentColor,
+                onThemeSelected = { chosen ->
+                    localAccentColor = chosen
+                }
+            )
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EditableProfileField(
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    leadingIcon: androidx.compose.ui.graphics.vector.ImageVector,
+    isPassword: Boolean = false,
+    isPasswordVisible: Boolean = false,
+    onPasswordToggle: (() -> Unit)? = null,
+    errorMessage: String? = null,
+) {
+    var passwordVisibility by remember { mutableStateOf(isPasswordVisible) }
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyLarge.copy(
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp
+            ),
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(bottom = 4.dp)
+        )
+        TextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = Modifier
+                .fillMaxWidth(),
+            singleLine = true,
+            isError = errorMessage != null,
+            shape = RoundedCornerShape(8.dp),
+            visualTransformation = if (isPassword && !passwordVisibility) PasswordVisualTransformation() else VisualTransformation.None,
+            trailingIcon = {
+                if (isPassword && onPasswordToggle != null) {
+                    IconButton(onClick = {
+                        passwordVisibility = !passwordVisibility
+                        onPasswordToggle()
+                    }) {
+                        Icon(
+                            imageVector = if (passwordVisibility) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                            contentDescription = if (passwordVisibility) stringResource(id = R.string.hide_password) else stringResource(id = R.string.show_password)
+                        )
+                    }
+                }
+            },
+            leadingIcon = {
+                Icon(
+                    imageVector = leadingIcon,
+                    contentDescription = "$label Icon",
+                    tint = MaterialTheme.colorScheme.primary,
+
+                )
+            },
+            colors = TextFieldDefaults.textFieldColors(
+                focusedIndicatorColor = if (errorMessage != null) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                unfocusedIndicatorColor = if (errorMessage != null) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                errorIndicatorColor = MaterialTheme.colorScheme.error
+            )
+        )
+        if (errorMessage != null) {
+            Text(
+                text = errorMessage,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+        }
+    }
+}
 
 @Composable
 fun ThemeCircle(
@@ -436,200 +504,6 @@ fun ThemeCircle(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun UserProfileField(
-    title: String,
-    value: String,
-    onValueChange: (String) -> Unit,
-    isPassword: Boolean = false,
-    isPasswordVisible: Boolean = false,
-    onPasswordToggle: (() -> Unit)? = null,
-    errorMessage: String? = null,
-    isNumber: Boolean = false
-) {
-    var textValue by remember { mutableStateOf(value) }
-
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Bold,
-            fontSize = 16.sp,
-            modifier = Modifier.padding(bottom = 4.dp)
-        )
-        TextField(
-            value = textValue,
-            onValueChange = {
-                if (isNumber) {
-                    // Επιτρέπουμε μόνο αριθμούς
-                    if (it.all { char -> char.isDigit() }) {
-                        textValue = it
-                        onValueChange(it)
-                    }
-                } else {
-                    textValue = it
-                    onValueChange(it)
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth(),
-            singleLine = true,
-            isError = errorMessage != null,
-            //shape = RoundedCornerShape(4.dp),
-            visualTransformation = if (isPassword && !isPasswordVisible) PasswordVisualTransformation() else VisualTransformation.None,
-            trailingIcon = {
-                if (isPassword && onPasswordToggle != null) {
-                    IconButton(onClick = { onPasswordToggle() }) {
-                        Icon(
-                            imageVector = if (isPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                            contentDescription = if (isPasswordVisible) "Hide password" else "Show password"
-                        )
-                    }
-                }
-            },
-            leadingIcon = {
-                val icon = when (title) {
-                    "Username" -> Icons.Filled.Person
-                    "Email" -> Icons.Filled.Mail
-                    "Password" -> Icons.Filled.Key
-                    "Age" -> Icons.Filled.Key
-                    "Height(cm)" -> Icons.Filled.Height
-                    "Weight(kg)" -> Icons.Filled.Scale
-                    else -> Icons.Filled.Person
-                }
-
-                Icon(
-                    imageVector = icon,
-                    contentDescription = when (title) {
-                        "Username" -> "Profile Icon"
-                        "Email" -> "Mail Icon"
-                        "Password" -> "Password Icon"
-                        "Age" -> "Age Icon"
-                        "Height(cm)" -> "Height Icon"
-                        "Weight(kg)" -> "Weight Icon"
-                        else -> "Icon"
-                    },
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            },
-            colors = TextFieldDefaults.textFieldColors(
-                focusedIndicatorColor = if (errorMessage != null) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
-                unfocusedIndicatorColor = if (errorMessage != null) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                errorIndicatorColor = MaterialTheme.colorScheme.error
-            )
-        )
-        if (errorMessage != null) {
-            Text(
-                text = errorMessage,
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(top = 4.dp)
-            )
-        }
-    }
-}
-
-@Composable
-fun EnhancedTextField(
-    title: String,
-    value: String,
-    onValueChange: (String) -> Unit,
-    enabled: Boolean = true,
-    isPassword: Boolean = false,
-    isPasswordVisible: Boolean = false,
-    onPasswordToggle: (() -> Unit)? = null,
-    errorMessage: String? = null
-) {
-    var passwordVisible by remember { mutableStateOf(isPasswordVisible) }
-
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .padding(vertical = 8.dp)) {
-        // Title
-        Text(
-            text = title,
-            style = MaterialTheme.typography.labelMedium,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
-        )
-        // TextField
-        TextField(
-            value = value,
-            onValueChange = onValueChange,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp),
-            textStyle = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface),
-            singleLine = true,
-            enabled = enabled,
-            shape = RoundedCornerShape(8.dp),
-            isError = errorMessage != null,
-            visualTransformation = if (isPassword && !passwordVisible) PasswordVisualTransformation() else VisualTransformation.None,
-            trailingIcon = {
-                if (isPassword && onPasswordToggle != null) {
-                    IconButton(onClick = {
-                        passwordVisible = !passwordVisible
-                        onPasswordToggle()
-                    }) {
-                        Icon(
-                            imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                            contentDescription = if (passwordVisible) stringResource(id = R.string.hide_password) else stringResource(id = R.string.show_password)
-                        )
-                    }
-                }
-            },
-            leadingIcon = {
-                val icon = when (title) {
-                    stringResource(id = R.string.username) -> Icons.Default.Person
-                    stringResource(id = R.string.email) -> Icons.Default.Mail
-                    else -> Icons.Default.Key
-                }
-
-                Icon(
-                    imageVector = icon,
-                    contentDescription = when (title) {
-                        stringResource(id = R.string.username) -> stringResource(id = R.string.profile_icon)
-                        stringResource(id = R.string.email) -> stringResource(id = R.string.mail_icon)
-                        else -> stringResource(id = R.string.password_icon)
-                    },
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            },
-            colors = TextFieldDefaults.colors(
-                focusedIndicatorColor = if (errorMessage != null) Color.Red else Color.Transparent,
-                unfocusedIndicatorColor = if (errorMessage != null) Color.Red else Color.Transparent,
-                errorIndicatorColor = Color.Red
-            )
-        )
-        // Error Message
-        if (errorMessage != null) {
-            Text(
-                text = errorMessage,
-                color = Color.Red,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(top = 4.dp)
-            )
-        }
-    }
-}
-
-// Validation Function
-fun validatePassword(context:Context,password: String): String? {
-    val lengthValid = password.length >= 6
-    val capitalValid = password.any { it.isUpperCase() }
-    val numberValid = password.any { it.isDigit() }
-    val symbolValid = password.any { !it.isLetterOrDigit() }
-
-    return when {
-        !lengthValid -> context.getString(R.string.password_must_be_six)
-        !capitalValid -> context.getString(R.string.password_must_contain_uppercase)
-        !numberValid -> context.getString(R.string.password_must_contain_number)
-        !symbolValid -> context.getString(R.string.password_must_contain_special)
-        else -> null // No errors
-    }
-}
-
 @Composable
 fun ThemeSelectionSection(
     availableThemes: List<AppThemeType>,
@@ -638,9 +512,10 @@ fun ThemeSelectionSection(
 ) {
     Text(
         text = stringResource(id = R.string.choose_app_color),
-        style = MaterialTheme.typography.labelLarge,
-        fontSize = 18.sp,
-        fontWeight = FontWeight.Bold
+        style = MaterialTheme.typography.titleMedium.copy(
+            fontWeight = FontWeight.Bold,
+            fontSize = 18.sp
+        )
     )
 
     Spacer(modifier = Modifier.height(8.dp))
@@ -680,12 +555,11 @@ fun StyledNumberPickerField(
         ) {
             Text(
                 text = label,
-                style = MaterialTheme.typography.labelLarge.copy(
-                    color = MaterialTheme.colorScheme.onSurface,
-                    fontSize = 18.sp, // Set a specific font size for the label
-                    fontWeight = FontWeight.Bold // Make the label bolder
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp
                 ),
-                maxLines = 1, // Limit text to a single line
+                maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
 
@@ -706,9 +580,10 @@ fun StyledNumberPickerField(
             ) {
                 Icon(
                     Icons.Default.Add,
-                    contentDescription = stringResource(id =R.string.increase),
+                    contentDescription = stringResource(id = R.string.increase),
                     tint = if (value < range.last) MaterialTheme.colorScheme.primary
-                    else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                    else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                    modifier = Modifier.size(20.dp)
                 )
             }
 
@@ -717,8 +592,8 @@ fun StyledNumberPickerField(
                 text = value.toString(),
                 style = MaterialTheme.typography.bodyLarge.copy(
                     color = MaterialTheme.colorScheme.onSurface,
-                    fontSize = 24.sp, // Larger font size for better visibility
-                    fontWeight = FontWeight.Medium // Medium weight for value text
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Medium
                 ),
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
@@ -740,10 +615,26 @@ fun StyledNumberPickerField(
                     Icons.Default.Remove,
                     contentDescription = stringResource(id = R.string.decrease),
                     tint = if (value > range.first) MaterialTheme.colorScheme.primary
-                    else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                    else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                    modifier = Modifier.size(20.dp) // Μείωση του μεγέθους του εικονιδίου
                 )
             }
         }
     }
 }
 
+// Validation Function
+fun validatePassword(context: Context, password: String): String? {
+    val lengthValid = password.length >= 6
+    val capitalValid = password.any { it.isUpperCase() }
+    val numberValid = password.any { it.isDigit() }
+    val symbolValid = password.any { !it.isLetterOrDigit() }
+
+    return when {
+        !lengthValid -> context.getString(R.string.password_must_be_six)
+        !capitalValid -> context.getString(R.string.password_must_contain_uppercase)
+        !numberValid -> context.getString(R.string.password_must_contain_number)
+        !symbolValid -> context.getString(R.string.password_must_contain_special)
+        else -> null
+    }
+}

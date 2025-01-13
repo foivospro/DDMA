@@ -118,6 +118,7 @@ fun AppNavHost(
         darkTheme = isDarkMode,
         appThemeType = accentColor
     ) {
+        SetStatusBarColor()
         Scaffold(
             bottomBar = {
                 if (shouldShowBottomBar) {
@@ -260,14 +261,16 @@ fun BottomNavigationBar(navController: NavController) {
         containerColor = MaterialTheme.colorScheme.background,
         contentColor = MaterialTheme.colorScheme.onSurface,
         tonalElevation = 8.dp,
-        modifier = Modifier.height(56.dp)
+        modifier = Modifier.height(72.dp),
     ) {
         items.forEachIndexed { index, item ->
             NavigationBarItem(
+
                 icon = {
                     Icon(
                         imageVector = item.icon,
-                        contentDescription = item.label
+                        contentDescription = item.label,
+                        modifier = Modifier.size(32.dp),
                     )
                 },
 
@@ -303,12 +306,12 @@ fun BottomNavigationBar(navController: NavController) {
                     unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                     selectedTextColor = MaterialTheme.colorScheme.primary,
                     unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                    indicatorColor = MaterialTheme.colorScheme.background // Matches background color
-                ),
+                    indicatorColor = MaterialTheme.colorScheme.background
 
+                ),
             )
         }
-    }
+      }
     }
 }
 

@@ -32,7 +32,7 @@ class MainActivity : ComponentActivity() {
                 modifier = Modifier.fillMaxSize(),
                 color = androidx.compose.material3.MaterialTheme.colorScheme.background
             ) {
-                SetStatusBarColor()
+
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = androidx.compose.material3.MaterialTheme.colorScheme.background
