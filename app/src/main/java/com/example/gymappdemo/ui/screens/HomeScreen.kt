@@ -18,8 +18,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -34,7 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -57,6 +55,9 @@ fun HomeScreen(
     val isWorkoutActive by viewModel.isWorkoutActive.collectAsState()
     val currentSessionId by viewModel.currentSessionId.collectAsState()
     val username by viewModel.username.collectAsState()
+    val userId by viewModel.userId.collectAsState()
+    val context = LocalContext.current
+    val locale = context.resources.configuration.locales[0]
     val sessionList by viewModel.userSessions.collectAsState()
 
     LazyColumn(
@@ -92,8 +93,26 @@ fun HomeScreen(
 
 
         item {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = when {
+                        locale.language == "el" && username == "Guest" -> stringResource(R.string.hi_user, "Επισκέπτη")
+                        else -> stringResource(R.string.hi_user, username)
+                    },
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+        item {
             Text(
-                text = "Workout History",
+                text = stringResource(R.string.workout_history),
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -113,7 +132,7 @@ fun HomeScreen(
             WorkoutSummary(sessionList = sessionList)
         }
 
-
+        // Start New Workout / Continue Workout Button
         item {
             Spacer(modifier = Modifier.height(64.dp))
 
@@ -145,7 +164,9 @@ fun HomeScreen(
                 )
             ) {
                 Text(
-                    text = if (isWorkoutActive) "Continue Workout" else "Start New Workout",
+                    text = stringResource(
+                        id = if (isWorkoutActive) R.string.continue_workout else R.string.start_new_workout
+                    ),
                     style = MaterialTheme.typography.titleMedium,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
@@ -155,7 +176,7 @@ fun HomeScreen(
             if (isWorkoutActive) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Έχει ήδη ενεργή προπόνηση.",
+                    text = stringResource(R.string.active_workout_warning),
                     color = Color.Red,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold
@@ -186,8 +207,8 @@ fun GymSessionCard(session: GymSession) {
             horizontalArrangement = Arrangement.Start
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.weightlifter),
-                contentDescription = "Workout Icon",
+                painter = painterResource(id = workout.iconRes),
+                contentDescription = stringResource(id = workout.descriptionRes),
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
                     .size(64.dp)
@@ -195,7 +216,7 @@ fun GymSessionCard(session: GymSession) {
             )
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "Workout",
+                    text = stringResource(id = workout.descriptionRes),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
@@ -203,11 +224,18 @@ fun GymSessionCard(session: GymSession) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = "Ημερομηνία: ${session.date}",
+                    text = stringResource(R.string.date, workout.date),
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.Gray
                 )
                 Text(
                     text = "Διάρκεια: $durationText",
+                    text = stringResource(R.string.duration, workout.duration),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray
+                )
+                Text(
+                    text = stringResource(R.string.calories_burned, workout.caloriesBurned),
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.Gray
                 )
@@ -235,14 +263,14 @@ fun WorkoutSummary(sessionList: List<GymSession>) {
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
-            text = "Σύνοψη Workout",
+            text = stringResource(R.string.workout_summary),
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.padding(bottom = 8.dp)
         )
         Text(
-            text = "Συνολικά Workouts: $totalWorkouts",
+            text = stringResource(R.string.total_workouts, totalWorkouts),
             fontSize = 16.sp,
             color = Color.Gray,
             modifier = Modifier.padding(bottom = 16.dp)
@@ -272,13 +300,13 @@ fun WorkoutSummary(sessionList: List<GymSession>) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            Text(text = "Δευ", fontSize = 12.sp)
-            Text(text = "Τρ", fontSize = 12.sp)
-            Text(text = "Τετ", fontSize = 12.sp)
-            Text(text = "Πεμ", fontSize = 12.sp)
-            Text(text = "Παρ", fontSize = 12.sp)
-            Text(text = "Σαβ", fontSize = 12.sp)
-            Text(text = "Κυρ", fontSize = 12.sp)
+            Text(text = stringResource(R.string.monday), fontSize = 12.sp)
+            Text(text = stringResource(R.string.tuesday), fontSize = 12.sp)
+            Text(text = stringResource(R.string.wednesday), fontSize = 12.sp)
+            Text(text = stringResource(R.string.thursday), fontSize = 12.sp)
+            Text(text = stringResource(R.string.friday), fontSize = 12.sp)
+            Text(text = stringResource(R.string.saturday), fontSize = 12.sp)
+            Text(text = stringResource(R.string.sunday), fontSize = 12.sp)
         }
     }
 }

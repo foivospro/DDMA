@@ -15,7 +15,7 @@ interface UserDao {
     suspend fun registerUser(user: User)
 
     @Query("SELECT * FROM users WHERE Email=:email AND passwordHash=:password")
-    fun loginUser(email: String, password: String): User?
+    suspend fun loginUser(email: String, password: String): User?
 
     @Update
     suspend fun update(user: User)
@@ -31,12 +31,10 @@ interface UserDao {
 
     // Get user by email for persistent login
     @Query("SELECT * FROM users WHERE Email = :email")
-    fun getUserByEmail(email: String): User?
+    suspend fun getUserByEmail(email: String): User?
 
     // Check if a user with a specific email already exists (for registration checks)
     @Query("SELECT COUNT(*) > 0 FROM users WHERE Email = :email")
     suspend fun doesUserExist(email: String): Boolean
 
-    @Query("SELECT * FROM users")
-    fun getAllUsers(): Flow<List<User>>
 }

@@ -1,6 +1,5 @@
 package com.example.gymappdemo.ui.screens
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,13 +11,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
@@ -26,7 +26,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -45,16 +44,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.gymappdemo.navigation.GymAppScreen
 import com.example.gymappdemo.R
 import com.example.gymappdemo.data.entities.ExerciseWithSets
 import com.example.gymappdemo.data.entities.Set
 import com.example.gymappdemo.ui.viewmodels.CurrentStatusViewModel
-import com.example.gymappdemo.Navigation.GymAppScreen
-
 
 @Composable
 fun CurrentStatus(
@@ -73,11 +74,11 @@ fun CurrentStatus(
     if (error != null) {
         AlertDialog(
             onDismissRequest = { viewModel.clearError() },
-            title = { Text("Error") },
+            title = { Text(stringResource(R.string.error)) },
             text = { Text(error!!) },
             confirmButton = {
                 Button(onClick = { viewModel.clearError() }) {
-                    Text("OK")
+                    Text(stringResource(R.string.ok))
                 }
             }
         )
@@ -102,7 +103,6 @@ fun CurrentStatus(
                     sessionExerciseId = setToAdd!!,
                     repetitions = repetitions,
                     weight = weight,
-
                 )
                 setToAdd = null
             }
@@ -115,38 +115,59 @@ fun CurrentStatus(
     }
 
     Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { navController.navigate("ExercisePicker/$sessionId") },
-                shape = CircleShape,
-                containerColor = colorScheme.primary,
-                contentColor = colorScheme.onPrimary
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.add),
-                    contentDescription = "Add Exercise"
-                )
-            }
-        },
         bottomBar = {
-            Button(
-                onClick = {
-                    viewModel.resetTimer()
-                    onWorkoutTerminated(timer)
-                    navController.navigate(GymAppScreen.Home.name) {
-                        popUpTo("CurrentStatus/$sessionId") { inclusive = true }
-                    }
-                },
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
-                    .height(56.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Red,
-                    contentColor = Color.White
-                )
             ) {
-                Text("Τερματισμός Workout")
+                Button(
+                    onClick = { navController.navigate("ExercisePicker/$sessionId") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = colorScheme.primary,
+                        contentColor = colorScheme.onPrimary
+                    )
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.add),
+                            contentDescription = stringResource(id = R.string.add_exercise),
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = stringResource(id = R.string.add_exercise),
+                            fontSize = 18.sp)
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+                Button(
+                    onClick = {
+                        viewModel.resetTimer()
+                        onWorkoutTerminated(timer)
+                        navController.navigate(GymAppScreen.Home.name) {
+                            popUpTo("CurrentStatus/$sessionId") { inclusive = true }
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Red,
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text(
+                        text = stringResource(R.string.finish_workout),
+                    )
+                }
             }
         },
         content = { innerPadding ->
@@ -163,6 +184,37 @@ fun CurrentStatus(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Top
                 ) {
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(id =R.string.workout),
+                            style = MaterialTheme.typography.headlineMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = colorScheme.primary
+                            ),
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+
+                        IconButton(
+                            onClick = { navController.popBackStack() },
+                            modifier = Modifier.align(Alignment.CenterStart)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowBack,
+                                contentDescription = stringResource(R.string.back),
+                                tint = colorScheme.primary
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
                     // Timer and Calories
                     TimerAndCalories(
                         timer = timer,
@@ -175,21 +227,32 @@ fun CurrentStatus(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // List of Exercises with Sets
                     LazyColumn(
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                         modifier = Modifier.fillMaxSize()
                     ) {
                         if (exercisesWithSets.isEmpty()) {
                             item {
-                                Text("No exercises available", modifier = Modifier.padding(16.dp))
+                                Card(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp),
+                                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                                    shape = RoundedCornerShape(12.dp)
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.no_addition_yet),
+                                        style = MaterialTheme.typography.bodyMedium.copy(fontSize = 18.sp),
+                                        color = colorScheme.onSurfaceVariant,
+                                        textAlign = TextAlign.Center,
+                                        modifier = Modifier
+                                            .padding(16.dp)
+                                            .fillMaxWidth()
+                                    )
+                                }
                             }
                         } else {
                             items(exercisesWithSets) { exerciseWithSets ->
-                                Log.d(
-                                    "CurrentStatus",
-                                    "Displaying exercise: ${exerciseWithSets.exercise.name}, sets: ${exerciseWithSets.sets}"
-                                )
                                 ExerciseWithSetsCard(
                                     exerciseWithSets = exerciseWithSets,
                                     onRemoveSet = { setId ->
@@ -224,19 +287,19 @@ fun AddSetDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = "Προσθήκη Νέου Set") },
+        title = { Text(stringResource(R.string.add_new_set)) },
         text = {
             Column {
                 OutlinedTextField(
                     value = repetitions,
                     onValueChange = { repetitions = it },
-                    label = { Text("Επαναλήψεις") },
+                    label = { Text(stringResource(R.string.repetitions)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
                 OutlinedTextField(
                     value = weight,
                     onValueChange = { weight = it },
-                    label = { Text("Βάρος (kg)") },
+                    label = { Text(stringResource(R.string.weight_kg_2)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
             }
@@ -251,12 +314,12 @@ fun AddSetDialog(
                     }
                 }
             ) {
-                Text("Προσθήκη")
+                Text(stringResource(R.string.add))
             }
         },
         dismissButton = {
             Button(onClick = onDismiss) {
-                Text("Ακύρωση")
+                Text(stringResource(R.string.cancel))
             }
         }
     )
@@ -269,19 +332,19 @@ fun EditSetDialog(set: Set, onDismiss: () -> Unit, onSave: (Set) -> Unit) {
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = "Επεξεργασία Set") },
+        title = { Text(stringResource(R.string.edit_set)) },
         text = {
             Column {
                 OutlinedTextField(
                     value = reps,
                     onValueChange = { reps = it },
-                    label = { Text("Επαναλήψεις") },
+                    label = { Text(stringResource(R.string.repetitions)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
                 OutlinedTextField(
                     value = weight,
                     onValueChange = { weight = it },
-                    label = { Text("Βάρος (kg)") },
+                    label = { Text(stringResource(R.string.weight)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
             }
@@ -296,17 +359,16 @@ fun EditSetDialog(set: Set, onDismiss: () -> Unit, onSave: (Set) -> Unit) {
                     onSave(updatedSet)
                 }
             ) {
-                Text("Αποθήκευση")
+                Text(stringResource(R.string.save))
             }
         },
         dismissButton = {
             Button(onClick = onDismiss) {
-                Text("Ακύρωση")
+                Text(stringResource(R.string.cancel))
             }
         }
     )
 }
-
 
 @Composable
 fun TimerAndCalories(
@@ -340,16 +402,15 @@ fun TimerAndCalories(
                     id = if (isStarted) R.drawable.pause_circle_24dp_e8eaed_fill0_wght400_grad0_opsz24
                     else R.drawable.start_24dp_e8eaed_fill0_wght400_grad0_opsz24
                 ),
-                contentDescription = if (isStarted) "Pause" else "Start",
+                contentDescription = if (isStarted) stringResource(R.string.pause) else stringResource(R.string.start),
                 tint = colorScheme.onPrimary,
                 modifier = Modifier.size(48.dp)
             )
         }
 
-        // Calories Display
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = "Calories",
+                text = stringResource(R.string.calories),
                 style = MaterialTheme.typography.titleMedium,
                 color = colorScheme.onBackground
             )
@@ -360,15 +421,14 @@ fun TimerAndCalories(
             )
         }
 
-        // Timer Display με μορφοποίηση
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = "Time",
+                text = stringResource(R.string.time),
                 style = MaterialTheme.typography.titleMedium,
                 color = colorScheme.onBackground
             )
             Text(
-                text = formattedTime, // Χρησιμοποίησε το μορφοποιημένο χρόνο
+                text = formattedTime,
                 style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
                 color = colorScheme.primary
             )
@@ -430,18 +490,17 @@ fun ExerciseWithSetsCard(
                     IconButton(onClick = { onAddSet(exerciseWithSets.sessionExercise.id) }) {
                         Icon(
                             imageVector = Icons.Default.Add,
-                            contentDescription = "Προσθήκη Set",
+                            contentDescription = stringResource(R.string.add_set),
                             tint = Color(0xFF0AAD0A)
                         )
                     }
                     IconButton(onClick = { onDeleteExercise(exerciseWithSets.sessionExercise.id) }) {
                         Icon(
                             imageVector = Icons.Default.Delete,
-                            contentDescription = "Διαγραφή Άσκησης",
+                            contentDescription = stringResource(R.string.delete_exercise),
                             tint = Color.Red
                         )
                     }
-
                 }
             }
 
@@ -458,8 +517,6 @@ fun ExerciseWithSetsCard(
     }
 }
 
-
-
 @Composable
 fun SetCard(set: Set, onRemove: () -> Unit, onEdit: (Set) -> Unit) {
     Row(
@@ -470,21 +527,21 @@ fun SetCard(set: Set, onRemove: () -> Unit, onEdit: (Set) -> Unit) {
             .padding(vertical = 4.dp)
     ) {
         Column {
-            Text(text = "Reps: ${set.reps}", style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Weight: ${set.weight} kg", style = MaterialTheme.typography.bodyMedium)
+            Text(text = stringResource(R.string.reps_status, set.reps), style = MaterialTheme.typography.bodyMedium)
+            Text(text = stringResource(R.string.weight_kg_status, set.weight), style = MaterialTheme.typography.bodyMedium)
         }
         Row {
             IconButton(onClick = { onEdit(set) }) {
                 Icon(
                     imageVector = Icons.Default.Edit,
-                    contentDescription = "Edit Set",
+                    contentDescription = stringResource(R.string.edit_set),
                     tint = Color.DarkGray
                 )
             }
             IconButton(onClick = onRemove) {
                 Icon(
                     imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete Set",
+                    contentDescription = stringResource(R.string.delete_exercise),
                     tint = Color.Red
                 )
             }

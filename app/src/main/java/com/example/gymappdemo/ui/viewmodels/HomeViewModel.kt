@@ -1,7 +1,6 @@
 package com.example.gymappdemo.ui.viewmodels
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,12 +13,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.time.LocalDate
 
 class HomeViewModel(
     private val workoutRepository: WorkoutRepository,
     private val userRepository: UserRepository
 ) : ViewModel() {
+    private val _userId = MutableStateFlow(0)
+    val userId: StateFlow<Int> = _userId.asStateFlow()
 
 
     private val _isWorkoutActive = MutableStateFlow(false)
@@ -41,9 +41,15 @@ class HomeViewModel(
     val userId: StateFlow<Int?> = _userId.asStateFlow()
 
     init {
+        updateViewModel()
+    }
+    fun updateViewModel() {
         viewModelScope.launch {
             fetchUserData()
             val activeSession = _userId.value?.let { workoutRepository.getActiveSession(it) }
+            fetchUsername()
+            _userId.value = fetchUserId()
+            val activeSession = workoutRepository.getActiveSession()
             if (activeSession != null) {
                 _isWorkoutActive.value = true
                 _currentSessionId.value = activeSession.id
@@ -78,8 +84,27 @@ class HomeViewModel(
         }
     }
 
+     private suspend fun fetchUserId(): Int {
+        // Χρήση του Dispatcher.IO για λειτουργίες βάσης δεδομένων
+        val email = withContext(Dispatchers.IO) {
+            userRepository.getLoggedInUserEmail()
+        }
+
+        val user = if (email != "Guest") {
+            withContext(Dispatchers.IO) {
+                userRepository.getUserByEmail(email!!)
+            }
+        } else {
+            null
+        }
+
+        // Ενημέρωση της κατάστασης στο κύριο νήμα
+        return  user?.id ?: 0
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     fun startNewWorkout(
+        userId: Int,
         onSessionCreated: (GymSession) -> Unit,
         onError: (String) -> Unit
     ) {
