@@ -9,13 +9,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.gymappdemo.data.network.NewsApi
+import com.example.gymappdemo.data.network.NewsApiService
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
-class NewsViewModel : ViewModel() {
+class NewsViewModel(private val service: NewsApiService) : ViewModel() {
 
     var newsUiState: NewsUiState by mutableStateOf(NewsUiState.Loading)
         private set
@@ -28,8 +28,8 @@ class NewsViewModel : ViewModel() {
     private fun getNews() {
         viewModelScope.launch {
             newsUiState = try {
-                val response: NewsResponse = NewsApi.retrofitService.getNews(
-                    query = "Gym",
+                val response: NewsResponse = service.getNews(
+                    query = "Sports",
                     fromDate = getDates(),
                     sortBy = "publishedAt",
                     apiKey = "e77cba1ddfbf40618da7d163d4d33946",

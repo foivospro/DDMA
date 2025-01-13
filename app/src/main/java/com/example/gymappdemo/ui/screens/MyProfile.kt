@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -60,8 +59,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.example.gymappdemo.Navigation.GymAppScreen
 import com.example.gymappdemo.R
+import com.example.gymappdemo.navigation.GymAppScreen
 import com.example.gymappdemo.ui.viewmodels.MyProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -120,11 +119,6 @@ fun UserProfileScreen(
                             horizontalArrangement = Arrangement.SpaceBetween, // Spread items across the row (title at start, icon at end)
                             verticalAlignment = Alignment.CenterVertically // Vertically center items in the row
                         ) {
-                            Text(
-                                stringResource(R.string.my_profile),
-                                style = MaterialTheme.typography.headlineMedium,
-                                color = MaterialTheme.colorScheme.primary
-                            )
 
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ExitToApp,
@@ -157,16 +151,6 @@ fun UserProfileScreen(
                         .padding(vertical = 8.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = "Προφίλ",
-                        style = MaterialTheme.typography.headlineMedium.copy(
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
-                        ),
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-
                     IconButton(
                         onClick = { navController.popBackStack() },
                         modifier = Modifier.align(Alignment.CenterStart)

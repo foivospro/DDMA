@@ -51,10 +51,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.gymappdemo.Navigation.GymAppScreen
 import com.example.gymappdemo.R
 import com.example.gymappdemo.data.entities.ExerciseWithSets
 import com.example.gymappdemo.data.entities.Set
+import com.example.gymappdemo.navigation.GymAppScreen
 import com.example.gymappdemo.ui.viewmodels.CurrentStatusViewModel
 
 @Composable
