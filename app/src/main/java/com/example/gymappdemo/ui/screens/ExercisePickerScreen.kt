@@ -104,13 +104,6 @@ fun ExercisePickerScreen(
     }
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(
-                    text = stringResource(R.string.select_exercises_title),
-                ) }
-            )
-        },
         content = { paddingValues ->
             Column(
                 modifier = Modifier

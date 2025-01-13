@@ -3,6 +3,7 @@ package com.example.gymappdemo.data
 import android.content.Context
 import com.example.gymappdemo.data.database.AppDatabase
 import com.example.gymappdemo.data.network.NewsApiService
+import com.example.gymappdemo.data.preferences.ThemePreferences
 import com.example.gymappdemo.data.repositories.UserRepository
 import com.example.gymappdemo.data.repositories.WorkoutRepository
 import kotlinx.serialization.json.Json
@@ -14,6 +15,7 @@ interface AppContainer {
     val userRepository: UserRepository
     val workoutRepository: WorkoutRepository
     val retrofitService: NewsApiService
+    val themePreferences: ThemePreferences
 }
 
 class AppContainerImpl(private val context: Context) : AppContainer {
@@ -35,6 +37,10 @@ class AppContainerImpl(private val context: Context) : AppContainer {
         AppDatabase.getInstance(context).userDao(),
         context
         )
+    }
+
+    override  val themePreferences: ThemePreferences by lazy {
+        ThemePreferences(context)
     }
 
     override val workoutRepository: WorkoutRepository by lazy {

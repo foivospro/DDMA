@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
         SessionExercise::class,
         Set::class
     ],
-    version = 7,
+    version = 8,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

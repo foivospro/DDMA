@@ -24,8 +24,10 @@
     <string name="time">Time</string>
     <string name="add_set">Add Set</string>
     <string name="delete_exercise">Delete Exercise</string>
-    <string name="reps">Reps: %1$d</string>
-    <string name="weight_kg">Weight: %1$.2f kg</string>
+    <string name="reps_status">Reps: %1$d</string>
+    <string name="weight_kg_status">Weight: %1$.2f kg</string>
+    <string name="reps">Reps</string>
+    <string name="weight_kg">Weight (kg)</string>
     <string name="hi_user">Hi 👋, %1$s</string>
     <string name="workout_history">Workout History</string>
     <string name="workout_summary">Summary of Workout</string>

@@ -74,8 +74,9 @@ fun SetRepsScreen(
         setRepsViewModel.loadExerciseDetails(exerciseId)
     }
 
-    LaunchedEffect(key1 = workoutSets.isEmpty()) {
-        if (workoutSets.isEmpty()) {
+    LaunchedEffect(key1 = exerciseId) {
+        setRepsViewModel.loadExerciseDetails(exerciseId)
+        if (setRepsViewModel.temporarySets.value.isEmpty()) {
             setRepsViewModel.addTemporarySet(dummySessionExerciseId = -1)
         }
     }
@@ -241,7 +242,6 @@ fun SetRepsScreen(
         }
     }
 }
-
 @Composable
 fun WorkoutSetCard(
     setItem: Set,
@@ -269,112 +269,45 @@ fun WorkoutSetCard(
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            Text(
-                text = stringResource(id = R.string.set_item, setItem.id.toString()),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.primary
-            )
+            // Set Header with Remove Button
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = stringResource(id = R.string.set_number, setItem.id),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                IconButton(
+                    onClick = onRemove,
+                    modifier = Modifier.size(24.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = stringResource(id = R.string.remove_set),
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Weight and Reps Controls
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Column {
-                    Text(
-                        text = stringResource(id = R.string.weight_kg_2),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Row {
-                        IconButton(onClick = { onWeightChange(setItem.weight - 0.5) }) {
-                            Icon(
-                                Icons.Default.Remove,
-                                contentDescription = stringResource(id = R.string.decrease_weight)
-                            )
-                        }
-                        Text(
-                            text = setItem.weight.toString(),
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                        IconButton(onClick = { onWeightChange(setItem.weight + 0.5) }) {
-                            Icon(
-                                Icons.Default.Add,
-                                contentDescription = stringResource(id = R.string.increase_weight)
-                            )
-                        }
-                    }
-                }
-
-                Column {
-                    Text(
-                        text = stringResource(id = R.string.reps),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Row {
-                        IconButton(onClick = { onRepsChange(setItem.reps - 1) }) {
-                            Icon(
-                                Icons.Default.Remove,
-                                contentDescription = stringResource(id = R.string.decrease_reps)
-                            )
-                        }
-                        Text(
-                            text = setItem.reps.toString(),
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                        IconButton(onClick = { onRepsChange(setItem.reps + 1) }) {
-                            Icon(
-                                Icons.Default.Add,
-                                contentDescription = stringResource(id = R.string.increase_reps)
-                            )
-                        }
-                    }
-                }
-
-                IconButton(onClick = onRemove) {
-                    Text(
-                        text = "Set #${setItem.id}",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    IconButton(
-                        onClick = onRemove,
-                        modifier = Modifier.size(24.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = stringResource(id = R.string.remove_set),
-                            tint = MaterialTheme.colorScheme.error
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                // Weight Section
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Βάρος (kg)",
+                        text = stringResource(id = R.string.weight_kg),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    Text(
-                        text = "Επαναλήψεις",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -384,7 +317,7 @@ fun WorkoutSetCard(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Remove,
-                                contentDescription = "Μείωση Βάρους",
+                                contentDescription = stringResource(id = R.string.decrease_weight),
                                 tint = MaterialTheme.colorScheme.primary
                             )
                         }
@@ -420,11 +353,22 @@ fun WorkoutSetCard(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Add,
-                                contentDescription = "Αύξηση Βάρους",
+                                contentDescription = stringResource(id = R.string.increase_weight),
                                 tint = MaterialTheme.colorScheme.primary
                             )
                         }
                     }
+                }
+
+                // Reps Section
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.reps),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -434,7 +378,7 @@ fun WorkoutSetCard(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Remove,
-                                contentDescription = "Μείωση Επαναλήψεων",
+                                contentDescription = stringResource(id = R.string.decrease_reps),
                                 tint = MaterialTheme.colorScheme.primary
                             )
                         }
@@ -442,7 +386,10 @@ fun WorkoutSetCard(
                         Text(
                             text = setItem.reps.toString(),
                             style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(horizontal = 8.dp)
+                            modifier = Modifier
+                                .padding(horizontal = 8.dp)
+                                .width(30.dp),
+                            textAlign = TextAlign.Center
                         )
 
                         IconButton(
@@ -451,7 +398,7 @@ fun WorkoutSetCard(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Add,
-                                contentDescription = "Αύξηση Επαναλήψεων",
+                                contentDescription = stringResource(id = R.string.increase_reps),
                                 tint = MaterialTheme.colorScheme.primary
                             )
                         }

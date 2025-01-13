@@ -195,33 +195,6 @@ fun LoginScreen(onLoginSuccess: () -> Unit,
                 Text(text = stringResource(R.string.login), fontSize = 16.sp)
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Button(
-                onClick = {
-                    // Add logic for Google sign-in
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4285F4)),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = "Google Logo",
-                        modifier = Modifier.size(24.dp),
-                        tint = Color.White
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = stringResource(R.string.login_with_google),
-                        color = Color.White,
-                        fontSize = 16.sp
-                    )
-                }
-            }
 
             Spacer(modifier = Modifier.height(24.dp))
 

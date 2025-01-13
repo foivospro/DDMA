@@ -23,9 +23,11 @@
     <string name="calories">Θερμίδες</string>
     <string name="time">Χρόνος</string>
     <string name="add_set">Προσθήκη Σετ</string>
+    <string name="reps_status">Επαναλήψεις: %1$d</string>
+    <string name="weight_kg_status">Βάρος: %1$.2f kg</string>
     <string name="delete_exercise">Διαγραφή Άσκησης</string>
-    <string name="reps">Επαναλήψεις: %1$d</string>
-    <string name="weight_kg">Βάρος: %1$.2f κιλά</string>
+    <string name="reps">Επαναλήψεις</string>
+    <string name="weight_kg">Βάρος (kg)</string>
     <string name="hi_user">Γεια 👋, %1$s</string>
     <string name="workout_history">Ιστορικό Προπονήσεων</string>
     <string name="workout_summary">Σύνοψη Προπόνησης</string>

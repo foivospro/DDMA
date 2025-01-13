@@ -1,4 +1,4 @@
-package com.example.gymappdemo.Navigation
+package com.example.gymappdemo.navigation
 
 
 import NewsScreen
@@ -22,7 +22,9 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,8 +42,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.gymappdemo.MyApplication
 import com.example.gymappdemo.R
 import com.example.gymappdemo.data.database.AppDatabase
+import com.example.gymappdemo.data.preferences.ThemePreferences
 import com.example.gymappdemo.data.repositories.UserRepository
 import com.example.gymappdemo.data.repositories.WorkoutRepository
 import com.example.gymappdemo.ui.screens.CurrentStatus
@@ -77,8 +81,6 @@ enum class GymAppScreen {
 
 fun AppNavHost(
     isAuthenticated: Boolean,
-    isDarkMode: Boolean,
-    onDarkModeToggle: (Boolean) -> Unit
 ) {
     val navController = rememberNavController()
     val application = LocalContext.current.applicationContext as MyApplication
@@ -86,8 +88,10 @@ fun AppNavHost(
     val factory = AppViewModelFactory(
         workoutRepository = container.workoutRepository,
         userRepository = container.userRepository,
-        service = container.retrofitService
+        service = container.retrofitService,
+        themePreferences = container.themePreferences
     )
+
     val currentStatusViewModel: CurrentStatusViewModel = viewModel(factory = factory)
     val exercisePickerViewModel: ExercisePickerViewModel = viewModel(factory = factory)
     val homeViewModel: HomeViewModel = viewModel(factory = factory)
@@ -97,8 +101,17 @@ fun AppNavHost(
     val myProfileViewModel: MyProfileViewModel = viewModel(factory = factory)
     val newsViewModel: NewsViewModel = viewModel(factory = factory)
 
+    val accentColor by myProfileViewModel.selectedAccentColor.collectAsState()
+    val isDarkMode by myProfileViewModel.isDarkModeEnabled.collectAsState()
     // State to track if the current destination should hide the BottomNavigationBar
     var shouldShowBottomBar by remember { mutableStateOf(true) }
+    val context = LocalContext.current
+    val themePreferences = ThemePreferences(context)
+
+    LaunchedEffect(Unit) {
+        val storedTheme = themePreferences.getTheme()
+        myProfileViewModel.updateTheme(storedTheme)
+    }
 
     Scaffold(
         bottomBar = {
@@ -234,7 +247,10 @@ fun BottomNavigationBar(navController: NavController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    NavigationBar(
+    Column {
+        Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f), thickness = 3.dp)
+
+        NavigationBar(
         containerColor = MaterialTheme.colorScheme.background,
         contentColor = MaterialTheme.colorScheme.onSurface,
         tonalElevation = 8.dp,
@@ -248,7 +264,7 @@ fun BottomNavigationBar(navController: NavController) {
                         contentDescription = item.label
                     )
                 },
-                label = { Text(text = item.label) },
+
                 // Check if the item's label matches the current route
                 selected = currentRoute == GymAppScreen.entries[index].name,
                 onClick = {
@@ -283,12 +299,13 @@ fun BottomNavigationBar(navController: NavController) {
                     unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                     indicatorColor = MaterialTheme.colorScheme.background // Matches background color
                 ),
-                alwaysShowLabel = false
+
             )
         }
     }
+    }
 }
-}
+
 
 @Composable
 fun SetStatusBarColor() {

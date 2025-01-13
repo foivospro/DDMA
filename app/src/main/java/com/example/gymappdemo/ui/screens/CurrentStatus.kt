@@ -51,10 +51,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.gymappdemo.navigation.GymAppScreen
 import com.example.gymappdemo.R
 import com.example.gymappdemo.data.entities.ExerciseWithSets
 import com.example.gymappdemo.data.entities.Set
-import com.example.gymappdemo.navigation.GymAppScreen
 import com.example.gymappdemo.ui.viewmodels.CurrentStatusViewModel
 
 @Composable
@@ -527,8 +527,8 @@ fun SetCard(set: Set, onRemove: () -> Unit, onEdit: (Set) -> Unit) {
             .padding(vertical = 4.dp)
     ) {
         Column {
-            Text(text = stringResource(R.string.reps, set.reps), style = MaterialTheme.typography.bodyMedium)
-            Text(text = stringResource(R.string.weight_kg, set.weight), style = MaterialTheme.typography.bodyMedium)
+            Text(text = stringResource(R.string.reps_status, set.reps), style = MaterialTheme.typography.bodyMedium)
+            Text(text = stringResource(R.string.weight_kg_status, set.weight), style = MaterialTheme.typography.bodyMedium)
         }
         Row {
             IconButton(onClick = { onEdit(set) }) {

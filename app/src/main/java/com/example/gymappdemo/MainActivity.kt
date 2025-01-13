@@ -15,10 +15,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
-import com.example.gymappdemo.navigation.AppNavHost
+
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.gymappdemo.Navigation.AppNavHost
-import com.example.gymappdemo.Navigation.SetStatusBarColor
+import com.example.gymappdemo.navigation.AppNavHost
+import com.example.gymappdemo.navigation.SetStatusBarColor
 import com.example.gymappdemo.data.database.AppDatabase
 import com.example.gymappdemo.data.preferences.ThemePreferences
 import com.example.gymappdemo.data.repositories.UserRepository
@@ -43,16 +43,9 @@ class MainActivity : ComponentActivity() {
         val themePreferences = ThemePreferences(applicationContext)
 
         setContent {
-            val accentColor by myProfileViewModel.selectedAccentColor.collectAsState()
-            val isDarkMode by myProfileViewModel.isDarkModeEnabled.collectAsState()
 
-
-            LaunchedEffect(Unit) {
-                val storedTheme = themePreferences.getTheme()
-                myProfileViewModel.updateTheme(storedTheme)
-            }
-            GymAppDemoTheme(  darkTheme = isDarkMode,
-                appThemeType = accentColor) { // Pass darkTheme state here
+            GymAppDemoTheme(
+            ) { // Pass darkTheme state here
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -64,11 +57,8 @@ class MainActivity : ComponentActivity() {
                     ) {
                         if (isAuthenticated != null) {
                             AppNavHost(
-                                isAuthenticated = isAuthenticated!!,
-                                isDarkMode = isDarkMode,
-                                onDarkModeToggle = { enabled ->
-                                    myProfileViewModel.toggleDarkMode(enabled)
-                                }
+                                isAuthenticated = isAuthenticated!!
+
                             )
                         }
                     }
