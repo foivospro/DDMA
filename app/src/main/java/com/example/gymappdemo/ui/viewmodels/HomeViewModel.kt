@@ -102,7 +102,8 @@ class HomeViewModel(
                     userId = userId,
                     date = date,
                     notes = null,
-                    duration = 0
+                    duration = 0,
+                    caloriesBurned = 0
                 )
 
                 val sessionId = workoutRepository.insertSession(newSession).toInt()
@@ -120,12 +121,12 @@ class HomeViewModel(
         }
     }
 
-    fun terminateWorkout(sessionId: Int, duration: Int) {
+    fun terminateWorkout(sessionId: Int, duration: Int, caloriesBurned: Int) {
         viewModelScope.launch {
             try {
                 val session = workoutRepository.getSessionById(sessionId)
                 if (session != null) {
-                    val updatedSession = session.copy(duration = duration)
+                    val updatedSession = session.copy(duration = duration,caloriesBurned = caloriesBurned)
                     workoutRepository.updateSession(updatedSession)
                     _isWorkoutActive.value = false
                     _currentSessionId.value = null

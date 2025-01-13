@@ -63,7 +63,7 @@ fun CurrentStatus(
     sessionId: Int,
     viewModel: CurrentStatusViewModel,
     navController: NavController,
-    onWorkoutTerminated: (Int) -> Unit
+    onWorkoutTerminated: (Int, Int) -> Unit
 ) {
     val timer by viewModel.timerState.collectAsState()
     val calories by viewModel.caloriesState.collectAsState()
@@ -152,7 +152,7 @@ fun CurrentStatus(
                 Button(
                     onClick = {
                         viewModel.resetTimer()
-                        onWorkoutTerminated(timer)
+                        onWorkoutTerminated(timer, calories)
                         navController.navigate(GymAppScreen.Home.name) {
                             popUpTo("CurrentStatus/$sessionId") { inclusive = true }
                         }
