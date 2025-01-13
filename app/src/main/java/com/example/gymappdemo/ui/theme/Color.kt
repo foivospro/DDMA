@@ -3,9 +3,9 @@ package com.example.gymappdemo.ui.theme
 import androidx.compose.ui.graphics.Color
 
 // Default Light
-val primaryLight_Default = Color(0xFF203443)
+val primaryLight_Default = Color(0xFF4B5C92)
 val onPrimaryLight_Default = Color(0xFFFFFFFF)
-val secondaryLight_Default = Color(0xFF1A2738)
+val secondaryLight_Default = Color(0xFF203443)
 val onSecondaryLight_Default = Color(0xFFFFFFFF)
 val tertiaryLight_Default = Color(0xFFFF4C29)
 val onTertiaryLight_Default = Color(0xFFFFFFFF)
@@ -13,127 +13,111 @@ val backgroundLight_Default = Color(0xFFFBF9FA)
 val onBackgroundLight_Default = Color(0xFF1B1C1D)
 val surfaceLight_Default = Color(0xFFFBF9FA)
 val onSurfaceLight_Default = Color(0xFF1B1B1D)
-val errorLight_Default = Color(0xFFBA1A1A)
+val errorLight_Default = Color(0xFFD32F2F)
 val onErrorLight_Default = Color(0xFFFFFFFF)
-val customColor1Light_Default = Color(0xFF000B18)
-val onCustomColor1Light_Default = Color(0xFFFFFFFF)
 
-// Default Dark
-val primaryDark_Default = Color(0xFFB4C9DB)
+// Dark Mode
+val primaryDark_Default = Color(0xFF4B5C92)
 val onPrimaryDark_Default = Color(0xFF1E3341)
 val secondaryDark_Default = Color(0xFFBAC7DE)
 val onSecondaryDark_Default = Color(0xFF243143)
 val tertiaryDark_Default = Color(0xFFCC3C21)
 val onTertiaryDark_Default = Color(0xFFFFFFFF)
-val backgroundDark_Default = Color(0xFF121314)
+val backgroundDark_Default = Color(0xFF252020)
 val onBackgroundDark_Default = Color(0xFFE3E2E3)
-val surfaceDark_Default = Color(0xFF131315)
+val surfaceDark_Default = Color(0xFF252020)
 val onSurfaceDark_Default = Color(0xFFE4E2E3)
-val errorDark_Default = Color(0xFFFFB4AB)
+val errorDark_Default = Color(0xFFD32F2F)
 val onErrorDark_Default = Color(0xFF690005)
-val customColor1Dark_Default = Color(0xFFB3C9E1)
-val onCustomColor1Dark_Default = Color(0xFF1D3245)
 
-// Blue Light
-val primaryLight_Blue = Color(0xFF2196F3)
-val onPrimaryLight_Blue = Color(0xFFFFFFFF)
-val secondaryLight_Blue = Color(0xFF64B5F6)
-val onSecondaryLight_Blue = Color(0xFFFFFFFF)
-val tertiaryLight_Blue = Color(0xFFBBDEFB)
-val onTertiaryLight_Blue = Color(0xFF000000)
-val backgroundLight_Blue = Color(0xFFE3F2FD)
-val onBackgroundLight_Blue = Color(0xFF0D47A1)
-val surfaceLight_Blue = Color(0xFFFFFFFF)
-val onSurfaceLight_Blue = Color(0xFF0D47A1)
-val errorLight_Blue = Color(0xFFBA1A1A)
-val onErrorLight_Blue = Color(0xFFFFFFFF)
-val customColor1Light_Blue = Color(0xFF0D47A1)
-val onCustomColor1Light_Blue = Color(0xFFFFFFFF)
+// Orange Light
+val primaryLight_Orange = Color(0xFFFF6500) // Bold Vibrant Orange
+val onPrimaryLight_Orange = Color(0xFFFFFFFF)
+val secondaryLight_Orange = Color(0xFFFF8500) // Rich Medium Orange
+val onSecondaryLight_Orange = Color(0xFFFFFFFF)
+val tertiaryLight_Orange = Color(0xFFFFA552) // Soft, Muted Orange
+val onTertiaryLight_Orange = Color(0xFF1A1A1A)
+val backgroundLight_Orange = Color(0xFFFFFFFF) // White Background
+val onBackgroundLight_Orange = Color(0xFF252020) // Dark Text
+val surfaceLight_Orange = Color(0xFFFFFFFF) // Matches background
+val onSurfaceLight_Orange = Color(0xFF1A1A1A)
+val errorLight_Orange = Color(0xFFD32F2F) // Standard Error Red
+val onErrorLight_Orange = Color(0xFFFFFFFF)
+val customColor1Light_Orange = Color(0xFFCC5500) // Deep Burnt Orange
+val onCustomColor1Light_Orange = Color(0xFFFFFFFF)
 
-// Blue Dark
-val primaryDark_Blue = Color(0xFF90CAF9)
-val onPrimaryDark_Blue = Color(0xFF0D47A1)
-val secondaryDark_Blue = Color(0xFF64B5F6)
-val onSecondaryDark_Blue = Color(0xFFFFFFFF)
-val tertiaryDark_Blue = Color(0xFF42A5F5)
-val onTertiaryDark_Blue = Color(0xFFFFFFFF)
-val backgroundDark_Blue = Color(0xFF0D47A1)
-val onBackgroundDark_Blue = Color(0xFF003457)
-val surfaceDark_Blue = Color(0xFF1E88E5)
-val onSurfaceDark_Blue = Color(0xFFE3F2FD)
-val errorDark_Blue = Color(0xFFFFB4AB)
-val onErrorDark_Blue = Color(0xFF690005)
-val customColor1Dark_Blue = Color(0xFF1E88E5)
-val onCustomColor1Dark_Blue = Color(0xFFFFFFFF)
+// Orange Dark
+val primaryDark_Orange = Color(0xFFFF6500) // Rich Medium Orange
+val onPrimaryDark_Orange = Color(0xFF1A1A1A) // Dark Text
+val secondaryDark_Orange = Color(0xFFFFA552) // Soft, Muted Orange
+val onSecondaryDark_Orange = Color(0xFF1A1A1A)
+val tertiaryDark_Orange = Color(0xFFFF6500) // Bold Vibrant Orange
+val onTertiaryDark_Orange = Color(0xFFFFFFFF)
+val backgroundDark_Orange = Color(0xFF000000) // Black Background
+val onBackgroundDark_Orange = Color(0xFFFFFFFF) // White Text
+val surfaceDark_Orange = Color(0xFF121212) // Slightly Elevated Black
+val onSurfaceDark_Orange = Color(0xFFFFFFFF)
+val errorDark_Orange = Color(0xFFCF6679) // Muted Red
+val onErrorDark_Orange = Color(0xFF690005)
 
-// Green Light
-val primaryLight_Green = Color(0xFF4CAF50)
-val onPrimaryLight_Green = Color(0xFFFFFFFF)
-val secondaryLight_Green = Color(0xFF81C784)
-val onSecondaryLight_Green = Color(0xFFFFFFFF)
-val tertiaryLight_Green = Color(0xFFA5D6A7)
-val onTertiaryLight_Green = Color(0xFF000000)
-val backgroundLight_Green = Color(0xFFE8F5E9)
-val onBackgroundLight_Green = Color(0xFF1B5E20)
-val surfaceLight_Green = Color(0xFFFFFFFF)
-val onSurfaceLight_Green = Color(0xFF1B5E20)
-val errorLight_Green = Color(0xFFBA1A1A)
-val onErrorLight_Green = Color(0xFFFFFFFF)
-val customColor1Light_Green = Color(0xFF1B5E20)
-val onCustomColor1Light_Green = Color(0xFFFFFFFF)
+// Purple Light
+val primaryLight_Purple = Color(0xFF6A1B9A) // Deep Purple
+val onPrimaryLight_Purple = Color(0xFFFFFFFF)
+val secondaryLight_Purple = Color(0xFF8E24AA) // Bright Purple
+val onSecondaryLight_Purple = Color(0xFFFFFFFF)
+val tertiaryLight_Purple = Color(0xFFCE93D8) // Light Purple
+val onTertiaryLight_Purple = Color(0xFF1B1C1D)
+val backgroundLight_Purple = Color(0xFFF8F3F9) // Soft Lavender
+val onBackgroundLight_Purple = Color(0xFF212121)
+val surfaceLight_Purple = Color(0xFFF8F3F9) // Matches background
+val onSurfaceLight_Purple = Color(0xFF1B1B1D)
+val errorLight_Purple = Color(0xFFD32F2F) // Standard Red Error
+val onErrorLight_Purple = Color(0xFFFFFFFF)
+val customColor1Light_Purple = Color(0xFF4A148C) // Very Deep Purple
+val onCustomColor1Light_Purple = Color(0xFFFFFFFF)
 
-// Green Dark
-val primaryDark_Green = Color(0xFF81C784)
-val onPrimaryDark_Green = Color(0xFF1B5E20)
-val secondaryDark_Green = Color(0xFFA5D6A7)
-val onSecondaryDark_Green = Color(0xFFFFFFFF)
-val tertiaryDark_Green = Color(0xFF66BB6A)
-val onTertiaryDark_Green = Color(0xFFFFFFFF)
-val backgroundDark_Green = Color(0xFF1B5E20)
-val onBackgroundDark_Green = Color(0xFFE8F5E9)
-val surfaceDark_Green = Color(0xFF2E7D32)
-val onSurfaceDark_Green = Color(0xFFE8F5E9)
-val errorDark_Green = Color(0xFFFFB4AB)
-val onErrorDark_Green = Color(0xFF690005)
-val customColor1Dark_Green = Color(0xFF388E3C)
-val onCustomColor1Dark_Green = Color(0xFFFFFFFF)
+// Purple Dark
+val primaryDark_Purple = Color(0xFF8E24AA) // Light Lavender
+val onPrimaryDark_Purple = Color(0xFF311B92) // Deep Purple
+val secondaryDark_Purple = Color(0xFFBA68C8) // Bright Lavender
+val onSecondaryDark_Purple = Color(0xFF4A148C)
+val tertiaryDark_Purple = Color(0xFFE1BEE7) // Light Purple
+val onTertiaryDark_Purple = Color(0xFF311B92)
+val backgroundDark_Purple = Color(0xFF121212) // Standard Dark Background
+val onBackgroundDark_Purple = Color(0xFF212121) // Soft Lavender White
+val surfaceDark_Purple = Color(0xFF212121) // Slightly Elevated Dark
+val onSurfaceDark_Purple = Color(0xFFEDE7F6)
+val errorDark_Purple = Color(0xFFFFB4AB) // Standard Red Error
+val onErrorDark_Purple = Color(0xFF690005)
 
-// Red Light
-val primaryLight_Red = Color(0xFFF44336)
-val onPrimaryLight_Red = Color(0xFFFFFFFF)
-val secondaryLight_Red = Color(0xFFE57373)
-val onSecondaryLight_Red = Color(0xFFFFFFFF)
-val tertiaryLight_Red = Color(0xFFFFCDD2)
-val onTertiaryLight_Red = Color(0xFF000000)
-val backgroundLight_Red = Color(0xFFFFEBEE)
-val onBackgroundLight_Red = Color(0xFFB71C1C)
-val surfaceLight_Red = Color(0xFFFFFFFF)
-val onSurfaceLight_Red = Color(0xFFB71C1C)
-val errorLight_Red = Color(0xFFBA1A1A)
-val onErrorLight_Red = Color(0xFFFFFFFF)
-val customColor1Light_Red = Color(0xFFB71C1C)
-val onCustomColor1Light_Red = Color(0xFFFFFFFF)
 
-// Red Dark
-val primaryDark_Red = Color(0xFFE57373)
-val onPrimaryDark_Red = Color(0xFFB71C1C)
-val secondaryDark_Red = Color(0xFFFFCDD2)
-val onSecondaryDark_Red = Color(0xFFFFFFFF)
-val tertiaryDark_Red = Color(0xFFF44336)
-val onTertiaryDark_Red = Color(0xFFFFFFFF)
-val backgroundDark_Red = Color(0xFFB71C1C)
-val onBackgroundDark_Red = Color(0xFFFFEBEE)
-val surfaceDark_Red = Color(0xFFB71C1C)
-val onSurfaceDark_Red = Color(0xFFFFEBEE)
-val errorDark_Red = Color(0xFFFFB4AB)
-val onErrorDark_Red = Color(0xFF690005)
-val customColor1Dark_Red = Color(0xFFCF6679)
-val onCustomColor1Dark_Red = Color(0xFFFFFFFF)
 
-// List of Custom Themes
-val CustomThemes = listOf(
-    AppThemeType.DEFAULT,
-    AppThemeType.BLUE,
-    AppThemeType.GREEN,
-    AppThemeType.RED
-)
+// Yellow Light
+val primaryLight_Yellow = Color(0xFFFF9800) // Vibrant Orange
+val onPrimaryLight_Yellow = Color(0xFFFFFFFF)
+val secondaryLight_Yellow = Color(0xFFFFB74D) // Softer Orange
+val onSecondaryLight_Yellow = Color(0xFFFFFFFF)
+val tertiaryLight_Yellow = Color(0xFFFFE0B2) // Light Orange
+val onTertiaryLight_Yellow = Color(0xFF000000)
+val backgroundLight_Yellow = Color(0xFFFFFFFF) // White Background
+val onBackgroundLight_Yellow = Color(0xFF212121) // Dark Text
+val surfaceLight_Yellow = Color(0xFFFFFFFF) // Matches background
+val onSurfaceLight_Yellow= Color(0xFF212121)
+val errorLight_Yellow = Color(0xFFD32F2F) // Standard Error Red
+val onErrorLight_Yellow = Color(0xFFFFFFFF)
+
+
+// Yellow Dark
+val primaryDark_Yellow = Color(0xFFFFB74D) // Softer Orange
+val onPrimaryDark_Yellow = Color(0xFF5D2600) // Dark Brown
+val secondaryDark_Yellow = Color(0xFFFFE0B2) // Light Orange
+val onSecondaryDark_Yellow = Color(0xFF5D2600) // Dark Brown
+val tertiaryDark_Yellow = Color(0xFFFF9800) // Vibrant Orange
+val onTertiaryDark_Yellow = Color(0xFFFFFFFF)
+val backgroundDark_Yellow = Color(0xFF212121) // Black Background
+val onBackgroundDark_Yellow = Color(0xFFFFFFFF) // White Text
+val surfaceDark_Yellow = Color(0xFF212121) // Matches background
+val onSurfaceDark_Yellow = Color(0xFFFFFFFF)
+val errorDark_Yellow = Color(0xFFCF6679) // Muted Red
+val onErrorDark_Yellow = Color(0xFF690005)
+

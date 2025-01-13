@@ -80,10 +80,10 @@ import coil.compose.AsyncImage
 import com.example.gymappdemo.R
 import com.example.gymappdemo.data.entities.User
 import com.example.gymappdemo.ui.theme.AppThemeType
-import com.example.gymappdemo.ui.theme.primaryLight_Blue
+import com.example.gymappdemo.ui.theme.primaryLight_Orange
 import com.example.gymappdemo.ui.theme.primaryLight_Default
-import com.example.gymappdemo.ui.theme.primaryLight_Green
-import com.example.gymappdemo.ui.theme.primaryLight_Red
+import com.example.gymappdemo.ui.theme.primaryLight_Yellow
+import com.example.gymappdemo.ui.theme.primaryLight_Purple
 import com.example.gymappdemo.ui.viewmodels.MyProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -372,7 +372,7 @@ fun EditProfileScreen(
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .padding(top = 16.dp),
-                enabled = hasChanges
+                enabled = hasChanges && passwordError == null
             ) {
                 Text("Save Changes")
             }
@@ -390,9 +390,9 @@ fun ThemeCircle(
     // Define the primary color based on the themeType
     val color = when (themeType) {
         AppThemeType.DEFAULT -> primaryLight_Default
-        AppThemeType.BLUE -> primaryLight_Blue
-        AppThemeType.GREEN -> primaryLight_Green
-        AppThemeType.RED -> primaryLight_Red
+        AppThemeType.ORANGE -> primaryLight_Orange
+        AppThemeType.PURPLE -> primaryLight_Purple
+        AppThemeType.YELLOW -> primaryLight_Yellow
     }
 
     Box(

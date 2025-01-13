@@ -20,9 +20,9 @@ fun GymAppDemoTheme(
 ) {
     val colorScheme = when (appThemeType) {
         AppThemeType.DEFAULT -> if (darkTheme) DarkColorScheme_Default else LightColorScheme_Default
-        AppThemeType.BLUE -> if (darkTheme) DarkColorScheme_Blue else LightColorScheme_Blue
-        AppThemeType.GREEN -> if (darkTheme) DarkColorScheme_Green else LightColorScheme_Green
-        AppThemeType.RED -> if (darkTheme) DarkColorScheme_Red else LightColorScheme_Red
+        AppThemeType.ORANGE -> if (darkTheme) DarkColorScheme_Orange else LightColorScheme_Orange
+        AppThemeType.PURPLE -> if (darkTheme) DarkColorScheme_Purple else LightColorScheme_Purple
+        AppThemeType.YELLOW -> if (darkTheme) DarkColorScheme_Yellow else LightColorScheme_Yellow
 
 
     }
@@ -44,96 +44,96 @@ fun GymAppDemoTheme(
 }
 
 // Light and Dark Color Schemes for Blue Theme
-private val LightColorScheme_Blue = lightColorScheme(
-    primary = primaryLight_Blue,
-    onPrimary = onPrimaryLight_Blue,
-    secondary = secondaryLight_Blue,
-    onSecondary = onSecondaryLight_Blue,
-    tertiary = tertiaryLight_Blue,
-    onTertiary = onTertiaryLight_Blue,
-    background = backgroundLight_Blue,
-    onBackground = onBackgroundLight_Blue,
-    surface = surfaceLight_Blue,
-    onSurface = onSurfaceLight_Blue,
+private val LightColorScheme_Orange = lightColorScheme(
+    primary = primaryLight_Orange,
+    onPrimary = onPrimaryLight_Orange,
+    secondary = secondaryLight_Orange,
+    onSecondary = onSecondaryLight_Orange,
+    tertiary = tertiaryLight_Orange,
+    onTertiary = onTertiaryLight_Orange,
+    background = backgroundLight_Orange,
+    onBackground = onBackgroundLight_Orange,
+    surface = surfaceLight_Orange,
+    onSurface = onSurfaceLight_Orange,
     error = errorLight_Default,
     onError = onErrorLight_Default
 )
 
-private val DarkColorScheme_Blue = darkColorScheme(
-    primary = primaryDark_Blue,
-    onPrimary = onPrimaryDark_Blue,
-    secondary = secondaryDark_Blue,
-    onSecondary = onSecondaryDark_Blue,
-    tertiary = tertiaryDark_Blue,
-    onTertiary = onTertiaryDark_Blue,
-    background = backgroundDark_Blue,
-    onBackground = onBackgroundDark_Blue,
-    surface = surfaceDark_Blue,
-    onSurface = onSurfaceDark_Blue,
-    error = errorDark_Blue,
-    onError = onErrorDark_Blue
+private val DarkColorScheme_Orange = darkColorScheme(
+    primary = primaryDark_Orange,
+    onPrimary = onPrimaryDark_Orange,
+    secondary = secondaryDark_Orange,
+    onSecondary = onSecondaryDark_Orange,
+    tertiary = tertiaryDark_Orange,
+    onTertiary = onTertiaryDark_Orange,
+    background = backgroundDark_Orange,
+    onBackground = onBackgroundDark_Orange,
+    surface = surfaceDark_Orange,
+    onSurface = onSurfaceDark_Orange,
+    error = errorDark_Default,
+    onError = onErrorDark_Default
 )
 
 // Light and Dark Color Schemes for Green Theme
-private val LightColorScheme_Green = lightColorScheme(
-    primary = primaryLight_Green,
-    onPrimary = onPrimaryLight_Green,
-    secondary = secondaryLight_Green,
-    onSecondary = onSecondaryLight_Green,
-    tertiary = tertiaryLight_Green,
-    onTertiary = onTertiaryLight_Green,
-    background = backgroundLight_Green,
-    onBackground = onBackgroundLight_Green,
-    surface = surfaceLight_Green,
-    onSurface = onSurfaceLight_Green,
+private val LightColorScheme_Purple = lightColorScheme(
+    primary = primaryLight_Purple,
+    onPrimary = onPrimaryLight_Purple,
+    secondary = secondaryLight_Purple,
+    onSecondary = onSecondaryLight_Purple,
+    tertiary = tertiaryLight_Purple,
+    onTertiary = onTertiaryLight_Purple,
+    background = backgroundLight_Purple,
+    onBackground = onBackgroundLight_Purple,
+    surface = surfaceLight_Purple,
+    onSurface = onSurfaceLight_Purple,
     error = errorLight_Default,
     onError = onErrorLight_Default
 )
 
-private val DarkColorScheme_Green = darkColorScheme(
-    primary = primaryDark_Green,
-    onPrimary = onPrimaryDark_Green,
-    secondary = secondaryDark_Green,
-    onSecondary = onSecondaryDark_Green,
-    tertiary = tertiaryDark_Green,
-    onTertiary = onTertiaryDark_Green,
-    background = backgroundDark_Green,
-    onBackground = onBackgroundDark_Green,
-    surface = surfaceDark_Green,
-    onSurface = onSurfaceDark_Green,
-    error = errorDark_Green,
-    onError = onErrorDark_Green
+private val DarkColorScheme_Purple = darkColorScheme(
+    primary = primaryDark_Purple,
+    onPrimary = onPrimaryDark_Purple,
+    secondary = secondaryDark_Purple,
+    onSecondary = onSecondaryDark_Purple,
+    tertiary = tertiaryDark_Purple,
+    onTertiary = onTertiaryDark_Purple,
+    background = backgroundDark_Purple,
+    onBackground = onBackgroundDark_Purple,
+    surface = surfaceDark_Purple,
+    onSurface = onSurfaceDark_Purple,
+    error = errorDark_Default,
+    onError = onErrorDark_Default
 )
 
 // Light and Dark Color Schemes for Red Theme
-private val LightColorScheme_Red = lightColorScheme(
-    primary = primaryLight_Red,
-    onPrimary = onPrimaryLight_Red,
-    secondary = secondaryLight_Red,
-    onSecondary = onSecondaryLight_Red,
-    tertiary = tertiaryLight_Red,
-    onTertiary = onTertiaryLight_Red,
-    background = backgroundLight_Red,
-    onBackground = onBackgroundLight_Red,
-    surface = surfaceLight_Red,
-    onSurface = onSurfaceLight_Red,
+private val LightColorScheme_Yellow = lightColorScheme(
+    primary = primaryLight_Yellow,
+    onPrimary = onPrimaryLight_Yellow,
+    secondary = secondaryLight_Yellow,
+    onSecondary = onSecondaryLight_Yellow,
+    tertiary = tertiaryLight_Yellow,
+    onTertiary = onTertiaryLight_Yellow,
+    background = backgroundLight_Yellow,
+    onBackground = onBackgroundLight_Yellow,
+    surface = surfaceLight_Yellow,
+    onSurface = onSurfaceLight_Yellow,
     error = errorLight_Default,
     onError = onErrorLight_Default
 )
 
-private val DarkColorScheme_Red = darkColorScheme(
-    primary = primaryDark_Red,
-    onPrimary = onPrimaryDark_Red,
-    secondary = secondaryDark_Red,
-    onSecondary = onSecondaryDark_Red,
-    tertiary = tertiaryDark_Red,
-    onTertiary = onTertiaryDark_Red,
-    background = backgroundDark_Red,
-    onBackground = onBackgroundDark_Red,
-    surface = surfaceDark_Red,
-    onSurface = onSurfaceDark_Red,
-    error = errorDark_Red,
-    onError = onErrorDark_Red
+private val DarkColorScheme_Yellow = darkColorScheme(
+    primary = primaryDark_Yellow,
+    onPrimary = onPrimaryDark_Yellow,
+    secondary = secondaryDark_Yellow,
+    onSecondary = onSecondaryDark_Yellow,
+    tertiary = tertiaryDark_Yellow,
+    onTertiary = onTertiaryDark_Yellow,
+    background = backgroundDark_Yellow,
+    onBackground = onBackgroundDark_Yellow,
+    surface = surfaceDark_Yellow,
+    onSurface = onSurfaceDark_Yellow,
+    error = errorDark_Default,
+    onError = onErrorDark_Default
 )
 
 // Light and Dark Color Schemes for Default Theme

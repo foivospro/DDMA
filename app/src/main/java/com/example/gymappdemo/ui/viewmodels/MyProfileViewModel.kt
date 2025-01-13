@@ -44,9 +44,9 @@ class MyProfileViewModel(
     fun getAvailableThemes(): List<AppThemeType> {
         return listOf(
             AppThemeType.DEFAULT,
-            AppThemeType.BLUE,
-            AppThemeType.GREEN,
-            AppThemeType.RED
+            AppThemeType.ORANGE,
+            AppThemeType.PURPLE,
+            AppThemeType.YELLOW
         )
     }
 
