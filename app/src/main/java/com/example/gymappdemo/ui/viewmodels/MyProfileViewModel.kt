@@ -3,79 +3,104 @@ package com.example.gymappdemo.ui.viewmodels
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.gymappdemo.data.preferences.ThemePreferences
 import com.example.gymappdemo.data.entities.User
+
 import com.example.gymappdemo.data.repositories.UserRepository
-import kotlinx.coroutines.Dispatchers
+import com.example.gymappdemo.ui.theme.AppThemeType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 
-class MyProfileViewModel(private val userRepository: UserRepository) : ViewModel() {
+class MyProfileViewModel(
+    private val userRepository: UserRepository,
+    private val themePreferences: ThemePreferences
+) : ViewModel() {
 
-    // StateFlow to hold the user data
+    private val _selectedAccentColor = MutableStateFlow(themePreferences.getTheme())
+    val selectedAccentColor: StateFlow<AppThemeType> = _selectedAccentColor
+
+
+    private val _isDarkModeEnabled = MutableStateFlow(false)
+    val isDarkModeEnabled: StateFlow<Boolean> = _isDarkModeEnabled
+
+
+
+    fun toggleDarkMode(enabled: Boolean) {
+        _isDarkModeEnabled.value = enabled
+    }
+
+    fun updateTheme(themeType: AppThemeType) {
+        _selectedAccentColor.value = themeType
+    }
+    fun saveThemeChanges() {
+        viewModelScope.launch {
+            themePreferences.saveTheme(_selectedAccentColor.value)
+            themePreferences.saveDarkModeEnabled(_isDarkModeEnabled.value) // αν υλοποιήσεις κάτι αντίστοιχο
+        }
+    }
+
+    fun getAvailableThemes(): List<AppThemeType> {
+        return listOf(
+            AppThemeType.DEFAULT,
+            AppThemeType.BLUE,
+            AppThemeType.GREEN,
+            AppThemeType.RED
+        )
+    }
+
     private val _user = MutableStateFlow<User?>(null)
     val user: StateFlow<User?> = _user
 
-    // StateFlow to hold the username (optional if needed for separate use cases)
     private val _username = MutableStateFlow("Guest")
     val username: StateFlow<String> = _username
 
     private val _profilePictureUri = MutableStateFlow<Uri?>(null)
-    val profilePictureUri: MutableStateFlow<Uri?> = _profilePictureUri
+    val profilePictureUri: StateFlow<Uri?> = _profilePictureUri
 
-    init {
-        updateViewModel()
-    }
     fun updateViewModel() {
         viewModelScope.launch {
             fetchLoggedInUser()
             loadProfilePicture(_user.value?.id ?: 0)
         }
     }
-    private suspend fun fetchLoggedInUser() {
-        // Fetch email from SharedPreferences using a background thread
-        val email = withContext(Dispatchers.IO) {
-            userRepository.getLoggedInUserEmail()
-        }
 
-        // Fetch user data based on email (or handle guest user)
+    private suspend fun fetchLoggedInUser() {
+        val email = userRepository.getLoggedInUserEmail()
+
         val user = if (email != null && email != "Guest") {
-            withContext(Dispatchers.IO) {
-                userRepository.getUserByEmail(email)
-            }
+            userRepository.getUserByEmail(email)
         } else {
             null
         }
-
-        // Update state on the main thread
         _user.value = user
         _username.value = user?.name ?: "Guest"
     }
 
-    // Update user profile if needed
     fun updateUser(updatedUser: User) {
         viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                userRepository.updateUser(updatedUser)
-            }
-            _user.value = updatedUser // Update the state
+            userRepository.updateUser(updatedUser)
+            _user.value = updatedUser
         }
     }
 
     fun logout() {
-        // Call UserRepository's method to clear the logged-in user data
-        userRepository.clearLoggedInUser()
+        viewModelScope.launch {
+            userRepository.clearLoggedInUser()
+            _user.value = null
+            _username.value = "Guest"
+            _profilePictureUri.value = null
+        }
     }
 
     fun loadProfilePicture(userId: Int) {
         viewModelScope.launch {
-            // Ensure this function is implemented and returns the correct URI
             _profilePictureUri.value = userRepository.getUserProfilePictureUri(userId)
         }
     }
-     fun changeUri(uri: Uri?){
+
+    fun changeUri(uri: Uri?) {
         _profilePictureUri.value = uri
     }
 }

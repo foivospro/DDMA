@@ -31,6 +31,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.gymappdemo.data.database.AppDatabase
+import com.example.gymappdemo.data.preferences.ThemePreferences
 import com.example.gymappdemo.data.repositories.UserRepository
 import com.example.gymappdemo.data.repositories.WorkoutRepository
 import com.example.gymappdemo.ui.screens.CurrentStatus
@@ -73,6 +74,7 @@ fun AppNavHost(
 ) {
     val navController = rememberNavController()
     val context = LocalContext.current
+    val themePreferences = ThemePreferences(context)
     val factory = AppViewModelFactory(
         workoutRepository = WorkoutRepository.getInstance(
             AppDatabase.getInstance(context).gymSessionDao(),
@@ -83,7 +85,8 @@ fun AppNavHost(
         userRepository = UserRepository.getInstance(
             AppDatabase.getInstance(context).userDao(),
             context
-        )
+        ),
+        themePreferences = themePreferences
     )
     val currentStatusViewModel: CurrentStatusViewModel = viewModel(factory = factory)
     val exercisePickerViewModel: ExercisePickerViewModel = viewModel(factory = factory)
@@ -93,8 +96,6 @@ fun AppNavHost(
     val registerViewModel: RegisterViewModel = viewModel(factory = factory)
     val myProfileViewModel: MyProfileViewModel = viewModel(factory = factory)
     val newsViewModel: NewsViewModel = viewModel(factory = factory)
-
-
     // State to track if the current destination should hide the BottomNavigationBar
     var shouldShowBottomBar by remember { mutableStateOf(true) }
 
@@ -183,10 +184,9 @@ fun AppNavHost(
             composable(route = GymAppScreen.ProfileSettings.name) {
                 shouldShowBottomBar = false
                 EditProfileScreen(
-                    isDarkMode = isDarkMode,
-                    onDarkModeToggle = onDarkModeToggle,  // Passing the callback here
-                    onBackPressed = { navController.navigateUp()},
-                    viewModel = myProfileViewModel)
+                    onBackPressed = { navController.navigateUp() },
+                    viewModel = myProfileViewModel
+                )
             }
             // Login Screen - Hide bottom bar
             composable(route = GymAppScreen.Login.name) {

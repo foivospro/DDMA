@@ -1,22 +1,20 @@
+// AppViewModelFactory.kt
 package com.example.gymappdemo.ui.viewmodel
 
+import android.annotation.SuppressLint
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.example.gymappdemo.data.preferences.ThemePreferences
 import com.example.gymappdemo.data.repositories.UserRepository
 import com.example.gymappdemo.data.repositories.WorkoutRepository
-import com.example.gymappdemo.ui.viewmodels.CurrentStatusViewModel
-import com.example.gymappdemo.ui.viewmodels.ExercisePickerViewModel
-import com.example.gymappdemo.ui.viewmodels.HomeViewModel
-import com.example.gymappdemo.ui.viewmodels.LoginViewModel
-import com.example.gymappdemo.ui.viewmodels.MyProfileViewModel
-import com.example.gymappdemo.ui.viewmodels.NewsViewModel
-import com.example.gymappdemo.ui.viewmodels.RegisterViewModel
-import com.example.gymappdemo.ui.viewmodels.SetRepsViewModel
+import com.example.gymappdemo.ui.viewmodels.*
 
 class AppViewModelFactory(
     private val workoutRepository: WorkoutRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val themePreferences: ThemePreferences
 ) : ViewModelProvider.Factory {
+    @SuppressLint("NewApi")
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return when {
@@ -44,12 +42,14 @@ class AppViewModelFactory(
                 RegisterViewModel(userRepository) as T
             }
 
-            (modelClass.isAssignableFrom(MyProfileViewModel::class.java)) -> {
-                MyProfileViewModel(userRepository) as T
+            modelClass.isAssignableFrom(MyProfileViewModel::class.java) -> {
+                MyProfileViewModel(userRepository, themePreferences) as T
             }
-            (modelClass.isAssignableFrom(NewsViewModel::class.java)) -> {
+
+            modelClass.isAssignableFrom(NewsViewModel::class.java) -> {
                 NewsViewModel() as T
             }
+
             else -> throw IllegalArgumentException("Unknown ViewModel class")
         }
     }
