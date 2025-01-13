@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
@@ -63,30 +64,33 @@ fun HomeScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-            item {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = "Hi 👋, $username",
-                        style = MaterialTheme.typography.headlineLarge,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = "Profile",
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier
-                            .size(40.dp)
-                            .padding(start = 8.dp)
-                    )
-                }
 
-                Spacer(modifier = Modifier.height(16.dp))
+        item {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "Hi 👋, $username",
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.weight(1f)
+                )
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = "Profile",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier
+                        .size(40.dp)
+                        .padding(start = 8.dp)
+                )
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
+
         item {
             Text(
                 text = "Workout History",
@@ -94,27 +98,29 @@ fun HomeScreen(
                 color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
-
             Divider(color = Color.Gray, thickness = 1.dp, modifier = Modifier.padding(bottom = 16.dp))
-
-            WorkoutHistory(sessionList)
         }
 
-        // Workout Summary Section
+
+        items(sessionList) { session ->
+            GymSessionCard(session)
+        }
+
+
         item {
             Spacer(modifier = Modifier.height(24.dp))
 
             WorkoutSummary(sessionList = sessionList)
         }
 
-        // Start New Workout / Continue Workout Button
+
         item {
             Spacer(modifier = Modifier.height(64.dp))
 
-            Button(onClick = {
+            Button(
+                onClick = {
                     if (!isWorkoutActive) {
                         viewModel.startNewWorkout(
-                            userId = 1, // αυτο πρεπει να το αλλαξουμε με το πραγματικό
                             onSessionCreated = { session ->
                                 currentStatusViewModel.setSessionId(session.id)
                                 navController.navigate("CurrentStatus/${session.id}")
@@ -128,12 +134,16 @@ fun HomeScreen(
                             navController.navigate("CurrentStatus/$sessionId")
                         }
                     }
-                }, modifier = Modifier
+                },
+                modifier = Modifier
                     .fillMaxWidth()
-                    .height(60.dp), shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.buttonColors(
+                    .height(60.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary
-                )) {
+                )
+            ) {
                 Text(
                     text = if (isWorkoutActive) "Continue Workout" else "Start New Workout",
                     style = MaterialTheme.typography.titleMedium,
@@ -156,16 +166,11 @@ fun HomeScreen(
 }
 
 @Composable
-fun WorkoutHistory(sessionList: List<GymSession>) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        sessionList.forEach { session ->
-            GymSessionCard(session)
-        }
-    }
-}
-
-@Composable
 fun GymSessionCard(session: GymSession) {
+    val minutes = session.duration / 60
+    val seconds = session.duration % 60
+    val durationText = if (seconds > 0) "$minutes λεπτά και $seconds δευτερόλεπτα" else "$minutes λεπτά"
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -202,7 +207,7 @@ fun GymSessionCard(session: GymSession) {
                     color = Color.Gray
                 )
                 Text(
-                    text = "Διάρκεια: ${session.duration} λεπτά",
+                    text = "Διάρκεια: $durationText",
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.Gray
                 )
@@ -210,7 +215,6 @@ fun GymSessionCard(session: GymSession) {
         }
     }
 }
-
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
