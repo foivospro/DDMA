@@ -126,4 +126,9 @@
     <string name="workout">Προπόνηση"</string>
     <string name="sports_news">Αθλητικά Νέα</string>
     <string name="choose_app_color">Διάλεξε Χρώμα Εφαρμογής</string>
+    <string name="workout_label">Workout</string>
+    <string name="date_label">Ημερομηνία: %1$s</string>
+    <string name="duration_label">Διάρκεια: %1$s</string>
+    <string name="workout_icon_description">εικονίδιο για γυμναστική </string>
+
 </resources>

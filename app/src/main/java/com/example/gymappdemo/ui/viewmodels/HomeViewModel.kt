@@ -1,6 +1,7 @@
 package com.example.gymappdemo.ui.viewmodels
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,13 +14,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.LocalDate
 
 class HomeViewModel(
     private val workoutRepository: WorkoutRepository,
     private val userRepository: UserRepository
 ) : ViewModel() {
     private val _userId = MutableStateFlow(0)
-    val userId: StateFlow<Int> = _userId.asStateFlow()
+    val userId: StateFlow<Int?> = _userId.asStateFlow()
 
 
     private val _isWorkoutActive = MutableStateFlow(false)
@@ -37,25 +39,26 @@ class HomeViewModel(
     val userSessions: StateFlow<List<GymSession>> = _userSessions.asStateFlow()
 
 
-    private val _userId = MutableStateFlow<Int?>(null)
-    val userId: StateFlow<Int?> = _userId.asStateFlow()
-
     init {
         updateViewModel()
     }
     fun updateViewModel() {
         viewModelScope.launch {
             fetchUserData()
-            val activeSession = _userId.value?.let { workoutRepository.getActiveSession(it) }
-            fetchUsername()
             _userId.value = fetchUserId()
-            val activeSession = workoutRepository.getActiveSession()
+
+            // Πάρε τον userId που μόλις έβαλες στο _userId.value
+            val localUserId = _userId.value
+
+            // Κάλεσε το getActiveSession περνώντας userId
+            val activeSession = workoutRepository.getActiveSession(localUserId)
             if (activeSession != null) {
                 _isWorkoutActive.value = true
                 _currentSessionId.value = activeSession.id
             }
         }
     }
+
 
     private suspend fun fetchUserData() {
 
@@ -73,7 +76,7 @@ class HomeViewModel(
 
 
         _username.value = user?.name ?: "Guest"
-        _userId.value = user?.id
+        _userId.value = user?.id ?:0
 
         // Αν ο χρήστης δεν είναι "Guest", ανακτά τις συνεδρίες του
         if (user != null) {
@@ -115,10 +118,6 @@ class HomeViewModel(
                     return@launch
                 }
                 val currentUserId = _userId.value
-                if (currentUserId == null) {
-                    onError("Δεν βρέθηκε χρήστης.")
-                    return@launch
-                }
                 val date = LocalDate.now().toString()
 
                 val newSession = GymSession(

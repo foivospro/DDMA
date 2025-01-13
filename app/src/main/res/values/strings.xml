@@ -1,4 +1,5 @@
 <resources>
+
     <string name="app_name">Gym App</string>
     <string name="biceps">Biceps</string>
     <string name="select_exercises_title">Select Exercises</string>
@@ -128,4 +129,9 @@
     <string name="finish_workout">Finish Workout</string>
     <string name="workout">Workout"</string>
     <string name="sports_news">Sports News</string>
+    <string name="workout_label">Workout</string>
+    <string name="date_label">Date: %1$s</string>
+    <string name="duration_label">Duration: %1$s</string>
+    <string name="workout_icon_description">Icon for the workout session</string>
+
 </resources>
