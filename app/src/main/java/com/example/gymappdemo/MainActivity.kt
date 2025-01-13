@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.gymappdemo.Navigation.AppNavHost
+import com.example.gymappdemo.Navigation.SetStatusBarColor
 import com.example.gymappdemo.data.database.AppDatabase
 import com.example.gymappdemo.data.preferences.ThemePreferences
 import com.example.gymappdemo.data.repositories.UserRepository
@@ -75,6 +76,7 @@ class MainActivity : ComponentActivity() {
                 darkTheme = isDarkMode,
                 appThemeType = accentColor
             ) {
+                SetStatusBarColor()
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
