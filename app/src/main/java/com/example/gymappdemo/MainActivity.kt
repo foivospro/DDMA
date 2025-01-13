@@ -14,7 +14,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
-import com.example.gymappdemo.Navigation.AppNavHost
+import com.example.gymappdemo.navigation.AppNavHost
 import com.example.gymappdemo.ui.theme.GymAppDemoTheme
 import kotlinx.coroutines.launch
 
@@ -23,7 +23,6 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         // Check system theme preference and apply
         isDarkMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
         // State to hold the authentication status

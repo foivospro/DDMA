@@ -1,3 +1,4 @@
+
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
@@ -17,7 +18,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -78,11 +78,6 @@ fun ResultScreen(news: List<Article>,navController: NavController, modifier: Mod
     ) {
         // Header
         item {
-            Text(
-                text = stringResource(R.string.stay_updated),
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(vertical = 16.dp)
-            )
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -90,7 +85,7 @@ fun ResultScreen(news: List<Article>,navController: NavController, modifier: Mod
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Αθλητικά Νέα",
+                    text = stringResource(id = R.string.sports_news),
                     style = MaterialTheme.typography.headlineMedium.copy(
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
@@ -104,7 +99,7 @@ fun ResultScreen(news: List<Article>,navController: NavController, modifier: Mod
                 ) {
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "Πίσω",
+                        contentDescription = stringResource(id = R.string.back),
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }

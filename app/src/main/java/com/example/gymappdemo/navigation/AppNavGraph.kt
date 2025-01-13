@@ -1,4 +1,4 @@
-package com.example.gymappdemo.Navigation
+package com.example.gymappdemo.navigation
 
 
 import NewsScreen
@@ -32,10 +32,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.gymappdemo.MyApplication
 import com.example.gymappdemo.R
-import com.example.gymappdemo.data.database.AppDatabase
-import com.example.gymappdemo.data.repositories.UserRepository
-import com.example.gymappdemo.data.repositories.WorkoutRepository
 import com.example.gymappdemo.ui.screens.CurrentStatus
 import com.example.gymappdemo.ui.screens.EditProfileScreen
 import com.example.gymappdemo.ui.screens.ExercisePickerScreen
@@ -59,7 +57,6 @@ enum class GymAppScreen {
     ExercisePicker,
     MyProfile,
     ProfileSettings,
-    CurrentStatus,
     Login,
     Register,
     News
@@ -74,18 +71,12 @@ fun AppNavHost(
     onDarkModeToggle: (Boolean) -> Unit
 ) {
     val navController = rememberNavController()
-    val context = LocalContext.current
+    val application = LocalContext.current.applicationContext as MyApplication
+    val container = application.appContainer
     val factory = AppViewModelFactory(
-        workoutRepository = WorkoutRepository.getInstance(
-            AppDatabase.getInstance(context).gymSessionDao(),
-            AppDatabase.getInstance(context).sessionExerciseDao(),
-            AppDatabase.getInstance(context).exerciseDao(),
-            AppDatabase.getInstance(context).setDao()
-        ),
-        userRepository = UserRepository.getInstance(
-            AppDatabase.getInstance(context).userDao(),
-            context
-        )
+        workoutRepository = container.workoutRepository,
+        userRepository = container.userRepository,
+        service = container.retrofitService
     )
     val currentStatusViewModel: CurrentStatusViewModel = viewModel(factory = factory)
     val exercisePickerViewModel: ExercisePickerViewModel = viewModel(factory = factory)
@@ -95,7 +86,6 @@ fun AppNavHost(
     val registerViewModel: RegisterViewModel = viewModel(factory = factory)
     val myProfileViewModel: MyProfileViewModel = viewModel(factory = factory)
     val newsViewModel: NewsViewModel = viewModel(factory = factory)
-
 
     // State to track if the current destination should hide the BottomNavigationBar
     var shouldShowBottomBar by remember { mutableStateOf(true) }
@@ -118,12 +108,8 @@ fun AppNavHost(
                 HomeScreen(
                     navController = navController,
                     viewModel = homeViewModel,
-                    currentStatusViewModel = currentStatusViewModel
+                    currentStatusViewModel = currentStatusViewModel,
                 )
-            }
-            // Exercise Picker Screen in NavHost
-            composable(route = GymAppScreen.ExercisePicker.name) {
-                ExercisePickerScreen(exercisePickerViewModel, navController = navController, sessionId = 1)
             }
             // MyProfile Screen
             composable(route = GymAppScreen.MyProfile.name) {
@@ -173,8 +159,8 @@ fun AppNavHost(
                 val sessionId = backStackEntry.arguments?.getInt("sessionId") ?: return@composable
                 CurrentStatus(
                     sessionId = sessionId,
-                    viewModel = currentStatusViewModel,
                     navController = navController,
+                    viewModel = currentStatusViewModel,
                     onWorkoutTerminated = { duration ->
                         homeViewModel.terminateWorkout(sessionId, duration)
                     }
@@ -215,9 +201,10 @@ fun AppNavHost(
             }
             composable(route = GymAppScreen.News.name) {
                 shouldShowBottomBar = true
+
                 NewsScreen(
                     newsViewModel,
-                    navController = navController,
+                    navController = navController
                 )
             }
         }
@@ -252,7 +239,7 @@ fun BottomNavigationBar(navController: NavController) {
                 },
                 label = { Text(text = item.label) },
                 // Check if the item's label matches the current route
-                selected = currentRoute == GymAppScreen.values()[index].name,
+                selected = currentRoute == GymAppScreen.entries[index].name,
                 onClick = {
                     when (item.label) {
                         context.getString(R.string.home) -> navController.navigate(GymAppScreen.Home.name) {
