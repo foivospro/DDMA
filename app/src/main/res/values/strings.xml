@@ -128,4 +128,6 @@
     <string name="finish_workout">Finish Workout</string>
     <string name="workout">Workout"</string>
     <string name="sports_news">Sports News</string>
+    <string name="choose_exercise">Choose Exercise</string>
+    <string name="no_match">No exercises match your search.</string>
 </resources>

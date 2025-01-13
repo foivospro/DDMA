@@ -126,4 +126,6 @@
     <string name="workout">Προπόνηση"</string>
     <string name="sports_news">Αθλητικά Νέα</string>
     <string name="choose_app_color">Διάλεξε Χρώμα Εφαρμογής</string>
+    <string name="choose_exercise">Επίλεξε Άσκηση</string>
+    <string name="no_match">Δεν βρέθηκαν ασκήσεις</string>
 </resources>

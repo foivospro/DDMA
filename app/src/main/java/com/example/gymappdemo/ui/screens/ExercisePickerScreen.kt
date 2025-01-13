@@ -27,8 +27,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FilterAlt
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -45,7 +45,6 @@ import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -116,9 +115,9 @@ fun ExercisePickerScreen(
                         .padding(vertical = 8.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    // Τίτλος στο κέντρο
+
                     Text(
-                        text = "Επίλεξε Άσκηση",
+                        text = stringResource(id = R.string.choose_exercise),
                         style = MaterialTheme.typography.headlineMedium.copy(
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary
@@ -134,47 +133,22 @@ fun ExercisePickerScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Πίσω",
+                            contentDescription = stringResource(id =R.string.back),
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
                 }
-                // Search Bar
-                SearchBar(
-                    query = query,
-                    onQueryChange = { query = it },
-                    onSearch = { active = false },
-                    active = active,
+                SearchBarWithExercises(
+                    onQueryChange = { query = it }, // Updates query in parent
                     onActiveChange = { active = it },
-                    placeholder = { Text(
-                        stringResource(id =R.string.search_placeholder))
-                                  },
-                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                    trailingIcon = { Icon(Icons.Default.MoreVert, contentDescription = null) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
-                ) {
-                    if (active) {
-                        Column(
-                            modifier = Modifier
-                                .verticalScroll(rememberScrollState())
-                                .padding(16.dp)
-                        ) {
-                            val suggestions = listOf("Bench Press", "Squat", "Deadlift")
-                            suggestions.forEach { suggestion ->
-                                ListItem(
-                                    headlineContent = { Text(suggestion) },
-                                    modifier = Modifier.clickable {
-                                        query = suggestion
-                                        active = false
-                                    }
-                                )
-                            }
-                        }
-                    }
-                }
-
+                    active = active,
+                    query = query,
+                    exercises = exercises,
+                    selectedMuscleGroup = selectedMuscleGroup,
+                    onMuscleGroupSelect = { selectedMuscleGroup = it },
+                    navController = navController,
+                    sessionId = sessionId,
+                    viewModel = viewModel)
                 // Muscle Groups Filter Chips
                 Row(
                     modifier = Modifier
@@ -229,7 +203,7 @@ fun ExercisePickerScreen(
                     if (filteredExercises.isEmpty()) {
                         item {
                             Text(
-                                text = "No exercises match your search.",
+                                text = stringResource(id = R.string.no_match),
                                 modifier = Modifier
                                     .padding(16.dp)
                                     .fillMaxWidth(),
@@ -334,6 +308,186 @@ fun ExerciseCard(
                 Text(
                     stringResource(id = R.string.add),
                     style = MaterialTheme.typography.labelSmall)
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SearchBarWithExercises(
+    query: String, // State managed by parent
+    onQueryChange: (String) -> Unit,
+    active: Boolean, // State managed by parent
+    onActiveChange: (Boolean) -> Unit,
+    exercises: List<Exercise>,
+    selectedMuscleGroup: String?,
+    onMuscleGroupSelect: (String?) -> Unit,
+    navController: NavController,
+    sessionId: Int,
+    viewModel: ExercisePickerViewModel,
+    modifier: Modifier = Modifier
+) {
+    // Only calculate suggestions when query is non-blank and update with changes to exercises list
+    val suggestions = remember(query, exercises) {
+        if (query.isNotBlank()) {
+            exercises.filter { it.name.contains(query, ignoreCase = true) }
+                .map { it.name }
+                .distinct()
+        } else {
+            emptyList()
+        }
+    }
+
+    // Dynamically filter exercises using query, selectedMuscleGroup and include exercises dependency
+    val filteredExercises = remember(query, selectedMuscleGroup, exercises) {
+        exercises.filter { exercise ->
+            (selectedMuscleGroup == null || exercise.muscleGroup.equals(selectedMuscleGroup, ignoreCase = true)) &&
+                    (query.isBlank() || exercise.name.contains(query, ignoreCase = true))
+        }
+    }
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        // SearchBar Component
+        SearchBar(
+            query = query,
+            onQueryChange = { newQuery ->
+                onQueryChange(newQuery) // Update the query in the parent
+                if (newQuery.isBlank()) {
+                    onActiveChange(false) // Hide suggestions when the query is cleared
+                }
+            },
+            onSearch = { onActiveChange(false) },
+            active = active,
+            onActiveChange = onActiveChange,
+            placeholder = { Text(stringResource(id = R.string.search_placeholder)) },
+            leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search icon") },
+            trailingIcon = {
+                if (query.isNotBlank()) {
+                    IconButton(
+                        onClick = {
+                            onQueryChange("")  // Clear the query
+                            onActiveChange(false) // Hide suggestions
+                        }
+                    ) {
+                        Icon(Icons.Default.Close, contentDescription = "Clear search")
+                    }
+                }
+            },
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+        ) {
+            // Only display suggestions when active and the query is not blank
+            if (active && query.isNotBlank() && suggestions.isNotEmpty()) {
+                Column(
+                    modifier = Modifier
+                        .verticalScroll(rememberScrollState())
+                        .padding(16.dp)
+                ) {
+                    suggestions.forEach { suggestion ->
+                        ListItem(
+                            headlineContent = { Text(suggestion) },
+                            modifier = Modifier.clickable {
+                                onQueryChange(suggestion) // Set the query from suggestion
+                                onActiveChange(false)     // Hide suggestions
+                            }
+                        )
+                    }
+                }
+            } else if (active && query.isNotBlank() && suggestions.isEmpty()) {
+                Text(
+                    text = stringResource(id = R.string.no_match),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Color.Gray,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                )
+            }
+        }
+
+        // Muscle Group Filter Chips
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            val muscleGroups = listOf(
+                stringResource(id = R.string.upper_body),
+                stringResource(id = R.string.lower_body),
+                stringResource(id = R.string.cardio)
+            )
+            muscleGroups.forEach { muscleGroup ->
+                val isSelected = muscleGroup == selectedMuscleGroup
+                FilterChip(
+                    onClick = {
+                        onMuscleGroupSelect(if (isSelected) null else muscleGroup)
+                    },
+                    label = { Text(muscleGroup) },
+                    selected = isSelected,
+                    modifier = Modifier.padding(start = 8.dp),
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.FilterAlt,
+                            contentDescription = null
+                        )
+                    },
+                    shape = RoundedCornerShape(50),
+                    colors = FilterChipDefaults.filterChipColors(
+                        containerColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.onSecondary,
+                        selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                    ),
+                    border = FilterChipDefaults.filterChipBorder(
+                        borderColor = MaterialTheme.colorScheme.outline,
+                        selectedBorderColor = MaterialTheme.colorScheme.primary,
+                        disabledBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.25f)
+                    )
+                )
+            }
+        }
+
+        // Display Filtered Exercises
+        LazyColumn(
+            contentPadding = PaddingValues(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.fillMaxSize()
+        ) {
+            if (filteredExercises.isEmpty() && query.isNotBlank()) {
+                item {
+                    Text(
+                        text = stringResource(id = R.string.no_match),
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth(),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = Color.Gray,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            } else {
+                itemsIndexed(filteredExercises) { index, exercise ->
+                    AnimatedVisibility(
+                        visible = true,
+                        enter = slideInVertically(
+                            animationSpec = spring(
+                                stiffness = Spring.StiffnessVeryLow,
+                                dampingRatio = Spring.DampingRatioLowBouncy
+                            ),
+                            initialOffsetY = { it * (index + 1) }
+                        ),
+                        exit = fadeOut()
+                    ) {
+                        ExerciseCard(
+                            exercise = exercise,
+                            navController = navController,
+                            currentSessionId = sessionId,
+                            viewModel = viewModel
+                        )
+                    }
+                }
             }
         }
     }
