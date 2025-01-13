@@ -43,7 +43,7 @@ fun GymAppDemoTheme(
     )
 }
 
-// Light and Dark Color Schemes for Blue Theme
+// Light and Dark Color Schemes for Orange Theme
 private val LightColorScheme_Orange = lightColorScheme(
     primary = primaryLight_Orange,
     onPrimary = onPrimaryLight_Orange,
@@ -74,7 +74,7 @@ private val DarkColorScheme_Orange = darkColorScheme(
     onError = onErrorDark_Default
 )
 
-// Light and Dark Color Schemes for Green Theme
+// Light and Dark Color Schemes for Purple Theme
 private val LightColorScheme_Purple = lightColorScheme(
     primary = primaryLight_Purple,
     onPrimary = onPrimaryLight_Purple,
@@ -105,7 +105,7 @@ private val DarkColorScheme_Purple = darkColorScheme(
     onError = onErrorDark_Default
 )
 
-// Light and Dark Color Schemes for Red Theme
+// Light and Dark Color Schemes for Yellow Theme
 private val LightColorScheme_Yellow = lightColorScheme(
     primary = primaryLight_Yellow,
     onPrimary = onPrimaryLight_Yellow,

@@ -19,6 +19,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -82,13 +86,13 @@ fun HomeScreen(
         }
         item {
             Text(
-                text = stringResource(R.string.workout_history),
+                text = "Workout History",
                 style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onBackground,
+                color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
-            Divider(color = Color.Gray, thickness = 1.dp, modifier = Modifier.padding(bottom = 16.dp))
+            Divider(color = MaterialTheme.colorScheme.secondary, thickness = 1.dp, modifier = Modifier.padding(bottom = 16.dp))
 
             WorkoutHistory()
         }
@@ -103,28 +107,29 @@ fun HomeScreen(
         item {
             Spacer(modifier = Modifier.height(64.dp))
             Button(onClick = {
-                if (!isWorkoutActive) {
-                    viewModel.startNewWorkout(
-                        userId = userId,
-                        onSessionCreated = { session ->
-                            currentStatusViewModel.setSessionId(session.id)
-                            navController.navigate("CurrentStatus/${session.id}")
-                        },
-                        onError = { error ->
-                            Log.e("HomeScreen", "Failed to start new workout: $error")
+                    if (!isWorkoutActive) {
+                        viewModel.startNewWorkout(
+                            userId = userId,
+                            onSessionCreated = { session ->
+                                currentStatusViewModel.setSessionId(session.id)
+                                navController.navigate("CurrentStatus/${session.id}")
+                            },
+                            onError = { error ->
+                                Log.e("HomeScreen", "Failed to start new workout: $error")
+                            }
+                        )
+                    } else {
+                        currentSessionId?.let { sessionId ->
+                            navController.navigate("CurrentStatus/$sessionId")
                         }
-                    )
-                } else {
-                    currentSessionId?.let { sessionId ->
-                        navController.navigate("CurrentStatus/$sessionId")
                     }
-                }
-            }, modifier = Modifier
-                .fillMaxWidth()
-                .height(60.dp), shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            )) {
+                }, modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp), shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                )) {
                 Text(
                     text = stringResource(
                         id = if (isWorkoutActive) R.string.continue_workout else R.string.start_new_workout
@@ -206,28 +211,29 @@ fun WorkoutCard(workout: Workout) {
                     text = stringResource(id = workout.descriptionRes),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground
+                    color = MaterialTheme.colorScheme.secondary
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = stringResource(R.string.date, workout.date),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = stringResource(R.string.duration, workout.duration),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = stringResource(R.string.calories_burned, workout.caloriesBurned),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
         }
     }
 }
+
 
 @Composable
 fun WorkoutSummary() {
@@ -241,14 +247,14 @@ fun WorkoutSummary() {
             text = stringResource(R.string.workout_summary),
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground,
+            color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
         Text(
             text = stringResource(R.string.total_workouts, totalWorkouts),
             fontSize = 16.sp,
-            color = Color.Gray,
+            color = MaterialTheme.colorScheme.secondary,
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
@@ -280,13 +286,13 @@ fun WorkoutSummary() {
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            Text(text = stringResource(R.string.monday), fontSize = 12.sp)
-            Text(text = stringResource(R.string.tuesday), fontSize = 12.sp)
-            Text(text = stringResource(R.string.wednesday), fontSize = 12.sp)
-            Text(text = stringResource(R.string.thursday), fontSize = 12.sp)
-            Text(text = stringResource(R.string.friday), fontSize = 12.sp)
-            Text(text = stringResource(R.string.saturday), fontSize = 12.sp)
-            Text(text = stringResource(R.string.sunday), fontSize = 12.sp)
+            Text(text = stringResource(R.string.monday), fontSize = 12.sp, color = MaterialTheme.colorScheme.secondary)
+            Text(text = stringResource(R.string.tuesday), fontSize = 12.sp, color = MaterialTheme.colorScheme.secondary)
+            Text(text = stringResource(R.string.wednesday), fontSize = 12.sp, color = MaterialTheme.colorScheme.secondary)
+            Text(text = stringResource(R.string.thursday), fontSize = 12.sp, color = MaterialTheme.colorScheme.secondary)
+            Text(text = stringResource(R.string.friday), fontSize = 12.sp, color = MaterialTheme.colorScheme.secondary)
+            Text(text = stringResource(R.string.saturday), fontSize = 12.sp, color = MaterialTheme.colorScheme.secondary)
+            Text(text = stringResource(R.string.sunday), fontSize = 12.sp, color = MaterialTheme.colorScheme.secondary)
         }
     }
 }
