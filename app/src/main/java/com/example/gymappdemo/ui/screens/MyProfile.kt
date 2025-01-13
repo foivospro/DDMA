@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material.icons.filled.Person
@@ -144,6 +145,19 @@ fun UserProfileScreen(
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                        contentDescription = "Profile",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .size(40.dp)
+                            .padding(start = 8.dp)
+                            .align(Alignment.CenterEnd)
+                            .clickable {
+                                showLogoutDialog = true
+                            }
+                    )
+
                 }
 
                 // User Picture
@@ -152,32 +166,28 @@ fun UserProfileScreen(
                         .size(130.dp)
                         .padding(8.dp)
                 ) {
-                    if (profilePictureUri != null) {
-                        if (user?.profilePicture != null) {
-                            // Use AsyncImage when profilePictureUri is available
-                            AsyncImage(
-                                model = profilePictureUri, // Pass the URI or URL here
-                                contentDescription = "Profile Picture",
-                                modifier = Modifier
-                                    .size(100.dp)
-                                    .clip(CircleShape)
-                                    .border(2.dp, MaterialTheme.colorScheme.primary, CircleShape),
-                                contentScale = ContentScale.Crop
-                            )
-                        } else {
-                            // Use Image with painterResource for default image
-                            Image(
-                                painter = painterResource(com.example.gymappdemo.R.drawable.default_profile),
-                                contentDescription = "Default Profile Picture",
-                                modifier = Modifier
-                                    .size(100.dp)
-                                    .clip(CircleShape)
-                                    .border(2.dp, MaterialTheme.colorScheme.primary, CircleShape),
-                                contentScale = ContentScale.Crop
-                            )
-                        }
-                    }
+                    val imageModifier = Modifier
+                        .size(100.dp)
+                        .clip(CircleShape)
+                        .border(2.dp, MaterialTheme.colorScheme.primary, CircleShape)
 
+                    if (profilePictureUri != null && user?.profilePicture != null) {
+                        // Χρήση AsyncImage όταν το profilePictureUri είναι διαθέσιμο και υπάρχει user.profilePicture
+                        AsyncImage(
+                            model = profilePictureUri, // Pass the URI or URL here
+                            contentDescription = "Profile Picture",
+                            modifier = imageModifier,
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        // Χρήση Image με painterResource για την προεπιλεγμένη εικόνα
+                        Image(
+                            painter = painterResource(com.example.gymappdemo.R.drawable.default_profile),
+                            contentDescription = "Default Profile Picture",
+                            modifier = imageModifier,
+                            contentScale = ContentScale.Crop
+                        )
+                    }
                 }
 
                 // User Information (Username & Email)
