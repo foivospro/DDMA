@@ -17,7 +17,6 @@ class ThemePreferences(context: Context) {
         return AppThemeType.valueOf(stored ?: AppThemeType.DEFAULT.name)
     }
 
-    // Αν θέλεις dark mode κι εδώ:
     fun saveDarkModeEnabled(enabled: Boolean) {
         sharedPreferences.edit().putBoolean("IS_DARK_MODE", enabled).apply()
     }

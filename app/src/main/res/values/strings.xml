@@ -104,7 +104,7 @@
     <string name="increase">Increase</string>
     <string name="decrease">Decrease</string>
     <string name="password_icon">Password Icon</string>
-
+    <string name="choose_app_color">Choose App Color</string>
     <string name="app_logo">App Logo</string>
     <string name="create_account">Create Account</string>
     <string name="confirm_password">Confirm Password</string>

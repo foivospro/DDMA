@@ -125,4 +125,5 @@
     <string name="finish_workout">Τερματισμός Προπόνησης</string>
     <string name="workout">Προπόνηση"</string>
     <string name="sports_news">Αθλητικά Νέα</string>
+    <string name="choose_app_color">Διάλεξε Χρώμα Εφαρμογής</string>
 </resources>

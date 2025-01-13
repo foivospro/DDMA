@@ -56,6 +56,7 @@ import com.example.gymappdemo.ui.screens.LoginScreen
 import com.example.gymappdemo.ui.screens.RegisterScreen
 import com.example.gymappdemo.ui.screens.SetRepsScreen
 import com.example.gymappdemo.ui.screens.UserProfileScreen
+import com.example.gymappdemo.ui.theme.GymAppDemoTheme
 import com.example.gymappdemo.ui.viewmodel.AppViewModelFactory
 import com.example.gymappdemo.ui.viewmodels.CurrentStatusViewModel
 import com.example.gymappdemo.ui.viewmodels.ExercisePickerViewModel
@@ -78,7 +79,6 @@ enum class GymAppScreen {
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-
 fun AppNavHost(
     isAuthenticated: Boolean,
 ) {
@@ -103,6 +103,7 @@ fun AppNavHost(
 
     val accentColor by myProfileViewModel.selectedAccentColor.collectAsState()
     val isDarkMode by myProfileViewModel.isDarkModeEnabled.collectAsState()
+
     // State to track if the current destination should hide the BottomNavigationBar
     var shouldShowBottomBar by remember { mutableStateOf(true) }
     val context = LocalContext.current
@@ -113,121 +114,126 @@ fun AppNavHost(
         myProfileViewModel.updateTheme(storedTheme)
     }
 
-    Scaffold(
-        bottomBar = {
-            if (shouldShowBottomBar) {
-                BottomNavigationBar(navController)
-            }
-        }
-    ) { paddingValues ->
-        NavHost(
-            navController = navController,
-            startDestination = if (isAuthenticated) GymAppScreen.Home.name else GymAppScreen.Login.name,
-            modifier = Modifier.padding(paddingValues)
-        ) {
-            // Home Screen
-            composable(route = GymAppScreen.Home.name) {
-                shouldShowBottomBar = true
-                HomeScreen(
-                    navController = navController,
-                    viewModel = homeViewModel,
-                    currentStatusViewModel = currentStatusViewModel,
-                )
-            }
-            // MyProfile Screen
-            composable(route = GymAppScreen.MyProfile.name) {
-                shouldShowBottomBar = true
-                UserProfileScreen(
-                    navController = navController,
-                    viewModel = myProfileViewModel)
-            }
-
-            // ExercisePicker Screen
-            composable("ExercisePicker/{sessionId}") { backStackEntry ->
-                val sessionId = backStackEntry.arguments?.getString("sessionId")?.toIntOrNull() ?: 0
-
-                ExercisePickerScreen(
-                    viewModel = exercisePickerViewModel,
-                    navController = navController,
-                    sessionId = sessionId
-                )
-            }
-
-            // SetReps Screen
-            composable(
-                route = "SetReps/{exerciseId}/{sessionId}",
-                arguments = listOf(
-                    navArgument("exerciseId") { type = NavType.IntType },
-                    navArgument("sessionId") { type = NavType.IntType }
-                )
-            ) { backStackEntry ->
-                val exerciseId = backStackEntry.arguments?.getInt("exerciseId")
-                val sessionId = backStackEntry.arguments?.getInt("sessionId")
-                if (exerciseId != null && sessionId != null) {
-                    SetRepsScreen(
-                        exerciseId = exerciseId,
-                        sessionId = sessionId,
-                        setRepsViewModel = setRepsViewModel,
-                        navController = navController,
-                        onSaveClicked = { navController.navigateUp() }
-                    )
+    GymAppDemoTheme(
+        darkTheme = isDarkMode,
+        appThemeType = accentColor
+    ) {
+        Scaffold(
+            bottomBar = {
+                if (shouldShowBottomBar) {
+                    BottomNavigationBar(navController)
                 }
             }
+        ) { paddingValues ->
+            NavHost(
+                navController = navController,
+                startDestination = if (isAuthenticated) GymAppScreen.Home.name else GymAppScreen.Login.name,
+                modifier = Modifier.padding(paddingValues)
+            ) {
+                // Home Screen
+                composable(route = GymAppScreen.Home.name) {
+                    shouldShowBottomBar = true
+                    HomeScreen(
+                        navController = navController,
+                        viewModel = homeViewModel,
+                        currentStatusViewModel = currentStatusViewModel,
+                    )
+                }
+                // MyProfile Screen
+                composable(route = GymAppScreen.MyProfile.name) {
+                    shouldShowBottomBar = true
+                    UserProfileScreen(
+                        navController = navController,
+                        viewModel = myProfileViewModel)
+                }
 
-            // CurrentStatus Screen
-            composable(
-                route = "CurrentStatus/{sessionId}",
-                arguments = listOf(navArgument("sessionId") { type = NavType.IntType })
-            ) { backStackEntry ->
-                val sessionId = backStackEntry.arguments?.getInt("sessionId") ?: return@composable
-                CurrentStatus(
-                    sessionId = sessionId,
-                    navController = navController,
-                    viewModel = currentStatusViewModel,
-                    onWorkoutTerminated = { duration ->
-                        homeViewModel.terminateWorkout(sessionId, duration)
+                // ExercisePicker Screen
+                composable("ExercisePicker/{sessionId}") { backStackEntry ->
+                    val sessionId = backStackEntry.arguments?.getString("sessionId")?.toIntOrNull() ?: 0
+
+                    ExercisePickerScreen(
+                        viewModel = exercisePickerViewModel,
+                        navController = navController,
+                        sessionId = sessionId
+                    )
+                }
+
+                // SetReps Screen
+                composable(
+                    route = "SetReps/{exerciseId}/{sessionId}",
+                    arguments = listOf(
+                        navArgument("exerciseId") { type = NavType.IntType },
+                        navArgument("sessionId") { type = NavType.IntType }
+                    )
+                ) { backStackEntry ->
+                    val exerciseId = backStackEntry.arguments?.getInt("exerciseId")
+                    val sessionId = backStackEntry.arguments?.getInt("sessionId")
+                    if (exerciseId != null && sessionId != null) {
+                        SetRepsScreen(
+                            exerciseId = exerciseId,
+                            sessionId = sessionId,
+                            setRepsViewModel = setRepsViewModel,
+                            navController = navController,
+                            onSaveClicked = { navController.navigateUp() }
+                        )
                     }
-                )
-            }
+                }
 
-            // Profile Settings Screen
-            composable(route = GymAppScreen.ProfileSettings.name) {
-                shouldShowBottomBar = false
-                EditProfileScreen(
-                    onBackPressed = { navController.navigateUp() },
-                    viewModel = myProfileViewModel
-                )
-            }
-            // Login Screen - Hide bottom bar
-            composable(route = GymAppScreen.Login.name) {
-                shouldShowBottomBar = false
-                LoginScreen(onLoginSuccess = {
-                    navController.navigate(GymAppScreen.Home.name) {
-                        popUpTo(GymAppScreen.Login.name) { inclusive = true }
-                    }
-                },
-                    navController = navController,
-                    loginViewModel = loginViewModel,
-                    homeViewModel = homeViewModel,
-                    myProfileViewModel = myProfileViewModel)
-            }
-            // Register Screen - Hide bottom bar
-            composable(route = GymAppScreen.Register.name) {
-                shouldShowBottomBar = false
-                RegisterScreen(
-                    registerViewModel = registerViewModel,
-                    homeViewModel = homeViewModel,
-                    myProfileViewModel = myProfileViewModel,
-                    navController = navController)
+                // CurrentStatus Screen
+                composable(
+                    route = "CurrentStatus/{sessionId}",
+                    arguments = listOf(navArgument("sessionId") { type = NavType.IntType })
+                ) { backStackEntry ->
+                    val sessionId = backStackEntry.arguments?.getInt("sessionId") ?: return@composable
+                    CurrentStatus(
+                        sessionId = sessionId,
+                        navController = navController,
+                        viewModel = currentStatusViewModel,
+                        onWorkoutTerminated = { duration ->
+                            homeViewModel.terminateWorkout(sessionId, duration)
+                        }
+                    )
+                }
 
-            }
-            composable(route = GymAppScreen.News.name) {
-                shouldShowBottomBar = true
+                // Profile Settings Screen
+                composable(route = GymAppScreen.ProfileSettings.name) {
+                    shouldShowBottomBar = false
+                    EditProfileScreen(
+                        onBackPressed = { navController.navigateUp() },
+                        viewModel = myProfileViewModel
+                    )
+                }
+                // Login Screen - Hide bottom bar
+                composable(route = GymAppScreen.Login.name) {
+                    shouldShowBottomBar = false
+                    LoginScreen(onLoginSuccess = {
+                        navController.navigate(GymAppScreen.Home.name) {
+                            popUpTo(GymAppScreen.Login.name) { inclusive = true }
+                        }
+                    },
+                        navController = navController,
+                        loginViewModel = loginViewModel,
+                        homeViewModel = homeViewModel,
+                        myProfileViewModel = myProfileViewModel)
+                }
+                // Register Screen - Hide bottom bar
+                composable(route = GymAppScreen.Register.name) {
+                    shouldShowBottomBar = false
+                    RegisterScreen(
+                        registerViewModel = registerViewModel,
+                        homeViewModel = homeViewModel,
+                        myProfileViewModel = myProfileViewModel,
+                        navController = navController)
 
-                NewsScreen(
-                    newsViewModel,
-                    navController = navController
-                )
+                }
+                composable(route = GymAppScreen.News.name) {
+                    shouldShowBottomBar = true
+
+                    NewsScreen(
+                        newsViewModel,
+                        navController = navController
+                    )
+                }
             }
         }
     }
