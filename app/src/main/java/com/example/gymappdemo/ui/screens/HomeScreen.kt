@@ -84,11 +84,11 @@ fun HomeScreen(
             Text(
                 text = "Workout History",
                 style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onBackground,
+                color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
-            Divider(color = Color.Gray, thickness = 1.dp, modifier = Modifier.padding(bottom = 16.dp))
+            Divider(color = MaterialTheme.colorScheme.secondary, thickness = 1.dp, modifier = Modifier.padding(bottom = 16.dp))
 
             WorkoutHistory()
         }
@@ -122,9 +122,10 @@ fun HomeScreen(
                     }
                 }, modifier = Modifier
                     .fillMaxWidth()
-                    .height(60.dp), shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
+                    .height(60.dp), shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
                 )) {
                 Text(
                     text = if (isWorkoutActive) "Continue Workout" else "Start New Workout",
@@ -205,23 +206,23 @@ fun WorkoutCard(workout: Workout) {
                     text = stringResource(id = workout.descriptionRes),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground
+                    color = MaterialTheme.colorScheme.secondary
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = "Ημερομηνία: ${workout.date}",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = "Διάρκεια: ${workout.duration}",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = "Θερμίδες: ${workout.caloriesBurned} kcal",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
         }
@@ -241,14 +242,14 @@ fun WorkoutSummary() {
             text = "Σύνοψη Workout",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground,
+            color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
         Text(
             text = "Συνολικά Workouts: $totalWorkouts",
             fontSize = 16.sp,
-            color = Color.Gray,
+            color = MaterialTheme.colorScheme.secondary,
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
@@ -280,13 +281,13 @@ fun WorkoutSummary() {
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            Text(text = "Δευ", fontSize = 12.sp)
-            Text(text = "Τρ", fontSize = 12.sp)
-            Text(text = "Τετ", fontSize = 12.sp)
-            Text(text = "Πεμ", fontSize = 12.sp)
-            Text(text = "Παρ", fontSize = 12.sp)
-            Text(text = "Σαβ", fontSize = 12.sp)
-            Text(text = "Κυρ", fontSize = 12.sp)
+            Text(text = "Δευ", fontSize = 12.sp, color = MaterialTheme.colorScheme.secondary)
+            Text(text = "Τρ", fontSize = 12.sp, color = MaterialTheme.colorScheme.secondary)
+            Text(text = "Τετ", fontSize = 12.sp, color = MaterialTheme.colorScheme.secondary)
+            Text(text = "Πεμ", fontSize = 12.sp, color = MaterialTheme.colorScheme.secondary)
+            Text(text = "Παρ", fontSize = 12.sp, color = MaterialTheme.colorScheme.secondary)
+            Text(text = "Σαβ", fontSize = 12.sp, color = MaterialTheme.colorScheme.secondary)
+            Text(text = "Κυρ", fontSize = 12.sp, color = MaterialTheme.colorScheme.secondary)
         }
     }
 }

@@ -42,6 +42,7 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -175,7 +176,7 @@ fun EditProfileScreen(
                     .size(120.dp)
                     .align(Alignment.CenterHorizontally)
                     .clip(CircleShape)
-                    .border(2.dp, MaterialTheme.colorScheme.secondary, CircleShape)
+                    .border(2.dp, MaterialTheme.colorScheme.primary, CircleShape)
                     .clickable {
                         // Show a dialog with options
                         showImageOptions = true
@@ -286,10 +287,9 @@ fun EditProfileScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(16.dp))
 
             // Dark Mode Switch
-            // Row with the icons
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth(),
@@ -298,6 +298,7 @@ fun EditProfileScreen(
                 Text(
                     text = "Dark Mode",
                     style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -308,6 +309,7 @@ fun EditProfileScreen(
                     Icon(
                         imageVector = Icons.Filled.WbSunny,
                         contentDescription = "Light Mode",
+                        tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier
                             .size(24.dp)
                             .clickable {
@@ -322,6 +324,7 @@ fun EditProfileScreen(
                     Icon(
                         imageVector = Icons.Filled.NightsStay,
                         contentDescription = "Dark Mode",
+                        tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier
                             .size(24.dp)
                             .clickable {
@@ -331,7 +334,7 @@ fun EditProfileScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Theme Selection Section
             ThemeSelectionSection(
@@ -372,7 +375,11 @@ fun EditProfileScreen(
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .padding(top = 16.dp),
-                enabled = hasChanges && passwordError == null
+                enabled = hasChanges && passwordError == null,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+            ),
             ) {
                 Text("Save Changes")
             }
@@ -433,11 +440,15 @@ fun UserProfileField(
 ) {
     var textValue by remember { mutableStateOf(value) }
 
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .padding(vertical = 8.dp)
+    ) {
         Text(
             text = title,
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface,
             fontSize = 16.sp,
             modifier = Modifier.padding(bottom = 4.dp)
         )
@@ -475,11 +486,7 @@ fun UserProfileField(
                 val icon = when (title) {
                     "Username" -> Icons.Filled.Person
                     "Email" -> Icons.Filled.Mail
-                    "Password" -> Icons.Filled.Key
-                    "Age" -> Icons.Filled.Key
-                    "Height(cm)" -> Icons.Filled.Height
-                    "Weight(kg)" -> Icons.Filled.Scale
-                    else -> Icons.Filled.Person
+                    else -> Icons.Filled.Key
                 }
 
                 Icon(
@@ -487,16 +494,12 @@ fun UserProfileField(
                     contentDescription = when (title) {
                         "Username" -> "Profile Icon"
                         "Email" -> "Mail Icon"
-                        "Password" -> "Password Icon"
-                        "Age" -> "Age Icon"
-                        "Height(cm)" -> "Height Icon"
-                        "Weight(kg)" -> "Weight Icon"
-                        else -> "Icon"
+                        else -> "Password Icon"
                     },
                     tint = MaterialTheme.colorScheme.primary
                 )
             },
-            colors = TextFieldDefaults.textFieldColors(
+            colors = TextFieldDefaults.colors(
                 focusedIndicatorColor = if (errorMessage != null) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
                 unfocusedIndicatorColor = if (errorMessage != null) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                 errorIndicatorColor = MaterialTheme.colorScheme.error
@@ -513,7 +516,7 @@ fun UserProfileField(
     }
 }
 
-@Composable
+/*@Composable
 fun EnhancedTextField(
     title: String,
     value: String,
@@ -595,7 +598,7 @@ fun EnhancedTextField(
             )
         }
     }
-}
+}*/
 
 // Validation Function
 fun validatePassword(password: String): String? {
@@ -622,6 +625,7 @@ fun ThemeSelectionSection(
     Text(
         text = "Choose App Color",
         style = MaterialTheme.typography.labelLarge,
+        color = MaterialTheme.colorScheme.onSurface,
         fontSize = 18.sp,
         fontWeight = FontWeight.Bold
     )
