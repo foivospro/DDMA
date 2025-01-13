@@ -59,8 +59,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.example.gymappdemo.Navigation.GymAppScreen
 import com.example.gymappdemo.R
-import com.example.gymappdemo.navigation.GymAppScreen
 import com.example.gymappdemo.ui.viewmodels.MyProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -111,30 +111,6 @@ fun UserProfileScreen(
             )
         }
         Scaffold(
-            topBar = {
-                CenterAlignedTopAppBar(
-                    title = {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(), // Ensure the row takes the full width
-                            horizontalArrangement = Arrangement.SpaceBetween, // Spread items across the row (title at start, icon at end)
-                            verticalAlignment = Alignment.CenterVertically // Vertically center items in the row
-                        ) {
-
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ExitToApp,
-                                contentDescription = stringResource(R.string.profile_icon),
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier
-                                    .size(40.dp)
-                                    .padding(start = 8.dp)
-                                    .clickable {
-                                        showLogoutDialog = true
-                                    }
-                            )
-                        }
-                    }
-                )
-            }
         ) { padding ->
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -151,6 +127,16 @@ fun UserProfileScreen(
                         .padding(vertical = 8.dp),
                     contentAlignment = Alignment.Center
                 ) {
+                    Text(
+                        text = "Προφίλ",
+                        style = MaterialTheme.typography.headlineMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        ),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+
                     IconButton(
                         onClick = { navController.popBackStack() },
                         modifier = Modifier.align(Alignment.CenterStart)
@@ -161,6 +147,19 @@ fun UserProfileScreen(
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                        contentDescription = "Profile",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .size(40.dp)
+                            .padding(start = 8.dp)
+                            .align(Alignment.CenterEnd)
+                            .clickable {
+                                showLogoutDialog = true
+                            }
+                    )
+
                 }
 
                 // User Picture
@@ -169,40 +168,28 @@ fun UserProfileScreen(
                         .size(130.dp)
                         .padding(8.dp)
                 ) {
-                    Image(
-                        painter = painterResource(com.example.gymappdemo.R.drawable.default_profile),
-                        contentDescription = stringResource(R.string.profile_icon),
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(CircleShape)
-                            .border(2.dp, MaterialTheme.colorScheme.secondary, CircleShape)
-                    )
-                    if (profilePictureUri != null) {
-                        if (user?.profilePicture != null) {
-                            // Use AsyncImage when profilePictureUri is available
-                            AsyncImage(
-                                model = profilePictureUri, // Pass the URI or URL here
-                                contentDescription = "Profile Picture",
-                                modifier = Modifier
-                                    .size(100.dp)
-                                    .clip(CircleShape)
-                                    .border(2.dp, MaterialTheme.colorScheme.primary, CircleShape),
-                                contentScale = ContentScale.Crop
-                            )
-                        } else {
-                            // Use Image with painterResource for default image
-                            Image(
-                                painter = painterResource(com.example.gymappdemo.R.drawable.default_profile),
-                                contentDescription = "Default Profile Picture",
-                                modifier = Modifier
-                                    .size(100.dp)
-                                    .clip(CircleShape)
-                                    .border(2.dp, MaterialTheme.colorScheme.primary, CircleShape),
-                                contentScale = ContentScale.Crop
-                            )
-                        }
-                    }
+                    val imageModifier = Modifier
+                        .size(100.dp)
+                        .clip(CircleShape)
+                        .border(2.dp, MaterialTheme.colorScheme.primary, CircleShape)
 
+                    if (profilePictureUri != null && user?.profilePicture != null) {
+                        // Χρήση AsyncImage όταν το profilePictureUri είναι διαθέσιμο και υπάρχει user.profilePicture
+                        AsyncImage(
+                            model = profilePictureUri, // Pass the URI or URL here
+                            contentDescription = "Profile Picture",
+                            modifier = imageModifier,
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        // Χρήση Image με painterResource για την προεπιλεγμένη εικόνα
+                        Image(
+                            painter = painterResource(com.example.gymappdemo.R.drawable.default_profile),
+                            contentDescription = "Default Profile Picture",
+                            modifier = imageModifier,
+                            contentScale = ContentScale.Crop
+                        )
+                    }
                 }
 
                 // User Information (Username & Email)

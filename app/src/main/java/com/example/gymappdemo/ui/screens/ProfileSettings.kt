@@ -21,6 +21,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,11 +30,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Height
 import androidx.compose.material.icons.filled.Key
 import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material.icons.filled.NightsStay
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.Scale
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.filled.WbSunny
@@ -80,33 +85,37 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.gymappdemo.R
 import com.example.gymappdemo.data.entities.User
+import com.example.gymappdemo.ui.theme.AppThemeType
+import com.example.gymappdemo.ui.theme.primaryLight_Orange
+import com.example.gymappdemo.ui.theme.primaryLight_Default
+import com.example.gymappdemo.ui.theme.primaryLight_Yellow
+import com.example.gymappdemo.ui.theme.primaryLight_Purple
 import com.example.gymappdemo.ui.viewmodels.MyProfileViewModel
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfileScreen(
-    isDarkMode: Boolean,
-    onDarkModeToggle: (Boolean) -> Unit,
     onBackPressed: () -> Unit,
-    //userId: Int,
     viewModel: MyProfileViewModel
 ) {
-    val flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
     val context = LocalContext.current
-    // Observe user data from the ViewModel
+
+    // Παρακολουθώ user, accent color & dark mode από το ViewModel
     val user by viewModel.user.collectAsState()
-    // Fetch user data when the composable is loaded
+    val currentAccent by viewModel.selectedAccentColor.collectAsState()
+    val currentDarkMode by viewModel.isDarkModeEnabled.collectAsState()
 
+    var localAccentColor by remember { mutableStateOf(currentAccent) }
+    var localDarkMode by remember { mutableStateOf(currentDarkMode) }
 
-    // State variables for editable fields (initialize with existing data or default values)
-    var username by remember { mutableStateOf(user?.name ?: "sex") }
+    var username by remember { mutableStateOf(user?.name ?: "") }
     var email by remember { mutableStateOf(user?.email ?: "") }
     var age by remember { mutableIntStateOf(user?.age ?: 20) }
     var height by remember { mutableIntStateOf(user?.height ?: 170) }
     var weight by remember { mutableIntStateOf(user?.weight ?: 75) }
     var password by remember { mutableStateOf(user?.passwordHash ?: "") }
     val profilePicture by viewModel.profilePictureUri.collectAsState()
+
 
     // Update local state variables when userState changes
     LaunchedEffect(user) {
@@ -128,7 +137,10 @@ fun EditProfileScreen(
             height != initialUserState?.height ||
             weight != initialUserState?.weight ||
             password != initialUserState?.passwordHash ||
-            profilePicture != initialUserState?.profilePicture
+            profilePicture != initialUserState?.profilePicture ||
+            localAccentColor != currentAccent ||
+            localDarkMode != currentDarkMode
+
 
 
     Scaffold(
@@ -151,7 +163,7 @@ fun EditProfileScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(10.dp)
+                .padding(16.dp)
                 .verticalScroll(rememberScrollState())
         ) {
 
@@ -170,7 +182,7 @@ fun EditProfileScreen(
 
             Box(
                 modifier = Modifier
-                    .size(100.dp)
+                    .size(120.dp)
                     .align(Alignment.CenterHorizontally)
                     .clip(CircleShape)
                     .border(2.dp, MaterialTheme.colorScheme.secondary, CircleShape)
@@ -231,7 +243,7 @@ fun EditProfileScreen(
                     }
                 )
             }
-
+            Spacer(modifier = Modifier.height(12.dp))
             // Editable Fields
             UserProfileField(
                 title = stringResource(id =R.string.username),
@@ -317,37 +329,51 @@ fun EditProfileScreen(
                         contentDescription = stringResource(id =R.string.light_mode),
                         modifier = Modifier
                             .size(24.dp)
-                            .clickable { if (!isDarkMode) onDarkModeToggle(true) }
+                            .clickable {
+                                localDarkMode = false
+                            }
                     )
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    // Switch to toggle between Light/Dark mode
                     Switch(
-                        checked = isDarkMode,
-                        onCheckedChange = { onDarkModeToggle(it) }
+                        checked = localDarkMode,
+                        onCheckedChange = { localDarkMode = it }
                     )
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    // Moon icon for Dark Mode
+                    // Moon icon
                     Icon(
                         imageVector = Icons.Filled.NightsStay,
                         contentDescription = stringResource(id =R.string.dark_mode),
                         modifier = Modifier
                             .size(24.dp)
-                            .clickable { if (isDarkMode) onDarkModeToggle(false) }
+                            .clickable {
+                                localDarkMode = true
+                            }
                     )
                 }
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Theme Selection Section
+            ThemeSelectionSection(
+                availableThemes = viewModel.getAvailableThemes(),
+                selectedTheme = localAccentColor,
+                onThemeSelected = { chosen ->
+                    localAccentColor = chosen
+                }
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             Button(
                 onClick = {
                     profilePicture?.let {
-                        context.contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION )
+                        context.contentResolver.takePersistableUriPermission(
+                            it,
+                            Intent.FLAG_GRANT_READ_URI_PERMISSION
+                        )
                     }
 
                     val updatedUser = User(
-                        id = user?.id ?: 0, // Use the existing user ID
+                        id = user?.id ?: 0,
                         name = username,
                         email = email,
                         age = age,
@@ -356,24 +382,65 @@ fun EditProfileScreen(
                         passwordHash = password,
                         profilePicture = profilePicture
                     )
-
                     viewModel.updateUser(updatedUser)
+                    viewModel.updateTheme(localAccentColor)
+                    viewModel.toggleDarkMode(localDarkMode)
+                    viewModel.saveThemeChanges()
                     onBackPressed()
                 },
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .padding(top = 16.dp),
-                enabled = hasChanges // Enable only if changes have been made
+                enabled = hasChanges && passwordError == null
             ) {
                 Text(
                     text = stringResource(id =R.string.save_changes)
                 )
             }
-
         }
     }
 }
 
+
+@Composable
+fun ThemeCircle(
+    themeType: AppThemeType,
+    isSelected: Boolean,
+    onSelect: () -> Unit
+) {
+    // Define the primary color based on the themeType
+    val color = when (themeType) {
+        AppThemeType.DEFAULT -> primaryLight_Default
+        AppThemeType.ORANGE -> primaryLight_Orange
+        AppThemeType.PURPLE -> primaryLight_Purple
+        AppThemeType.YELLOW -> primaryLight_Yellow
+    }
+
+    Box(
+        modifier = Modifier
+            .size(50.dp)
+            .clip(CircleShape)
+            .background(color)
+            .border(
+                width = if (isSelected) 3.dp else 2.dp,
+                color = MaterialTheme.colorScheme.primary,
+                shape = CircleShape
+            )
+            .clickable { onSelect() },
+        contentAlignment = Alignment.Center
+    ) {
+        if (isSelected) {
+            Icon(
+                imageVector = Icons.Filled.Check,
+                contentDescription = "Selected",
+                tint = Color.White,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserProfileField(
     title: String,
@@ -382,25 +449,86 @@ fun UserProfileField(
     isPassword: Boolean = false,
     isPasswordVisible: Boolean = false,
     onPasswordToggle: (() -> Unit)? = null,
-    errorMessage: String? = null
+    errorMessage: String? = null,
+    isNumber: Boolean = false
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 2.dp),  // Added padding for better spacing
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        // Enhanced TextField with weight to avoid overlapping the button
-        Column(modifier = Modifier.fillMaxSize()) { // Ensure the TextField doesn't overlap
-            EnhancedTextField(
-                title = title,
-                value = value,
-                onValueChange = onValueChange,
-                isPassword = isPassword,
-                isPasswordVisible = isPasswordVisible,
-                onPasswordToggle = onPasswordToggle,
-                errorMessage = errorMessage
+    var textValue by remember { mutableStateOf(value) }
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp,
+            modifier = Modifier.padding(bottom = 4.dp)
+        )
+        TextField(
+            value = textValue,
+            onValueChange = {
+                if (isNumber) {
+                    // Επιτρέπουμε μόνο αριθμούς
+                    if (it.all { char -> char.isDigit() }) {
+                        textValue = it
+                        onValueChange(it)
+                    }
+                } else {
+                    textValue = it
+                    onValueChange(it)
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth(),
+            singleLine = true,
+            isError = errorMessage != null,
+            //shape = RoundedCornerShape(4.dp),
+            visualTransformation = if (isPassword && !isPasswordVisible) PasswordVisualTransformation() else VisualTransformation.None,
+            trailingIcon = {
+                if (isPassword && onPasswordToggle != null) {
+                    IconButton(onClick = { onPasswordToggle() }) {
+                        Icon(
+                            imageVector = if (isPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                            contentDescription = if (isPasswordVisible) "Hide password" else "Show password"
+                        )
+                    }
+                }
+            },
+            leadingIcon = {
+                val icon = when (title) {
+                    "Username" -> Icons.Filled.Person
+                    "Email" -> Icons.Filled.Mail
+                    "Password" -> Icons.Filled.Key
+                    "Age" -> Icons.Filled.Key
+                    "Height(cm)" -> Icons.Filled.Height
+                    "Weight(kg)" -> Icons.Filled.Scale
+                    else -> Icons.Filled.Person
+                }
+
+                Icon(
+                    imageVector = icon,
+                    contentDescription = when (title) {
+                        "Username" -> "Profile Icon"
+                        "Email" -> "Mail Icon"
+                        "Password" -> "Password Icon"
+                        "Age" -> "Age Icon"
+                        "Height(cm)" -> "Height Icon"
+                        "Weight(kg)" -> "Weight Icon"
+                        else -> "Icon"
+                    },
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            },
+            colors = TextFieldDefaults.textFieldColors(
+                focusedIndicatorColor = if (errorMessage != null) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                unfocusedIndicatorColor = if (errorMessage != null) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                errorIndicatorColor = MaterialTheme.colorScheme.error
+            )
+        )
+        if (errorMessage != null) {
+            Text(
+                text = errorMessage,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(top = 4.dp)
             )
         }
     }
@@ -503,6 +631,35 @@ fun validatePassword(context:Context,password: String): String? {
         !numberValid -> context.getString(R.string.password_must_contain_number)
         !symbolValid -> context.getString(R.string.password_must_contain_special)
         else -> null // No errors
+    }
+}
+
+@Composable
+fun ThemeSelectionSection(
+    availableThemes: List<AppThemeType>,
+    selectedTheme: AppThemeType,
+    onThemeSelected: (AppThemeType) -> Unit
+) {
+    Text(
+        text = "Choose App Color",
+        style = MaterialTheme.typography.labelLarge,
+        fontSize = 18.sp,
+        fontWeight = FontWeight.Bold
+    )
+
+    Spacer(modifier = Modifier.height(8.dp))
+
+    LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+        items(
+            items = availableThemes,
+            key = { it.ordinal }
+        ) { themeType ->
+            ThemeCircle(
+                themeType = themeType,
+                isSelected = (themeType == selectedTheme),
+                onSelect = { onThemeSelected(themeType) }
+            )
+        }
     }
 }
 
