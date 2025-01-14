@@ -4,30 +4,13 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -63,109 +46,129 @@ fun HomeScreen(
     val locale = context.resources.configuration.locales[0]
     val sessionList by viewModel.userSessions.collectAsState()
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-
-        item {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = "Hi 👋, $username",
-                    style = MaterialTheme.typography.headlineLarge,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.weight(1f)
-                )
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = "Profile",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier
-                        .size(40.dp)
-                        .padding(start = 8.dp)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-
-
-        item {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = when {
-                        locale.language == "el" && username == "Guest" -> stringResource(R.string.hi_user, "Επισκέπτη")
-                        else -> stringResource(R.string.hi_user, username)
-                    },
-                    style = MaterialTheme.typography.headlineLarge,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.weight(1f)
-                )
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-        item {
-            Text(
-                text = stringResource(R.string.workout_history),
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.padding(bottom = 8.dp)
+    // -- Περνάμε σε Scaffold αντί για απλό LazyColumn --
+    Scaffold(
+        // bottomBar: pinned στο κάτω μέρος
+        bottomBar = {
+            // Τοποθετούμε το κουμπί σε Row ή απευθείας σε Surface / Box
+            BottomBar(
+                isWorkoutActive = isWorkoutActive,
+                currentSessionId = currentSessionId,
+                userId = userId,
+                onStartNewWorkout = { userIdValue ->
+                    // Κλήση της συνάρτησης περνώντας userId και onError
+                    viewModel.startNewWorkout(
+                        userId = userIdValue,
+                        onSessionCreated = { session ->
+                            currentStatusViewModel.setSessionId(session.id)
+                            navController.navigate("CurrentStatus/${session.id}")
+                        },
+                        onError = { error ->
+                            Log.e("HomeScreen", "Failed to start new workout: $error")
+                        }
+                    )
+                },
+                onContinueWorkout = { sessionId ->
+                    navController.navigate("CurrentStatus/$sessionId")
+                }
             )
-            Divider(color = Color.Gray, thickness = 1.dp, modifier = Modifier.padding(bottom = 16.dp))
         }
+    ) { innerPadding ->
 
+        // Το scrollable περιεχόμενο πάει στο Scaffold content
+        LazyColumn(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            // -- (1) Hello / Hi user row --
+            item {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = when {
+                            locale.language == "el" && username == "Guest" ->
+                                stringResource(R.string.hi_user, "Επισκέπτη")
+                            else ->
+                                stringResource(R.string.hi_user, username)
+                        },
+                        style = MaterialTheme.typography.headlineLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.weight(1f)
+                    )
 
-        items(sessionList) { session ->
-            GymSessionCard(session)
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = "Profile",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .size(40.dp)
+                            .padding(start = 8.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            // -- (2) Workout History Title --
+            item {
+                Text(
+                    text = stringResource(R.string.workout_history),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                Divider(color = Color.Gray, thickness = 1.dp, modifier = Modifier.padding(bottom = 16.dp))
+            }
+
+            // -- (3) Items με GymSessionCard --
+            items(sessionList) { session ->
+                GymSessionCard(session)
+            }
+
+            // -- (4) WorkoutSummary κάτω από τα items --
+            item {
+                Spacer(modifier = Modifier.height(24.dp))
+                WorkoutSummary(sessionList = sessionList)
+            }
+
+            // Τέλος LazyColumn
         }
+    }
+}
 
-
-        item {
-            Spacer(modifier = Modifier.height(24.dp))
-
-            WorkoutSummary(sessionList = sessionList)
-        }
-
-        // Start New Workout / Continue Workout Button
-        item {
-            Spacer(modifier = Modifier.height(64.dp))
-
+// -- Π pinned bottom Bar me to koumpi mas --
+@Composable
+fun BottomBar(
+    isWorkoutActive: Boolean,
+    currentSessionId: Int?,
+    userId: Int?,
+    onStartNewWorkout: (Int) -> Unit,
+    onContinueWorkout: (Int) -> Unit
+) {
+    Surface(shadowElevation = 4.dp) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Button(
                 onClick = {
                     if (!isWorkoutActive) {
-                        // Πάρε το userId από το ViewModel
-                        val userIdValue = userId  // ή viewModel.userId.collectAsState().value
-
-                        if (userIdValue == null) {
-                            // Εδώ μπορείς να κάνεις π.χ. πλοήγηση σε Login Screen
-                            navController.navigate("LoginScreen")
+                        if (userId == null || userId == 0) {
+                            // Αν θέλεις, μπορείς να κάνεις κάτι άλλο
+                            Log.e("BottomBar", "UserId is null or 0, maybe show login screen?")
                         } else {
-                            // Κλήση της συνάρτησης περνώντας userId και onError
-                            viewModel.startNewWorkout(
-                                userId = userIdValue,
-                                onSessionCreated = { session ->
-                                    currentStatusViewModel.setSessionId(session.id)
-                                    navController.navigate("CurrentStatus/${session.id}")
-                                },
-                                onError = { error ->
-                                    Log.e("HomeScreen", "Failed to start new workout: $error")
-                                }
-                            )
+                            onStartNewWorkout(userId)
                         }
                     } else {
-                        // Αν υπάρχει ενεργή προπόνηση, πήγαινε στην CurrentStatus
-                        currentSessionId?.let { sessionId ->
-                            navController.navigate("CurrentStatus/$sessionId")
-                        }
+                        currentSessionId?.let { onContinueWorkout(it) }
                     }
                 },
                 modifier = Modifier
@@ -178,22 +181,12 @@ fun HomeScreen(
                 )
             ) {
                 Text(
-                    text = stringResource(
-                        id = if (isWorkoutActive) R.string.continue_workout else R.string.start_new_workout
-                    ),
+                    text = if (isWorkoutActive)
+                        stringResource(R.string.continue_workout)
+                    else
+                        stringResource(R.string.start_new_workout),
                     style = MaterialTheme.typography.titleMedium,
                     fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-
-            if (isWorkoutActive) {
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = stringResource(R.string.active_workout_warning),
-                    color = Color.Red,
-                    fontSize = 14.sp,
                     fontWeight = FontWeight.Bold
                 )
             }
@@ -201,9 +194,10 @@ fun HomeScreen(
     }
 }
 
+
+// -- GymSessionCard: Προσθέτουμε και τις θερμίδες --
 @Composable
 fun GymSessionCard(session: GymSession) {
-    // Υπολογισμός χρόνου
     val minutes = session.duration / 60
     val seconds = session.duration % 60
     val durationText = if (seconds > 0) {
@@ -247,20 +241,23 @@ fun GymSessionCard(session: GymSession) {
                 )
                 Spacer(modifier = Modifier.height(4.dp))
 
+                // Ημερομηνία
                 Text(
-                    text = stringResource(
-                        R.string.date_label,
-                        session.date
-                    ),
+                    text = stringResource(R.string.date_label, session.date),
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.Gray
                 )
 
+                // Διάρκεια
                 Text(
-                    text = stringResource(
-                        R.string.duration_label,
-                        durationText
-                    ),
+                    text = stringResource(R.string.duration_label, durationText),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray
+                )
+
+                // Θερμίδες - Ας υποθέσουμε ότι το πεδίο λέγεται `caloriesBurned`
+                Text(
+                    text = "Θερμίδες: ${session.caloriesBurned} kcal",
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.Gray
                 )
