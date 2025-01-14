@@ -1,6 +1,7 @@
 package com.example.gymappdemo.ui.viewmodels
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,33 +14,44 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.LocalDate
 
 class HomeViewModel(
     private val workoutRepository: WorkoutRepository,
     private val userRepository: UserRepository
 ) : ViewModel() {
     private val _userId = MutableStateFlow(0)
-    val userId: StateFlow<Int> = _userId.asStateFlow()
+    val userId: StateFlow<Int?> = _userId.asStateFlow()
 
-    // Κατάσταση Προπόνησης
+
     private val _isWorkoutActive = MutableStateFlow(false)
     val isWorkoutActive: StateFlow<Boolean> = _isWorkoutActive.asStateFlow()
 
     private val _currentSessionId = MutableStateFlow<Int?>(null)
     val currentSessionId: StateFlow<Int?> = _currentSessionId.asStateFlow()
 
-    // Κατάσταση Username
+
     private val _username = MutableStateFlow("Guest")
     val username: StateFlow<String> get() = _username
+
+
+    private val _userSessions = MutableStateFlow<List<GymSession>>(emptyList())
+    val userSessions: StateFlow<List<GymSession>> = _userSessions.asStateFlow()
+
 
     init {
         updateViewModel()
     }
     fun updateViewModel() {
         viewModelScope.launch {
-            fetchUsername()
+            fetchUserData()
             _userId.value = fetchUserId()
-            val activeSession = workoutRepository.getActiveSession()
+
+            // Πάρε τον userId που μόλις έβαλες στο _userId.value
+            val localUserId = _userId.value
+
+            // Κάλεσε το getActiveSession περνώντας userId
+            val activeSession = workoutRepository.getActiveSession(localUserId)
             if (activeSession != null) {
                 _isWorkoutActive.value = true
                 _currentSessionId.value = activeSession.id
@@ -47,8 +59,9 @@ class HomeViewModel(
         }
     }
 
-    private suspend fun fetchUsername() {
-        // Χρήση του Dispatcher.IO για λειτουργίες βάσης δεδομένων
+
+    private suspend fun fetchUserData() {
+
         val email = withContext(Dispatchers.IO) {
             userRepository.getLoggedInUserEmail()
         }
@@ -61,8 +74,17 @@ class HomeViewModel(
             null
         }
 
-        // Ενημέρωση της κατάστασης στο κύριο νήμα
+
         _username.value = user?.name ?: "Guest"
+        _userId.value = user?.id ?:0
+
+        // Αν ο χρήστης δεν είναι "Guest", ανακτά τις συνεδρίες του
+        if (user != null) {
+            val sessions = withContext(Dispatchers.IO) {
+                workoutRepository.getSessionsForUser(user.id)
+            }
+            _userSessions.value = sessions
+        }
     }
 
      private suspend fun fetchUserId(): Int {
@@ -95,15 +117,17 @@ class HomeViewModel(
                     onError("Έχει ήδη ενεργή προπόνηση.")
                     return@launch
                 }
-                val date = java.time.LocalDate.now().toString()
+                val currentUserId = _userId.value
+                val date = LocalDate.now().toString()
 
                 val newSession = GymSession(
-                    id = 0, // Το ID δημιουργείται αυτόματα από τη βάση δεδομένων
-                    userId = userId,
+                    id = 0,
+                    userId = currentUserId,
                     date = date,
                     notes = null,
                     duration = 0,
                     caloriesBurned = 0
+
                 )
 
                 val sessionId = workoutRepository.insertSession(newSession).toInt()
@@ -112,6 +136,9 @@ class HomeViewModel(
                     _isWorkoutActive.value = true
                     _currentSessionId.value = sessionId
                     onSessionCreated(createdSession)
+
+
+                    _userSessions.value = listOf(createdSession) + _userSessions.value
                 } else {
                     onError("Αποτυχία ανάκτησης προπόνησης με ID: $sessionId")
                 }
@@ -130,9 +157,15 @@ class HomeViewModel(
                     workoutRepository.updateSession(updatedSession)
                     _isWorkoutActive.value = false
                     _currentSessionId.value = null
+
+
+                    _userSessions.value = _userSessions.value.map {
+                        if (it.id == sessionId) updatedSession else it
+                    }
                 }
             } catch (e: Exception) {
-                // Διαχείριση σφάλματος (π.χ., εμφάνιση Snackbar)
+
+                Log.e("HomeViewModel", "Error terminating workout: ${e.message}")
             }
         }
     }

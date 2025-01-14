@@ -1,4 +1,5 @@
 <resources>
+
     <string name="app_name">Gym App</string>
     <string name="biceps">Biceps</string>
     <string name="select_exercises_title">Select Exercises</string>
@@ -16,7 +17,9 @@
     <string name="cancel">Cancel</string>
     <string name="edit_set">Edit Set</string>
     <string name="save">Save</string>
+    <string name="calories_label">Calories: %1$d kcal</string>
     <string name="termination_workout">Stop Workout</string>
+    <string name="no_workouts_yet">You haven\'t started any workouts yet. Begin your first workout today!</string>
     <string name="no_exercises_available">No exercises available</string>
     <string name="pause">Pause</string>
     <string name="start">Start</string>
@@ -128,4 +131,9 @@
     <string name="finish_workout">Finish Workout</string>
     <string name="workout">Workout"</string>
     <string name="sports_news">Sports News</string>
+    <string name="workout_label">Workout</string>
+    <string name="date_label">Date: %1$s</string>
+    <string name="duration_label">Duration: %1$s</string>
+    <string name="workout_icon_description">Icon for the workout session</string>
+
 </resources>
