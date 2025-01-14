@@ -17,7 +17,9 @@
     <string name="cancel">Cancel</string>
     <string name="edit_set">Edit Set</string>
     <string name="save">Save</string>
+    <string name="calories_label">Calories: %1$d kcal</string>
     <string name="termination_workout">Stop Workout</string>
+    <string name="no_workouts_yet">You haven\'t started any workouts yet. Begin your first workout today!</string>
     <string name="no_exercises_available">No exercises available</string>
     <string name="pause">Pause</string>
     <string name="start">Start</string>

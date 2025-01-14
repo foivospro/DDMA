@@ -8,18 +8,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ExitToApp
-import androidx.compose.material.icons.filled.ExitToApp
-import androidx.compose.material.icons.filled.Person
+
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -28,7 +22,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -112,15 +105,6 @@ fun HomeScreen(
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.weight(1f)
                     )
-
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = "Profile",
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier
-                            .size(40.dp)
-                            .padding(start = 8.dp)
-                    )
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -129,12 +113,12 @@ fun HomeScreen(
             // -- (2) Workout History Title --
             item {
                 Text(
-                    text = stringResource(R.string.workout_history),
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                text = stringResource(R.string.workout_history),
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(bottom = 8.dp)
                 )
-                Divider(color = Color.Gray, thickness = 1.dp, modifier = Modifier.padding(bottom = 16.dp))
             }
 
             // -- (3) Items με GymSessionCard --
@@ -173,9 +157,9 @@ fun BottomBar(
             Button(
                 onClick = {
                     if (!isWorkoutActive) {
-                        if (userId == null || userId == 0) {
+                        if (userId == null) {
                             // Αν θέλεις, μπορείς να κάνεις κάτι άλλο
-                            Log.e("BottomBar", "UserId is null or 0, maybe show login screen?")
+                            Log.e("BottomBar", "UserId is null, maybe show login screen?")
                         } else {
                             onStartNewWorkout(userId)
                         }
@@ -269,7 +253,7 @@ fun GymSessionCard(session: GymSession) {
 
                 // Θερμίδες - Ας υποθέσουμε ότι το πεδίο λέγεται `caloriesBurned`
                 Text(
-                    text = "Θερμίδες: ${session.caloriesBurned} kcal",
+                    text = stringResource(R.string.calories_label, session.caloriesBurned),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -283,67 +267,126 @@ fun GymSessionCard(session: GymSession) {
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun WorkoutSummary(sessionList: List<GymSession>) {
-    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-
-    val totalWorkouts = sessionList.size
-
-    val workoutsPerWeek = (1..7).map { dayIndex ->
-        sessionList.count { session ->
-            val localDate = LocalDate.parse(session.date, formatter)
-            localDate.dayOfWeek.value == dayIndex
-        }
-    }
-
-    val maxBarHeight = 100.dp
-    val maxWorkouts = workoutsPerWeek.maxOrNull() ?: 1
-
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = stringResource(R.string.workout_summary),
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-        Text(
-            text = stringResource(R.string.total_workouts, totalWorkouts),
-            fontSize = 16.sp,
-            color = MaterialTheme.colorScheme.secondary,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-        Row(
+    if (sessionList.isEmpty()) {
+        Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(maxBarHeight + 40.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.Bottom
+                .padding(vertical = 8.dp),
+            shape = RoundedCornerShape(12.dp),
+            elevation = CardDefaults.cardElevation(8.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface
+            )
         ) {
-            workoutsPerWeek.forEach { count ->
-                val barHeight = if (maxWorkouts > 0) {
-                    (count.toFloat() / maxWorkouts) * maxBarHeight.value
-                } else {
-                    0f
-                }
-                Box(
-                    modifier = Modifier
-                        .width(20.dp)
-                        .height(barHeight.dp)
-                        .background(MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(4.dp))
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = stringResource(R.string.no_workouts_yet),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
                 )
             }
         }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            Text(text = stringResource(R.string.monday), fontSize = 12.sp, color = MaterialTheme.colorScheme.secondary)
-            Text(text = stringResource(R.string.tuesday), fontSize = 12.sp, color = MaterialTheme.colorScheme.secondary)
-            Text(text = stringResource(R.string.wednesday), fontSize = 12.sp, color = MaterialTheme.colorScheme.secondary)
-            Text(text = stringResource(R.string.thursday), fontSize = 12.sp, color = MaterialTheme.colorScheme.secondary)
-            Text(text = stringResource(R.string.friday), fontSize = 12.sp, color = MaterialTheme.colorScheme.secondary)
-            Text(text = stringResource(R.string.saturday), fontSize = 12.sp, color = MaterialTheme.colorScheme.secondary)
-            Text(text = stringResource(R.string.sunday), fontSize = 12.sp, color = MaterialTheme.colorScheme.secondary)
+    } else {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+
+        val totalWorkouts = sessionList.size
+
+        val workoutsPerWeek = (1..7).map { dayIndex ->
+            sessionList.count { session ->
+                val localDate = LocalDate.parse(session.date, formatter)
+                localDate.dayOfWeek.value == dayIndex
+            }
+        }
+
+        val maxBarHeight = 100.dp
+        val maxWorkouts = workoutsPerWeek.maxOrNull() ?: 1
+
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                text = stringResource(R.string.workout_summary),
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            Text(
+                text = stringResource(R.string.total_workouts, totalWorkouts),
+                fontSize = 16.sp,
+                color = MaterialTheme.colorScheme.secondary,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(maxBarHeight + 40.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.Bottom
+            ) {
+                workoutsPerWeek.forEach { count ->
+                    val barHeight = if (maxWorkouts > 0) {
+                        (count.toFloat() / maxWorkouts) * maxBarHeight.value
+                    } else {
+                        0f
+                    }
+                    Box(
+                        modifier = Modifier
+                            .width(20.dp)
+                            .height(barHeight.dp)
+                            .background(
+                                MaterialTheme.colorScheme.primary,
+                                shape = RoundedCornerShape(4.dp)
+                            )
+                    )
+                }
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Text(
+                    text = stringResource(R.string.monday),
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+                Text(
+                    text = stringResource(R.string.tuesday),
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+                Text(
+                    text = stringResource(R.string.wednesday),
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+                Text(
+                    text = stringResource(R.string.thursday),
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+                Text(
+                    text = stringResource(R.string.friday),
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+                Text(
+                    text = stringResource(R.string.saturday),
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+                Text(
+                    text = stringResource(R.string.sunday),
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+            }
         }
     }
 }
-

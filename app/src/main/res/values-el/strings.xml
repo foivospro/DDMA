@@ -101,7 +101,9 @@
     <string name="default_profile_picture">Προεπιλεγμένη Εικόνα Προφίλ</string>
     <string name="increase">Αύξηση</string>
     <string name="decrease">Μείωση</string>
+    <string name="calories_label">Θερμίδες: %1$d kcal</string>
     <string name="password_icon">Εικονίδιο Κωδικού</string>
+    <string name="no_workouts_yet">Δεν έχετε ακόμα προπονήσεις. Ξεκινήστε την πρώτη σας προπόνηση!</string>
     <string name="app_logo">Λογότυπο Εφαρμογής</string>
     <string name="create_account">Δημιουργία Λογαριασμού</string>
     <string name="confirm_password">Επιβεβαίωση Κωδικού</string>
