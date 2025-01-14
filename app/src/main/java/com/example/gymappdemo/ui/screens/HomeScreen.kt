@@ -11,6 +11,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -237,7 +249,7 @@ fun GymSessionCard(session: GymSession) {
                     text = stringResource(R.string.workout_label),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground
+                    color = MaterialTheme.colorScheme.secondary
                 )
                 Spacer(modifier = Modifier.height(4.dp))
 
@@ -245,26 +257,27 @@ fun GymSessionCard(session: GymSession) {
                 Text(
                     text = stringResource(R.string.date_label, session.date),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurface
                 )
 
                 // Διάρκεια
                 Text(
                     text = stringResource(R.string.duration_label, durationText),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurface
                 )
 
                 // Θερμίδες - Ας υποθέσουμε ότι το πεδίο λέγεται `caloriesBurned`
                 Text(
                     text = "Θερμίδες: ${session.caloriesBurned} kcal",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
         }
     }
 }
+
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -289,13 +302,13 @@ fun WorkoutSummary(sessionList: List<GymSession>) {
             text = stringResource(R.string.workout_summary),
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground,
+            color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(bottom = 8.dp)
         )
         Text(
             text = stringResource(R.string.total_workouts, totalWorkouts),
             fontSize = 16.sp,
-            color = Color.Gray,
+            color = MaterialTheme.colorScheme.secondary,
             modifier = Modifier.padding(bottom = 16.dp)
         )
         Row(
@@ -323,13 +336,13 @@ fun WorkoutSummary(sessionList: List<GymSession>) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            Text(text = stringResource(R.string.monday), fontSize = 12.sp)
-            Text(text = stringResource(R.string.tuesday), fontSize = 12.sp)
-            Text(text = stringResource(R.string.wednesday), fontSize = 12.sp)
-            Text(text = stringResource(R.string.thursday), fontSize = 12.sp)
-            Text(text = stringResource(R.string.friday), fontSize = 12.sp)
-            Text(text = stringResource(R.string.saturday), fontSize = 12.sp)
-            Text(text = stringResource(R.string.sunday), fontSize = 12.sp)
+            Text(text = stringResource(R.string.monday), fontSize = 12.sp, color = MaterialTheme.colorScheme.secondary)
+            Text(text = stringResource(R.string.tuesday), fontSize = 12.sp, color = MaterialTheme.colorScheme.secondary)
+            Text(text = stringResource(R.string.wednesday), fontSize = 12.sp, color = MaterialTheme.colorScheme.secondary)
+            Text(text = stringResource(R.string.thursday), fontSize = 12.sp, color = MaterialTheme.colorScheme.secondary)
+            Text(text = stringResource(R.string.friday), fontSize = 12.sp, color = MaterialTheme.colorScheme.secondary)
+            Text(text = stringResource(R.string.saturday), fontSize = 12.sp, color = MaterialTheme.colorScheme.secondary)
+            Text(text = stringResource(R.string.sunday), fontSize = 12.sp, color = MaterialTheme.colorScheme.secondary)
         }
     }
 }

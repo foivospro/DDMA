@@ -56,13 +56,14 @@ import com.example.gymappdemo.R
 import com.example.gymappdemo.data.entities.ExerciseWithSets
 import com.example.gymappdemo.data.entities.Set
 import com.example.gymappdemo.ui.viewmodels.CurrentStatusViewModel
+import com.example.gymappdemo.utils.IconResourceMapper
 
 @Composable
 fun CurrentStatus(
     sessionId: Int,
     viewModel: CurrentStatusViewModel,
     navController: NavController,
-    onWorkoutTerminated: (Int) -> Unit
+    onWorkoutTerminated: (Int, Int) -> Unit
 ) {
     val timer by viewModel.timerState.collectAsState()
     val calories by viewModel.caloriesState.collectAsState()
@@ -151,7 +152,7 @@ fun CurrentStatus(
                 Button(
                     onClick = {
                         viewModel.resetTimer()
-                        onWorkoutTerminated(timer)
+                        onWorkoutTerminated(timer, calories)
                         navController.navigate(GymAppScreen.Home.name) {
                             popUpTo("CurrentStatus/$sessionId") { inclusive = true }
                         }
@@ -456,6 +457,8 @@ fun ExerciseWithSetsCard(
     onEditSet: (Set) -> Unit,
     onAddSet: (Int) -> Unit
 ) {
+    val iconRes = IconResourceMapper.getIconResource(exerciseWithSets.exercise.name)
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -472,7 +475,7 @@ fun ExerciseWithSetsCard(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        painter = painterResource(id = R.drawable.weightlifter),
+                        painter = painterResource(id = iconRes),
                         contentDescription = exerciseWithSets.exercise.name,
                         tint = colorScheme.primary,
                         modifier = Modifier

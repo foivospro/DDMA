@@ -8,5 +8,6 @@ data class GymSession(
     val userId: Int, // Foreign key to User
     val date: String, // ISO 8601 format (e.g., "2023-12-31")
     val notes: String?,
-    val duration: Int
+    val duration: Int, // Duration in minutes
+    val caloriesBurned: Int
 )
