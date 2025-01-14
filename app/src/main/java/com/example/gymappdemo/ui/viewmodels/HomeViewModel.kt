@@ -20,6 +20,8 @@ class HomeViewModel(
     private val workoutRepository: WorkoutRepository,
     private val userRepository: UserRepository
 ) : ViewModel() {
+    private val _userId = MutableStateFlow(0)
+    val userId: StateFlow<Int?> = _userId.asStateFlow()
 
 
     private val _isWorkoutActive = MutableStateFlow(false)
@@ -37,19 +39,26 @@ class HomeViewModel(
     val userSessions: StateFlow<List<GymSession>> = _userSessions.asStateFlow()
 
 
-    private val _userId = MutableStateFlow<Int?>(null)
-    val userId: StateFlow<Int?> = _userId.asStateFlow()
-
     init {
+        updateViewModel()
+    }
+    fun updateViewModel() {
         viewModelScope.launch {
             fetchUserData()
-            val activeSession = _userId.value?.let { workoutRepository.getActiveSession(it) }
+            _userId.value = fetchUserId()
+
+            // Πάρε τον userId που μόλις έβαλες στο _userId.value
+            val localUserId = _userId.value
+
+            // Κάλεσε το getActiveSession περνώντας userId
+            val activeSession = workoutRepository.getActiveSession(localUserId)
             if (activeSession != null) {
                 _isWorkoutActive.value = true
                 _currentSessionId.value = activeSession.id
             }
         }
     }
+
 
     private suspend fun fetchUserData() {
 
@@ -67,7 +76,7 @@ class HomeViewModel(
 
 
         _username.value = user?.name ?: "Guest"
-        _userId.value = user?.id
+        _userId.value = user?.id ?:0
 
         // Αν ο χρήστης δεν είναι "Guest", ανακτά τις συνεδρίες του
         if (user != null) {
@@ -78,8 +87,27 @@ class HomeViewModel(
         }
     }
 
+     private suspend fun fetchUserId(): Int {
+        // Χρήση του Dispatcher.IO για λειτουργίες βάσης δεδομένων
+        val email = withContext(Dispatchers.IO) {
+            userRepository.getLoggedInUserEmail()
+        }
+
+        val user = if (email != "Guest") {
+            withContext(Dispatchers.IO) {
+                userRepository.getUserByEmail(email!!)
+            }
+        } else {
+            null
+        }
+
+        // Ενημέρωση της κατάστασης στο κύριο νήμα
+        return  user?.id ?: 0
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     fun startNewWorkout(
+        userId: Int,
         onSessionCreated: (GymSession) -> Unit,
         onError: (String) -> Unit
     ) {
@@ -90,10 +118,6 @@ class HomeViewModel(
                     return@launch
                 }
                 val currentUserId = _userId.value
-                if (currentUserId == null) {
-                    onError("Δεν βρέθηκε χρήστης.")
-                    return@launch
-                }
                 val date = LocalDate.now().toString()
 
                 val newSession = GymSession(
