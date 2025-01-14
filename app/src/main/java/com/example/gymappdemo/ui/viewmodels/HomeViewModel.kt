@@ -125,7 +125,9 @@ class HomeViewModel(
                     userId = currentUserId,
                     date = date,
                     notes = null,
-                    duration = 0
+                    duration = 0,
+                    caloriesBurned = 0
+
                 )
 
                 val sessionId = workoutRepository.insertSession(newSession).toInt()
