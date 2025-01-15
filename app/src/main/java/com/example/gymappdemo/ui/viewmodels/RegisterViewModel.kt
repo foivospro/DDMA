@@ -51,7 +51,7 @@ class RegisterViewModel(private val userRepository: UserRepository) : ViewModel(
         }
 
         // Check if password meets complexity requirements
-        val passwordRegex = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}\$".toRegex()
+        val passwordRegex = "^(?=.*[A-Za-z])(?=.*\\d).{8,}\$".toRegex()
         if (!password.matches(passwordRegex)) {
             if(language == "el") {
                 _errorMessage.value =

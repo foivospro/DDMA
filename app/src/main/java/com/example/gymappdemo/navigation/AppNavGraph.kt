@@ -4,6 +4,7 @@ package com.example.gymappdemo.navigation
 import NewsScreen
 import android.app.Activity
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
@@ -20,7 +21,6 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
@@ -44,10 +44,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.gymappdemo.MyApplication
 import com.example.gymappdemo.R
-import com.example.gymappdemo.data.database.AppDatabase
 import com.example.gymappdemo.data.preferences.ThemePreferences
-import com.example.gymappdemo.data.repositories.UserRepository
-import com.example.gymappdemo.data.repositories.WorkoutRepository
 import com.example.gymappdemo.ui.screens.CurrentStatus
 import com.example.gymappdemo.ui.screens.EditProfileScreen
 import com.example.gymappdemo.ui.screens.ExercisePickerScreen
@@ -74,7 +71,9 @@ enum class GymAppScreen {
     ProfileSettings,
     Login,
     Register,
-    News
+    News,
+    SetReps,
+    CurrentStatus
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -244,74 +243,92 @@ fun AppNavHost(
 fun BottomNavigationBar(navController: NavController) {
     val context = LocalContext.current
 
-    // Menu elements
+    // Explicitly define the routes for bottom navigation
+    val homeRoute = GymAppScreen.Home.name
+    val newsRoute = GymAppScreen.News.name
+    val profileRoute = GymAppScreen.MyProfile.name
+
+    // Create a list of bottom nav items with their routes.
     val items = listOf(
-        NavigationItem(context.getString(R.string.home), Icons.Filled.Home),
-        NavigationItem(context.getString(R.string.news), Icons.Filled.Newspaper),
-        NavigationItem(context.getString(R.string.profile), Icons.Filled.Person)
+        NavigationItem(context.getString(R.string.home), Icons.Filled.Home, homeRoute),
+        NavigationItem(context.getString(R.string.news), Icons.Filled.Newspaper, newsRoute),
+        NavigationItem(context.getString(R.string.profile), Icons.Filled.Person, profileRoute)
     )
 
+    // List of bottom nav routes for quick checking.
+    val bottomNavRoutes = items.map { it.route }
+
+    // Observe the current back stack entry to get the current route.
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
     Column {
-        Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f), thickness = 3.dp)
+        Divider(
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
+            thickness = 3.dp
+        )
 
         NavigationBar(
-        containerColor = MaterialTheme.colorScheme.background,
-        contentColor = MaterialTheme.colorScheme.onSurface,
-        tonalElevation = 8.dp,
-        modifier = Modifier.height(72.dp),
-    ) {
-        items.forEachIndexed { index, item ->
-            NavigationBarItem(
-
-                icon = {
-                    Icon(
-                        imageVector = item.icon,
-                        contentDescription = item.label,
-                        modifier = Modifier.size(32.dp),
+            containerColor = MaterialTheme.colorScheme.background,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            tonalElevation = 8.dp,
+            modifier = Modifier.height(72.dp)
+        ) {
+            items.forEach { item ->
+                // Check if the current route exactly matches this bottom nav route.
+                // This ensures the proper icon size is selected.
+                val isSelected = currentRoute == item.route
+                Log.d("BottomNav", "Current Route: $currentRoute")
+                NavigationBarItem(
+                    icon = {
+                        Icon(
+                            imageVector = item.icon,
+                            contentDescription = item.label,
+                            modifier = Modifier.size(if (isSelected) 40.dp else 32.dp)
+                        )
+                    },
+                    selected = isSelected,
+                    onClick = {
+                        // Check if the currentRoute is not any of the bottom nav routes.
+                        // Here, if you are in a route with parameters (like "CurrentStatus/1")
+                        // then currentRoute.startsWith(...) will return true.
+                        if (currentRoute !in bottomNavRoutes) {
+                            if (currentRoute?.startsWith(GymAppScreen.ExercisePicker.name) == true ||
+                                currentRoute?.startsWith(GymAppScreen.SetReps.name) == true ||
+                                currentRoute?.startsWith(GymAppScreen.CurrentStatus.name) == true
+                            ) {
+                                Log.d("BottomNav", "Navigating from a special screen to ${item.route}")
+                                navController.navigate(item.route) {
+                                    // Pop up to the start destination, without saving state.
+                                    popUpTo(navController.graph.startDestinationId) {
+                                        saveState = false
+                                    }
+                                    launchSingleTop = false
+                                    restoreState = false
+                                }
+                            }
+                        }
+                        else {
+                            navController.navigate(item.route) {
+                                // Pop up to the start destination while saving state.
+                                popUpTo(navController.graph.startDestinationId) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
+                    },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = MaterialTheme.colorScheme.primary,
+                        unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                        selectedTextColor = MaterialTheme.colorScheme.primary,
+                        unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                        indicatorColor = MaterialTheme.colorScheme.background
                     )
-                },
-
-                // Check if the item's label matches the current route
-                selected = currentRoute == GymAppScreen.entries[index].name,
-                onClick = {
-                    when (item.label) {
-                        context.getString(R.string.home) -> navController.navigate(GymAppScreen.Home.name) {
-                            popUpTo(navController.graph.startDestinationId) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                        context.getString(R.string.news) -> navController.navigate(GymAppScreen.News.name) {
-                            popUpTo(navController.graph.startDestinationId) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                        context.getString(R.string.profile) -> navController.navigate(GymAppScreen.MyProfile.name) {
-                            popUpTo(navController.graph.startDestinationId) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    }
-                },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = MaterialTheme.colorScheme.primary,
-                    unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                    selectedTextColor = MaterialTheme.colorScheme.primary,
-                    unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                    indicatorColor = MaterialTheme.colorScheme.background
-
-                ),
-            )
+                )
+            }
         }
-      }
     }
 }
 
@@ -325,4 +342,8 @@ fun SetStatusBarColor() {
         activity?.window?.statusBarColor = backgroundColor.toArgb()
     }
 }
-data class NavigationItem(val label: String, val icon: ImageVector)
+data class NavigationItem(
+    val label: String,
+    val icon: ImageVector,
+    val route: String
+)
