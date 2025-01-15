@@ -189,8 +189,8 @@ fun AppNavHost(
                         sessionId = sessionId,
                         navController = navController,
                         viewModel = currentStatusViewModel,
-                        onWorkoutTerminated = { duration ->
-                            homeViewModel.terminateWorkout(sessionId, duration)
+                        onWorkoutTerminated = { duration, calories ->
+                            homeViewModel.terminateWorkout(sessionId, duration, calories)
                         }
                     )
                 }

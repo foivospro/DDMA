@@ -22,5 +22,9 @@ interface GymSessionDao {
     suspend fun getSessionById(id: Int): GymSession?
 
     @Query("SELECT * FROM gym_sessions WHERE userId = :userId ORDER BY date DESC")
-    suspend fun getSessionsByUser(userId: Int): List<GymSession>
+    suspend fun getSessionsByUserId(userId: Int): List<GymSession>
+
+    // Προσθήκη της συνάρτησης για την ενεργή προπόνηση
+    @Query("SELECT * FROM gym_sessions WHERE userId = :userId AND duration = 0 LIMIT 1")
+    suspend fun getActiveSession(userId: Int): GymSession?
 }

@@ -101,7 +101,9 @@
     <string name="default_profile_picture">Προεπιλεγμένη Εικόνα Προφίλ</string>
     <string name="increase">Αύξηση</string>
     <string name="decrease">Μείωση</string>
+    <string name="calories_label">Θερμίδες: %1$d kcal</string>
     <string name="password_icon">Εικονίδιο Κωδικού</string>
+    <string name="no_workouts_yet">Δεν έχετε ακόμα προπονήσεις. Ξεκινήστε την πρώτη σας προπόνηση!</string>
     <string name="app_logo">Λογότυπο Εφαρμογής</string>
     <string name="create_account">Δημιουργία Λογαριασμού</string>
     <string name="confirm_password">Επιβεβαίωση Κωδικού</string>
@@ -128,4 +130,8 @@
     <string name="choose_app_color">Διάλεξε Χρώμα Εφαρμογής</string>
     <string name="choose_exercise">Επίλεξε Άσκηση</string>
     <string name="no_match">Δεν βρέθηκαν ασκήσεις</string>
+    <string name="workout_label">Workout</string>
+    <string name="date_label">Ημερομηνία: %1$s</string>
+    <string name="duration_label">Διάρκεια: %1$s</string>
+    <string name="workout_icon_description">εικονίδιο για γυμναστική </string>
 </resources>

@@ -21,6 +21,11 @@ class WorkoutRepository private constructor(
 ) {
 
     // GymSession Operations
+
+    suspend fun getSessionsForUser(userId: Int): List<GymSession> {
+        return gymSessionDao.getSessionsByUserId(userId)
+    }
+
     suspend fun getSessionById(sessionId: Int): GymSession? {
         return gymSessionDao.getSessionById(sessionId)
     }
@@ -34,8 +39,8 @@ class WorkoutRepository private constructor(
     }
 
     // SessionExercise Operations
-    suspend fun getActiveSession(): GymSession? {
-        return sessionExerciseDao.getActiveSession()
+    suspend fun getActiveSession(userId: Int): GymSession? {
+        return gymSessionDao.getActiveSession(userId)
     }
 
     suspend fun insertSessionExercise(sessionExercise: SessionExercise): Long {
@@ -59,7 +64,7 @@ class WorkoutRepository private constructor(
     }
 
     // Exercise Operations
-     fun getAllExercises(): Flow<List<Exercise>> {
+    fun getAllExercises(): Flow<List<Exercise>> {
         return exerciseDao.getAllExercises()
     }
 
@@ -85,6 +90,7 @@ class WorkoutRepository private constructor(
     suspend fun updateSet(set: Set) {
         setDao.update(set)
     }
+
     suspend fun insertSet(set: Set) {
         setDao.insert(set)
     }
