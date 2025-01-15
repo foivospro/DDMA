@@ -39,43 +39,46 @@ class HomeViewModel(
     private val _userSessions = MutableStateFlow<List<GymSession>>(emptyList())
     val userSessions: StateFlow<List<GymSession>> = _userSessions.asStateFlow()
 
-    fun logout() {
-        viewModelScope.launch {
-            _username.value = "Guest"
-            _userId.value = 0
-            _isWorkoutActive.value = false
-            _currentSessionId.value = null
-        }
-    }
     init {
         observeLogout()
+        updateViewModel(asGuest = false)
+
     }
     private fun observeLogout() {
         viewModelScope.launch {
             profileViewModel.logoutEvent.collect { isLoggedOut ->
                 if (isLoggedOut) {
-                    logout() // Reset HomeViewModel state
+                    updateViewModel(asGuest = true) // Reset HomeViewModel state
                 }
             }
         }
     }
 
-    init {
-        updateViewModel()
-    }
-    fun updateViewModel() {
+    fun updateViewModel(asGuest: Boolean) {
         viewModelScope.launch {
-            fetchUserData()
-            _userId.value = fetchUserId()
+            if (!asGuest) {
+                fetchUserData()
+                _userId.value = fetchUserId()
 
-            // Πάρε τον userId που μόλις έβαλες στο _userId.value
-            val localUserId = _userId.value
+                // Πάρε τον userId που μόλις έβαλες στο _userId.value
+                val localUserId = _userId.value
 
-            // Κάλεσε το getActiveSession περνώντας userId
-            val activeSession = workoutRepository.getActiveSession(localUserId)
-            if (activeSession != null) {
-                _isWorkoutActive.value = true
-                _currentSessionId.value = activeSession.id
+                // Κάλεσε το getActiveSession περνώντας userId
+                val activeSession = workoutRepository.getActiveSession(localUserId)
+                if (activeSession != null) {
+                    _isWorkoutActive.value = true
+                    _currentSessionId.value = activeSession.id
+                }
+            } else{
+                terminateWorkout(_currentSessionId.value ?: 0, 0, 0)
+                _username.value = "Guest"
+                _userId.value = 1
+                _isWorkoutActive.value = false
+                _currentSessionId.value = null
+                val sessions = withContext(Dispatchers.IO) {
+                    workoutRepository.getSessionsForUser(_userId.value)
+                }
+                _userSessions.value = sessions
             }
         }
     }
@@ -86,8 +89,9 @@ class HomeViewModel(
         val email = withContext(Dispatchers.IO) {
             userRepository.getLoggedInUserEmail()
         }
-
-        val user = if (email != "Guest") {
+        Log.d("HomeViewModel", "Email: $email")
+        val user =
+            if (email != "Guest") {
             withContext(Dispatchers.IO) {
                 userRepository.getUserByEmail(email!!)
             }
@@ -100,12 +104,11 @@ class HomeViewModel(
         _userId.value = user?.id ?:0
 
         // Αν ο χρήστης δεν είναι "Guest", ανακτά τις συνεδρίες του
-        if (user != null) {
             val sessions = withContext(Dispatchers.IO) {
-                workoutRepository.getSessionsForUser(user.id)
+                workoutRepository.getSessionsForUser(_userId.value)
             }
             _userSessions.value = sessions
-        }
+
     }
 
      private suspend fun fetchUserId(): Int {
@@ -123,7 +126,7 @@ class HomeViewModel(
         }
 
         // Ενημέρωση της κατάστασης στο κύριο νήμα
-        return  user?.id ?: 0
+        return  user?.id ?: 1
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -137,7 +140,7 @@ class HomeViewModel(
             try {
                 if (_isWorkoutActive.value) {
                     if (language == "el") {
-                        onError("Έχει ήδη ενεργή προπόνηση.")
+                        onError("Έχεις ήδη ενεργή προπόνηση.")
                     } else {
                         onError("There is already an active workout.")
                     }
@@ -145,7 +148,7 @@ class HomeViewModel(
                 }
                 val currentUserId = _userId.value
                 val date = LocalDate.now().toString()
-
+                Log.d("HomeViewModel", "Current user ID: $currentUserId")
                 val newSession = GymSession(
                     id = 0,
                     userId = currentUserId,

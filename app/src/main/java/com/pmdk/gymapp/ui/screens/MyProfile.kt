@@ -73,7 +73,8 @@ fun UserProfileScreen(
 
 
     // If the user is guest or log in
-    if (user == null) {
+    if (user != null){
+    if (user.id == 1) {
         GuestUserPrompt(navController)
     } else {
         LaunchedEffect(user) {
@@ -310,7 +311,7 @@ fun UserProfileScreen(
             }
         }
     }
-}
+}}
 
 @Composable
 fun UserDetailCard(label: String, value: String) {
@@ -420,7 +421,6 @@ fun GuestUserPrompt(navController: NavController) {
         }
     }
 }
-
 
 
 

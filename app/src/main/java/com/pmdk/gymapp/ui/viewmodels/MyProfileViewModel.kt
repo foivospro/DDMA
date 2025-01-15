@@ -1,11 +1,11 @@
 package com.pmdk.gymapp.ui.viewmodels
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pmdk.gymapp.data.preferences.ThemePreferences
 import com.pmdk.gymapp.data.entities.User
-
 import com.pmdk.gymapp.data.repositories.UserRepository
 import com.pmdk.gymapp.ui.theme.AppThemeType
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,7 +25,21 @@ class MyProfileViewModel(
     private val _isDarkModeEnabled = MutableStateFlow(false)
     val isDarkModeEnabled: StateFlow<Boolean> = _isDarkModeEnabled
 
+    private val _user = MutableStateFlow<User?>(null)
+    val user: StateFlow<User?> = _user
 
+    private val _username = MutableStateFlow("Guest")
+    val username: StateFlow<String> = _username
+
+    private val _profilePictureUri = MutableStateFlow<Uri?>(null)
+    val profilePictureUri: StateFlow<Uri?> = _profilePictureUri
+
+    private val _logoutEvent = MutableStateFlow(false)
+    val logoutEvent: StateFlow<Boolean> = _logoutEvent
+
+    init{
+        updateViewModel()
+    }
 
     fun toggleDarkMode(enabled: Boolean) {
         _isDarkModeEnabled.value = enabled
@@ -50,17 +64,7 @@ class MyProfileViewModel(
         )
     }
 
-    private val _user = MutableStateFlow<User?>(null)
-    val user: StateFlow<User?> = _user
 
-    private val _username = MutableStateFlow("Guest")
-    val username: StateFlow<String> = _username
-
-    private val _profilePictureUri = MutableStateFlow<Uri?>(null)
-    val profilePictureUri: StateFlow<Uri?> = _profilePictureUri
-
-    private val _logoutEvent = MutableStateFlow(false)
-    val logoutEvent: StateFlow<Boolean> = _logoutEvent
 
     fun updateViewModel() {
         viewModelScope.launch {
@@ -71,12 +75,13 @@ class MyProfileViewModel(
 
     private suspend fun fetchLoggedInUser() {
         val email = userRepository.getLoggedInUserEmail()
-
+        Log.d("MyProfileViewModel", "Email: $email")
         val user = if (email != null && email != "Guest") {
             userRepository.getUserByEmail(email)
         } else {
-            null
+            userRepository.getUser(1)
         }
+        Log.d("MyProfileViewModel", "User: $user")
         _user.value = user
         _username.value = user?.name ?: "Guest"
     }

@@ -176,7 +176,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit,
                         val user = loginViewModel.login(email = email, password = password, language = language)
                         if (user!=null) {
                             showSuccessfulLogin = true
-                            homeViewModel.updateViewModel()
+                            homeViewModel.updateViewModel(asGuest = false)
                             myProfileViewModel.updateViewModel()
                             delay(500)
                             navController.navigate(GymAppScreen.Home.name)
@@ -222,7 +222,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit,
             OutlinedButton(
                 onClick = {
                     navController.navigate(GymAppScreen.Home.name)
-                    homeViewModel.updateViewModel()
+                    homeViewModel.updateViewModel(asGuest = true)
                     myProfileViewModel.updateViewModel()
                 },
                 modifier = Modifier

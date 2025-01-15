@@ -162,24 +162,14 @@ abstract class AppDatabase : RoomDatabase() {
                 // Insert Default Users
                 val users = listOf(
                     User(
-                        name = "John Doe",
-                        email = "johndoe@example.com",
-                        passwordHash = "JohnbigDoe12!",
-                        age = 30,
-                        height = 175,
-                        weight = 70,
+                        name = "Guest",
+                        email = "guest@example.com",
+                        passwordHash = "guest123",
+                        age = null,
+                        height = null,
+                        weight = null,
                         profilePicture = null
                     ),
-                    User(
-                        name = "Jane Smith",
-                        email = "janesmith@example.com",
-                        passwordHash = "#TheQueen123",
-                        age = 25,
-                        height = 165,
-                        weight = 60,
-                        profilePicture = null
-
-                    )
                 )
 
                 // Insert users into the database

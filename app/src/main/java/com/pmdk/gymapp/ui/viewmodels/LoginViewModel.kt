@@ -35,7 +35,10 @@ class LoginViewModel(private val userRepository: UserRepository) : ViewModel() {
                 _loginState.value = LoginState.Success(user)
                 user
             } else {
-                _loginState.value = LoginState.Error("Λανθασμένο email ή κωδικός!")
+                if (language == "el")
+                    _loginState.value = LoginState.Error("Λανθασμένο email ή κωδικός!")
+                else
+                    _loginState.value = LoginState.Error("Wrong email or password!")
                 null
             }
         } catch (e: Exception) {

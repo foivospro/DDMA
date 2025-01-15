@@ -249,7 +249,7 @@ fun RegisterScreen(
                                 showSuccessfulRegister = true
                                 delay(1000)
                                 registerViewModel.saveLoggedInUser(email)
-                                homeViewModel.updateViewModel()
+                                homeViewModel.updateViewModel(asGuest = false)
                                 myProfileViewModel.updateViewModel()
                                 navController.navigate(GymAppScreen.Home.name)
                             } else {
