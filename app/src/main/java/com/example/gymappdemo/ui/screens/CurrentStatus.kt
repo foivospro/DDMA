@@ -43,6 +43,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -51,10 +52,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.gymappdemo.navigation.GymAppScreen
 import com.example.gymappdemo.R
 import com.example.gymappdemo.data.entities.ExerciseWithSets
 import com.example.gymappdemo.data.entities.Set
+import com.example.gymappdemo.navigation.GymAppScreen
 import com.example.gymappdemo.ui.viewmodels.CurrentStatusViewModel
 import com.example.gymappdemo.utils.IconResourceMapper
 
@@ -71,7 +72,7 @@ fun CurrentStatus(
     var setToEdit by remember { mutableStateOf<Set?>(null) }
     var setToAdd by remember { mutableStateOf<Int?>(null) }
     val error by viewModel.errorState.collectAsState()
-
+    val context = LocalContext.current
     if (error != null) {
         AlertDialog(
             onDismissRequest = { viewModel.clearError() },
@@ -104,6 +105,7 @@ fun CurrentStatus(
                     sessionExerciseId = setToAdd!!,
                     repetitions = repetitions,
                     weight = weight,
+                    context = context
                 )
                 setToAdd = null
             }
@@ -260,7 +262,7 @@ fun CurrentStatus(
                                         viewModel.removeSetFromExercise(setId)
                                     },
                                     onDeleteExercise = { exerciseId ->
-                                        viewModel.deleteExercise(exerciseId)
+                                        viewModel.deleteExercise(exerciseId, language = context.resources.configuration.locales[0].language)
                                     },
                                     onEditSet = { set ->
                                         setToEdit = set

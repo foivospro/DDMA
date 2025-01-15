@@ -16,14 +16,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -40,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -49,8 +47,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
-import com.example.gymappdemo.navigation.GymAppScreen
 import com.example.gymappdemo.R
+import com.example.gymappdemo.navigation.GymAppScreen
 import com.example.gymappdemo.ui.viewmodels.HomeViewModel
 import com.example.gymappdemo.ui.viewmodels.LoginViewModel
 import com.example.gymappdemo.ui.viewmodels.MyProfileViewModel
@@ -71,7 +69,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit,
     var showError by remember { mutableStateOf(false) }
     var showErrorLogin by remember { mutableStateOf(false) }
     var showSuccessfulLogin by remember { mutableStateOf(false) }
-
+    val language = LocalContext.current.resources.configuration.locales[0].language
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -175,7 +173,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit,
                 onClick = {
 
                     loginViewModel.viewModelScope.launch {
-                        val user = loginViewModel.login(email, password)
+                        val user = loginViewModel.login(email = email, password = password, language = language)
                         if (user!=null) {
                             showSuccessfulLogin = true
                             homeViewModel.updateViewModel()

@@ -361,7 +361,8 @@ fun SearchBarWithExercises(
             active = active,
             onActiveChange = onActiveChange,
             placeholder = { Text(stringResource(id = R.string.search_placeholder)) },
-            leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search icon") },
+            leadingIcon = { Icon(Icons.Default.Search, contentDescription =
+            stringResource(id = R.string.search_icon)) },
             trailingIcon = {
                 if (query.isNotBlank()) {
                     IconButton(
@@ -370,7 +371,7 @@ fun SearchBarWithExercises(
                             onActiveChange(false) // Hide suggestions
                         }
                     ) {
-                        Icon(Icons.Default.Close, contentDescription = "Clear search")
+                        Icon(Icons.Default.Close, contentDescription = stringResource(id = R.string.clear_search))
                     }
                 }
             },

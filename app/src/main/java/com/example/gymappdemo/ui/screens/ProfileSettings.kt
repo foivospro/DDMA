@@ -1,6 +1,7 @@
 package com.example.gymappdemo.ui.screens
 
 
+import android.content.Context
 import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -30,13 +31,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Height
 import androidx.compose.material.icons.filled.Key
 import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material.icons.filled.NightsStay
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Remove
-import androidx.compose.material.icons.filled.Scale
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.filled.WbSunny
@@ -71,6 +70,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -81,10 +81,10 @@ import coil.compose.AsyncImage
 import com.example.gymappdemo.R
 import com.example.gymappdemo.data.entities.User
 import com.example.gymappdemo.ui.theme.AppThemeType
-import com.example.gymappdemo.ui.theme.primaryLight_Orange
 import com.example.gymappdemo.ui.theme.primaryLight_Default
-import com.example.gymappdemo.ui.theme.primaryLight_Yellow
+import com.example.gymappdemo.ui.theme.primaryLight_Orange
 import com.example.gymappdemo.ui.theme.primaryLight_Purple
+import com.example.gymappdemo.ui.theme.primaryLight_Yellow
 import com.example.gymappdemo.ui.viewmodels.MyProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -110,7 +110,6 @@ fun EditProfileScreen(
     var weight by remember { mutableIntStateOf(user?.weight ?: 75) }
     var password by remember { mutableStateOf(user?.passwordHash ?: "") }
     val profilePicture by viewModel.profilePictureUri.collectAsState()
-
 
     // Update local state variables when userState changes
     LaunchedEffect(user) {
@@ -141,10 +140,12 @@ fun EditProfileScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Edit Profile") },
+                title = { stringResource(id = R.string.edit_profile) },
                 navigationIcon = {
                     IconButton(onClick = onBackPressed) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(
+                            id = R.string.back
+                        ))
                     }
                 }
             )
@@ -192,7 +193,7 @@ fun EditProfileScreen(
                 ),
                     shape = RoundedCornerShape(12.dp)
             ) {
-                Text("Save Changes")
+                    Text(stringResource(id = R.string.save_changes))
             }
             }
         }
@@ -232,14 +233,14 @@ fun EditProfileScreen(
                 if (profilePicture != null) {
                     AsyncImage(
                         model = profilePicture,
-                        contentDescription = "Profile Picture",
+                        contentDescription = stringResource(id =R.string.profile_picture),
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
                     )
                 } else {
                     Image(
                         painter = painterResource(R.drawable.default_profile),
-                        contentDescription = "Default Profile Picture",
+                        contentDescription = stringResource(id = R.string.default_profile_picture),
                         modifier = Modifier.fillMaxSize()
                     )
                 }
@@ -248,8 +249,8 @@ fun EditProfileScreen(
             if (showImageOptions) {
                 AlertDialog(
                     onDismissRequest = { showImageOptions = false },
-                    title = { Text("Profile Picture Options") },
-                    text = { Text("What would you like to do?") },
+                    title = { Text(stringResource(id = R.string.profile_picture_options)) },
+                    text = { Text(stringResource(id = R.string.profile_picture_question)) },
                     confirmButton = {
                         TextButton(onClick = {
                             // Logic to pick a new image
@@ -258,7 +259,7 @@ fun EditProfileScreen(
                             )
                             showImageOptions = false
                         }) {
-                            Text("Change Picture")
+                            Text(stringResource(id = R.string.change_picture))
                         }
                     },
                     dismissButton = {
@@ -267,20 +268,20 @@ fun EditProfileScreen(
                             viewModel.changeUri(null)
                             showImageOptions = false
                         }) {
-                            Text("Remove Picture")
+                            Text(stringResource(id = R.string.remove_picture))
                         }
                     }
                 )
             }
             // Editable Fields
             UserProfileField(
-                title = "Username",
+                title = stringResource(id = R.string.username),
                 value =  username,
                 onValueChange = { username = it }
             )
 
             UserProfileField(
-                title = "Email",
+                title = stringResource(id = R.string.email),
                 value = email,
                 onValueChange = { email = it }
             )
@@ -288,11 +289,11 @@ fun EditProfileScreen(
             var passwordVisible by remember { mutableStateOf(false) }
 
             UserProfileField(
-                title = "Password",
+                title = stringResource(id = R.string.password),
                 value = password,
                 onValueChange = {
                     password = it
-                    passwordError = validatePassword(password)
+                    passwordError = validatePassword(password, context = context)
                 },
                 isPassword = true,
                 isPasswordVisible = passwordVisible,
@@ -311,21 +312,21 @@ fun EditProfileScreen(
                 verticalAlignment = Alignment.CenterVertically
             ){
                 StyledNumberPickerField(
-                    label = "Height(cm)",
+                    label = stringResource(id = R.string.height_cm),
                     value = height,
                     onValueChange = { height = it },
                     range = 50..250
                 )
 
                 StyledNumberPickerField(
-                    label = "Weight(kg)",
+                    label = stringResource(id = R.string.weight_kg_2),
                     value = weight,
                     onValueChange = { weight = it },
                     range = 10..200
                 )
 
                 StyledNumberPickerField(
-                    label = "Age",
+                    label = stringResource(id = R.string.age),
                     value = age,
                     onValueChange = { age = it },
                     range = 1..100
@@ -342,7 +343,7 @@ fun EditProfileScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Dark Mode",
+                    text = stringResource(id = R.string.dark_mode),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 18.sp,
@@ -354,7 +355,7 @@ fun EditProfileScreen(
                     // Sun icon for Light Mode
                     Icon(
                         imageVector = Icons.Filled.WbSunny,
-                        contentDescription = "Light Mode",
+                        contentDescription = stringResource(id = R.string.light_mode),
                         tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier
                             .size(24.dp)
@@ -369,7 +370,7 @@ fun EditProfileScreen(
                     // Moon icon
                     Icon(
                         imageVector = Icons.Filled.NightsStay,
-                        contentDescription = "Dark Mode",
+                        contentDescription = stringResource(id = R.string.dark_mode),
                         tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier
                             .size(24.dp)
@@ -425,7 +426,7 @@ fun ThemeCircle(
         if (isSelected) {
             Icon(
                 imageVector = Icons.Filled.Check,
-                contentDescription = "Selected",
+                contentDescription = stringResource(id = R.string.selected),
                 tint = Color.White,
                 modifier = Modifier.size(24.dp)
             )
@@ -484,7 +485,11 @@ fun UserProfileField(
                     IconButton(onClick = { onPasswordToggle() }) {
                         Icon(
                             imageVector = if (isPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                            contentDescription = if (isPasswordVisible) "Hide password" else "Show password"
+                            contentDescription =
+                            if (isPasswordVisible)
+                                stringResource(id = R.string.hide_password)
+                            else
+                                stringResource(id = R.string.show_password)
                         )
                     }
                 }
@@ -524,17 +529,33 @@ fun UserProfileField(
 }
 
 // Validation Function
-fun validatePassword(password: String): String? {
+fun validatePassword(password: String, context: Context): String? {
     val lengthValid = password.length >= 6
     val capitalValid = password.any { it.isUpperCase() }
     val numberValid = password.any { it.isDigit() }
     val symbolValid = password.any { !it.isLetterOrDigit() }
-
+    val language = context.resources.configuration.locales[0].language
     return when {
-        !lengthValid -> "Password must be at least 6 characters long."
-        !capitalValid -> "Password must contain at least one uppercase letter."
-        !numberValid -> "Password must contain at least one number."
-        !symbolValid -> "Password must contain at least one special character."
+        !lengthValid ->
+            if (language == "en")
+                "Password must be at least 6 characters long."
+            else
+                "Ο κωδικός πρέπει να περιέχει τουλάχιστον 6 χαρακτήρες."
+        !capitalValid ->
+            if (language == "en")
+                "Password must contain at least one uppercase letter."
+            else
+                "Ο κωδικός πρέπει να περιέχει τουλάχιστον ένα κεφαλαίο γράμμα."
+        !numberValid ->
+            if (language == "en")
+                "Password must contain at least one number."
+            else
+                "Ο κωδικός πρέπει να περιέχει τουλάχιστον έναν αριθμό."
+        !symbolValid ->
+            if (language == "en")
+                "Password must contain at least one special character."
+            else
+                "Ο κωδικός πρέπει να περιέχει τουλάχιστον έναν ειδικό χαρακτήρα."
         else -> null // No errors
     }
 }
@@ -546,7 +567,7 @@ fun ThemeSelectionSection(
     onThemeSelected: (AppThemeType) -> Unit
 ) {
     Text(
-        text = "Choose App Color",
+        text = stringResource(id = R.string.choose_app_color),
         style = MaterialTheme.typography.labelLarge,
         fontSize = 18.sp,
         fontWeight = FontWeight.Bold
@@ -615,7 +636,7 @@ fun StyledNumberPickerField(
             ) {
                 Icon(
                     Icons.Default.Add,
-                    contentDescription = "Increase",
+                    contentDescription = stringResource(id = R.string.increase),
                     tint = if (value < range.last) MaterialTheme.colorScheme.primary
                     else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                 )
@@ -647,7 +668,7 @@ fun StyledNumberPickerField(
             ) {
                 Icon(
                     Icons.Default.Remove,
-                    contentDescription = "Decrease",
+                    contentDescription = stringResource(id = R.string.decrease),
                     tint = if (value > range.first) MaterialTheme.colorScheme.primary
                     else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                 )

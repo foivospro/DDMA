@@ -109,12 +109,17 @@ class HomeViewModel(
     fun startNewWorkout(
         userId: Int,
         onSessionCreated: (GymSession) -> Unit,
-        onError: (String) -> Unit
+        onError: (String) -> Unit,
+        language: String
     ) {
         viewModelScope.launch {
             try {
                 if (_isWorkoutActive.value) {
-                    onError("Έχει ήδη ενεργή προπόνηση.")
+                    if (language == "el") {
+                        onError("Έχει ήδη ενεργή προπόνηση.")
+                    } else {
+                        onError("There is already an active workout.")
+                    }
                     return@launch
                 }
                 val currentUserId = _userId.value
@@ -140,10 +145,18 @@ class HomeViewModel(
 
                     _userSessions.value = listOf(createdSession) + _userSessions.value
                 } else {
-                    onError("Αποτυχία ανάκτησης προπόνησης με ID: $sessionId")
+                    if (language == "el") {
+                        onError("Αποτυχία ανάκτησης προπόνησης με ID: $sessionId")
+                    } else {
+                        onError("Failed to retrieve workout with ID: $sessionId")
+                    }
                 }
             } catch (e: Exception) {
-                onError("Σφάλμα κατά την έναρξη προπόνησης: ${e.message}")
+                if (language == "el") {
+                    onError("Σφάλμα κατά την έναρξη προπόνησης: ${e.message}")
+                } else {
+                    onError("Error starting workout: ${e.message}")
+                }
             }
         }
     }

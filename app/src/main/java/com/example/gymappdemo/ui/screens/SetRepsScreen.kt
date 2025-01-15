@@ -43,9 +43,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -134,13 +134,13 @@ fun SetRepsScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "Πίσω",
+                        contentDescription = stringResource(R.string.back),
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Ρύθμιση Άσκησης",
+                    text = stringResource(id = R.string.exercise_settings),
                     style = MaterialTheme.typography.headlineMedium.copy(
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
@@ -165,10 +165,10 @@ fun SetRepsScreen(
             )
             if (exerciseIcon.isNotEmpty()) {
                 val resourceId = getIconResource(exerciseIcon)
-
+                val imageText = stringResource(id = R.string.image)
                 Image(
                     painter = painterResource(id = resourceId),
-                    contentDescription = "$exerciseName Εικόνα",
+                    contentDescription = "$exerciseName $imageText",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .size(90.dp)
@@ -184,7 +184,7 @@ fun SetRepsScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "Δεν υπάρχει εικόνα διαθέσιμη",
+                        text = stringResource(id =R.string.no_image),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center
