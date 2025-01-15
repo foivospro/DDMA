@@ -64,7 +64,6 @@ fun SetRepsScreen(
     sessionId: Int,
     setRepsViewModel: SetRepsViewModel,
     navController: NavController,
-    onSaveClicked: () -> Unit
 ) {
     val workoutSets by setRepsViewModel.temporarySets.collectAsState(initial = emptyList())
     val exerciseName by setRepsViewModel.exerciseName.collectAsState()

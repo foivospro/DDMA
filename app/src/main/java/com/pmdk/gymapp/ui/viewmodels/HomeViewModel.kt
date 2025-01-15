@@ -131,7 +131,6 @@ class HomeViewModel(
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun startNewWorkout(
-        userId: Int,
         onSessionCreated: (GymSession) -> Unit,
         onError: (String) -> Unit,
         language: String

@@ -19,8 +19,4 @@ class ThemePreferences(context: Context) {
     fun saveDarkModeEnabled(enabled: Boolean) {
         sharedPreferences.edit().putBoolean("IS_DARK_MODE", enabled).apply()
     }
-
-    fun getDarkModeEnabled(): Boolean {
-        return sharedPreferences.getBoolean("IS_DARK_MODE", false)
-    }
 }

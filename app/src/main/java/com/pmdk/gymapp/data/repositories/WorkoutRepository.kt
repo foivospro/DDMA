@@ -59,9 +59,6 @@ class WorkoutRepository private constructor(
         sessionExerciseDao.deleteSessionExercise(sessionExerciseId)
     }
 
-    suspend fun getSetsBySessionExerciseId(sessionExerciseId: Int): List<Set> {
-        return setDao.getSetsBySessionExerciseId(sessionExerciseId)
-    }
 
     // Exercise Operations
     fun getAllExercises(): Flow<List<Exercise>> {

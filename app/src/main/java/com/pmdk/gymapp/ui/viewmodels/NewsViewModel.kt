@@ -55,7 +55,6 @@ fun getDates(): String {
 
     // Format the dates as "yyyy-MM-dd"
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-    val todayFormatted = today.format(formatter)
     val fromDateFormatted = fromDate.format(formatter)
 
     return fromDateFormatted

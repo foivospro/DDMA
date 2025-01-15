@@ -52,9 +52,6 @@ class LoginViewModel(private val userRepository: UserRepository) : ViewModel() {
         userRepository.saveLoggedInUserEmail(email)
     }
 
-    private fun clearLoggedInUser() {
-        userRepository.clearLoggedInUser()
-    }
 }
 
 // State class to represent login status

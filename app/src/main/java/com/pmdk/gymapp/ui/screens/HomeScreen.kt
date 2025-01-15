@@ -73,7 +73,6 @@ fun HomeScreen(
                 onStartNewWorkout = { userIdValue ->
                     // Κλήση της συνάρτησης περνώντας userId και onError
                     viewModel.startNewWorkout(
-                        userId = userIdValue,
                         onSessionCreated = { session ->
                             currentStatusViewModel.setSessionId(session.id)
                             navController.navigate("CurrentStatus/${session.id}")

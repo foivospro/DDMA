@@ -77,8 +77,6 @@ fun ExercisePickerScreen(
     viewModel: ExercisePickerViewModel = viewModel(),
     navController: NavController,
     sessionId: Int,
-    contentPadding: PaddingValues = PaddingValues(0.dp),
-    modifier: Modifier = Modifier
 ) {
     // Create a SnackbarHostState
     val snackbarHostState = remember { SnackbarHostState() }

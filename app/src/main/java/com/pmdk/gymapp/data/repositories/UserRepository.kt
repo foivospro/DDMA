@@ -12,10 +12,6 @@ class UserRepository(private val userDao: UserDao, private val context: Context)
         context.getSharedPreferences("user_preferences", Context.MODE_PRIVATE)
     }
 
-    suspend fun insertUser(user: User): Long {
-        return userDao.insertUser(user)
-    }
-
     suspend fun getUser(userId: Int): User? {
         return userDao.getUserById(userId)
     }
@@ -45,22 +41,9 @@ class UserRepository(private val userDao: UserDao, private val context: Context)
         userDao.update(user)
     }
 
-    suspend fun getUserProfilePicture(userId: Int): Uri? {
-        val user = userDao.getUserById(userId)
-        return user?.profilePicture
-    }
-
     // Save the logged-in user's email to preferences
     fun saveLoggedInUserEmail(email: String) {
         sharedPreferences.edit().putString("logged_in_user_email", email).apply()
-    }
-
-    // Retrieve the logged-in user's ID from preferences
-    suspend fun getLoggedInUserId(): Int? {
-        val email = getLoggedInUserEmail()
-        return email?.let {
-            userDao.getUserByEmail(it)?.id
-        }
     }
 
     suspend fun getUserProfilePictureUri(userId: Int): Uri? {
@@ -69,15 +52,9 @@ class UserRepository(private val userDao: UserDao, private val context: Context)
         return user?.profilePicture // Assuming you have the URI field in the User entity
     }
 
-
     // Retrieve the logged-in user's email from preferences
     fun getLoggedInUserEmail(): String? {
         return sharedPreferences.getString("logged_in_user_email", "Guest")
-    }
-
-    // Check if a user is logged in
-    fun isUserLoggedIn(): Boolean {
-        return getLoggedInUserEmail() != null
     }
 
     // Clear logged-in user preferences (e.g., on logout)

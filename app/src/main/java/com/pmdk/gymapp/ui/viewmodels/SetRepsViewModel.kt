@@ -13,31 +13,17 @@ import com.pmdk.gymapp.data.entities.Set
 
 
 class SetRepsViewModel(private val repository: WorkoutRepository) : ViewModel() {
-    private val _sets = MutableStateFlow<List<Set>>(emptyList())
-    val sets: StateFlow<List<Set>> = _sets
 
     private val _temporarySets = MutableStateFlow<List<Set>>(emptyList())
     val temporarySets: StateFlow<List<Set>> = _temporarySets
 
-    private val _exerciseName = MutableStateFlow<String>("Άσκηση")
+    private val _exerciseName = MutableStateFlow("Άσκηση")
     val exerciseName: StateFlow<String> = _exerciseName
 
-    private val _exerciseImageUrl = MutableStateFlow<String>("")
+    private val _exerciseImageUrl = MutableStateFlow("")
     val exerciseImageUrl: StateFlow<String> = _exerciseImageUrl
 
     val snackbarHostState = SnackbarHostState()
-
-    fun loadSets(sessionExerciseId: Int) {
-        viewModelScope.launch {
-            try {
-                val sets = repository.getSetsForExercise(sessionExerciseId)
-                _temporarySets.value = sets
-            } catch (e: Exception) {
-                Log.e("SetRepsViewModel", "Error loading sets: ${e.message}")
-                snackbarHostState.showSnackbar("Error loading sets: ${e.message}")
-            }
-        }
-    }
 
     fun loadExerciseDetails(exerciseId: Int) {
         viewModelScope.launch {

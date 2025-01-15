@@ -172,8 +172,7 @@ fun AppNavHost(
                             exerciseId = exerciseId,
                             sessionId = sessionId,
                             setRepsViewModel = setRepsViewModel,
-                            navController = navController,
-                            onSaveClicked = { navController.navigateUp() }
+                            navController = navController
                         )
                     }
                 }

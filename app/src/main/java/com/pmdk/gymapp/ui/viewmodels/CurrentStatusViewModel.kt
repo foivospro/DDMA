@@ -19,7 +19,6 @@ class CurrentStatusViewModel(
 ) : ViewModel() {
 
     private val _currentSessionId = MutableStateFlow<Int?>(null)
-    val currentSessionId: StateFlow<Int?> = _currentSessionId.asStateFlow()
 
     private val _currentExercises = MutableStateFlow<List<ExerciseWithSets>>(emptyList())
     val currentExercises: StateFlow<List<ExerciseWithSets>> = _currentExercises.asStateFlow()
@@ -34,7 +33,6 @@ class CurrentStatusViewModel(
     private var timerJob: Job? = null
 
     private val _isWorkoutActive = MutableStateFlow(false)
-    val isWorkoutActive: StateFlow<Boolean> = _isWorkoutActive.asStateFlow()
 
     private val _errorState = MutableStateFlow<String?>(null)
     val errorState: StateFlow<String?> = _errorState.asStateFlow()
@@ -108,7 +106,6 @@ class CurrentStatusViewModel(
     fun removeSetFromExercise(setId: Int) {
         viewModelScope.launch {
             try {
-                val sessionExerciseId = workoutRepository.getSessionExerciseIdBySetId(setId)
                 workoutRepository.deleteSet(setId)
                 _currentExercises.value = workoutRepository.getExercisesWithSets(_currentSessionId.value!!)
             } catch (e: Exception) {
