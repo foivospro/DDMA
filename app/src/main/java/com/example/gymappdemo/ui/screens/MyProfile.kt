@@ -138,16 +138,7 @@ fun UserProfileScreen(
                         modifier = Modifier.fillMaxWidth(),
                     )
 
-                    IconButton(
-                        onClick = { navController.popBackStack() },
-                        modifier = Modifier.align(Alignment.CenterStart)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = stringResource(id =R.string.back),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
+
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ExitToApp,
                         contentDescription = stringResource(id =R.string.profile),

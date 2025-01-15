@@ -140,7 +140,13 @@ fun EditProfileScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { stringResource(id = R.string.edit_profile) },
+                title = {
+                    Text(
+                        text = stringResource(id = R.string.edit_profile),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                },
+
                 navigationIcon = {
                     IconButton(onClick = onBackPressed) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(
@@ -154,7 +160,7 @@ fun EditProfileScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp),
+                    .padding(bottom = 16.dp),
                 contentAlignment = Alignment.Center
             ) {
 

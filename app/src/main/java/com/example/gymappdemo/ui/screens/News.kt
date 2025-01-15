@@ -93,16 +93,6 @@ fun ResultScreen(news: List<Article>,navController: NavController, modifier: Mod
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth(),
                 )
-                IconButton(
-                    onClick = { navController.popBackStack() },
-                    modifier = Modifier.align(Alignment.CenterStart)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = stringResource(id = R.string.back),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
             }
         }
         // News items
