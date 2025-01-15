@@ -1,8 +1,22 @@
 package com.example.gymappdemo.data.entities
 import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "gym_sessions")
+@Entity(
+    tableName = "gym_sessions",
+    foreignKeys = [
+        ForeignKey(
+            entity = User::class,
+            parentColumns = ["id"],
+            childColumns = ["userId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ],
+    indices = [Index(value = ["userId"])]
+)
+
 data class GymSession(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val userId: Int, // Foreign key to User
