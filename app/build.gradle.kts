@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.gymappdemo"
+    namespace = "com.pmdk.gymapp"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.gymappdemo"
+        applicationId = "com.pmdk.gymapp"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
