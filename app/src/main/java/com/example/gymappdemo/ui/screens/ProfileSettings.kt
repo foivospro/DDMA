@@ -137,7 +137,7 @@ fun EditProfileScreen(
             localDarkMode != currentDarkMode
 
 
-
+    var passwordError by remember { mutableStateOf<String?>(null) }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -148,13 +148,60 @@ fun EditProfileScreen(
                     }
                 }
             )
+        },
+        bottomBar = {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                contentAlignment = Alignment.Center
+            ) {
+
+                Button(
+                onClick = {
+                    profilePicture?.let {
+                        context.contentResolver.takePersistableUriPermission(
+                            it,
+                            Intent.FLAG_GRANT_READ_URI_PERMISSION
+                        )
+                    }
+
+                    val updatedUser = User(
+                        id = user?.id ?: 0,
+                        name = username,
+                        email = email,
+                        age = age,
+                        height = height,
+                        weight = weight,
+                        passwordHash = password,
+                        profilePicture = profilePicture
+                    )
+                    viewModel.updateUser(updatedUser)
+                    viewModel.updateTheme(localAccentColor)
+                    viewModel.toggleDarkMode(localDarkMode)
+                    viewModel.saveThemeChanges()
+                    onBackPressed()
+                },
+                modifier = Modifier
+                    .fillMaxWidth(0.95f)
+                    .height(45.dp),
+                enabled = hasChanges && passwordError == null,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ),
+                    shape = RoundedCornerShape(12.dp)
+            ) {
+                Text("Save Changes")
+            }
+            }
         }
     ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(16.dp)
+                .padding(6.dp)
                 .verticalScroll(rememberScrollState())
         ) {
 
@@ -173,7 +220,7 @@ fun EditProfileScreen(
 
             Box(
                 modifier = Modifier
-                    .size(120.dp)
+                    .size(80.dp)
                     .align(Alignment.CenterHorizontally)
                     .clip(CircleShape)
                     .border(2.dp, MaterialTheme.colorScheme.secondary, CircleShape)
@@ -225,7 +272,6 @@ fun EditProfileScreen(
                     }
                 )
             }
-            Spacer(modifier = Modifier.height(12.dp))
             // Editable Fields
             UserProfileField(
                 title = "Username",
@@ -239,7 +285,6 @@ fun EditProfileScreen(
                 onValueChange = { email = it }
             )
 
-            var passwordError by remember { mutableStateOf<String?>(null) }
             var passwordVisible by remember { mutableStateOf(false) }
 
             UserProfileField(
@@ -255,7 +300,7 @@ fun EditProfileScreen(
                 errorMessage = passwordError
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(3.dp))
 
             // Row for Age, Height, Weight fields
             Row (
@@ -287,7 +332,7 @@ fun EditProfileScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(4.dp))
 
             // Dark Mode Switch
             // Row with the icons
@@ -335,7 +380,7 @@ fun EditProfileScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(7.dp))
 
             // Theme Selection Section
             ThemeSelectionSection(
@@ -345,45 +390,6 @@ fun EditProfileScreen(
                     localAccentColor = chosen
                 }
             )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(
-                onClick = {
-                    profilePicture?.let {
-                        context.contentResolver.takePersistableUriPermission(
-                            it,
-                            Intent.FLAG_GRANT_READ_URI_PERMISSION
-                        )
-                    }
-
-                    val updatedUser = User(
-                        id = user?.id ?: 0,
-                        name = username,
-                        email = email,
-                        age = age,
-                        height = height,
-                        weight = weight,
-                        passwordHash = password,
-                        profilePicture = profilePicture
-                    )
-                    viewModel.updateUser(updatedUser)
-                    viewModel.updateTheme(localAccentColor)
-                    viewModel.toggleDarkMode(localDarkMode)
-                    viewModel.saveThemeChanges()
-                    onBackPressed()
-                },
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(top = 16.dp),
-                enabled = hasChanges && passwordError == null,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                ),
-            ) {
-                Text("Save Changes")
-            }
         }
     }
 }
@@ -443,7 +449,7 @@ fun UserProfileField(
 
     Column(modifier = Modifier
         .fillMaxWidth()
-        .padding(8.dp)
+        .padding(6.dp)
     ) {
         Text(
             text = title,
@@ -546,7 +552,7 @@ fun ThemeSelectionSection(
         fontWeight = FontWeight.Bold
     )
 
-    Spacer(modifier = Modifier.height(8.dp))
+
 
     LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
         items(
