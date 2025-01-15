@@ -59,6 +59,9 @@ class MyProfileViewModel(
     private val _profilePictureUri = MutableStateFlow<Uri?>(null)
     val profilePictureUri: StateFlow<Uri?> = _profilePictureUri
 
+    private val _logoutEvent = MutableStateFlow(false)
+    val logoutEvent: StateFlow<Boolean> = _logoutEvent
+
     fun updateViewModel() {
         viewModelScope.launch {
             fetchLoggedInUser()
@@ -91,6 +94,7 @@ class MyProfileViewModel(
             _user.value = null
             _username.value = "Guest"
             _profilePictureUri.value = null
+            _logoutEvent.value = true
         }
     }
 

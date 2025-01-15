@@ -94,8 +94,10 @@ fun UserProfileScreen(
                         onClick = {
                             // Handle logout logic (clear session, user data, etc.)
                             // Navigate to login screen
-                            navController.navigate("login") // Change to your login screen route
                             viewModel.logout()
+                            navController.navigate("login") {
+                                popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                            }
                             showLogoutDialog = false // Close the dialog
                         }
                     ) {

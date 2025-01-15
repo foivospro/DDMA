@@ -82,7 +82,7 @@ class UserRepository(private val userDao: UserDao, private val context: Context)
 
     // Clear logged-in user preferences (e.g., on logout)
     fun clearLoggedInUser() {
-        sharedPreferences.edit().remove("logged_in_user_email").apply()
+        sharedPreferences.edit().clear().apply()
     }
 
     companion object {

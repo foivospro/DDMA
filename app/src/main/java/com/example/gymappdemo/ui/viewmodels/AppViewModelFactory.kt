@@ -30,7 +30,8 @@ class AppViewModelFactory(
             }
 
             modelClass.isAssignableFrom(HomeViewModel::class.java) -> {
-                HomeViewModel(workoutRepository, userRepository) as T
+                val profileViewModel = MyProfileViewModel(userRepository, themePreferences)
+                HomeViewModel(workoutRepository, userRepository, profileViewModel) as T
             }
 
             modelClass.isAssignableFrom(SetRepsViewModel::class.java) -> {

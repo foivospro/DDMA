@@ -18,7 +18,8 @@ import java.time.LocalDate
 
 class HomeViewModel(
     private val workoutRepository: WorkoutRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val profileViewModel: MyProfileViewModel
 ) : ViewModel() {
     private val _userId = MutableStateFlow(0)
     val userId: StateFlow<Int?> = _userId.asStateFlow()
@@ -38,6 +39,26 @@ class HomeViewModel(
     private val _userSessions = MutableStateFlow<List<GymSession>>(emptyList())
     val userSessions: StateFlow<List<GymSession>> = _userSessions.asStateFlow()
 
+    fun logout() {
+        viewModelScope.launch {
+            _username.value = "Guest"
+            _userId.value = 0
+            _isWorkoutActive.value = false
+            _currentSessionId.value = null
+        }
+    }
+    init {
+        observeLogout()
+    }
+    private fun observeLogout() {
+        viewModelScope.launch {
+            profileViewModel.logoutEvent.collect { isLoggedOut ->
+                if (isLoggedOut) {
+                    logout() // Reset HomeViewModel state
+                }
+            }
+        }
+    }
 
     init {
         updateViewModel()

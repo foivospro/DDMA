@@ -222,6 +222,8 @@ fun LoginScreen(onLoginSuccess: () -> Unit,
             OutlinedButton(
                 onClick = {
                     navController.navigate(GymAppScreen.Home.name)
+                    homeViewModel.updateViewModel()
+                    myProfileViewModel.updateViewModel()
                 },
                 modifier = Modifier
                     .fillMaxWidth()
