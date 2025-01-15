@@ -275,6 +275,8 @@ fun BottomNavigationBar(navController: NavController) {
             modifier = Modifier.height(72.dp)
         ) {
             items.forEach { item ->
+                // Check if the current route exactly matches this bottom nav route.
+                // This ensures the proper icon size is selected.
                 val isSelected = currentRoute == item.route
                 Log.d("BottomNav", "Current Route: $currentRoute")
                 NavigationBarItem(
@@ -287,27 +289,33 @@ fun BottomNavigationBar(navController: NavController) {
                     },
                     selected = isSelected,
                     onClick = {
-                        if (currentRoute !in bottomNavRoutes || currentRoute != item.route) {
-                            if (currentRoute==GymAppScreen.ExercisePicker.name || currentRoute==GymAppScreen.SetReps.name || currentRoute==GymAppScreen.CurrentStatus.name){
+                        // Check if the currentRoute is not any of the bottom nav routes.
+                        // Here, if you are in a route with parameters (like "CurrentStatus/1")
+                        // then currentRoute.startsWith(...) will return true.
+                        if (currentRoute !in bottomNavRoutes) {
+                            if (currentRoute?.startsWith(GymAppScreen.ExercisePicker.name) == true ||
+                                currentRoute?.startsWith(GymAppScreen.SetReps.name) == true ||
+                                currentRoute?.startsWith(GymAppScreen.CurrentStatus.name) == true
+                            ) {
+                                Log.d("BottomNav", "Navigating from a special screen to ${item.route}")
                                 navController.navigate(item.route) {
-                                    // If currentRoute is not a bottom nav route then popUpTo the start destination
-                                    // so that the pressed bottom nav item appears in front.
+                                    // Pop up to the start destination, without saving state.
                                     popUpTo(navController.graph.startDestinationId) {
                                         saveState = false
                                     }
                                     launchSingleTop = false
                                     restoreState = false
                                 }
-                            } else{
-                                navController.navigate(item.route) {
-                                    // If currentRoute is not a bottom nav route then popUpTo the start destination
-                                    // so that the pressed bottom nav item appears in front.
-                                    popUpTo(navController.graph.startDestinationId) {
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                    restoreState = true
+                            }
+                        }
+                        else {
+                            navController.navigate(item.route) {
+                                // Pop up to the start destination while saving state.
+                                popUpTo(navController.graph.startDestinationId) {
+                                    saveState = true
                                 }
+                                launchSingleTop = true
+                                restoreState = true
                             }
                         }
                     },
@@ -323,9 +331,6 @@ fun BottomNavigationBar(navController: NavController) {
         }
     }
 }
-
-
-
 
 
 @Composable
