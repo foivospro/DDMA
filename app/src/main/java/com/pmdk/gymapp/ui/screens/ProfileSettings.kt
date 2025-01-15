@@ -536,10 +536,9 @@ fun UserProfileField(
 
 // Validation Function
 fun validatePassword(password: String, context: Context): String? {
-    val lengthValid = password.length >= 6
-    val capitalValid = password.any { it.isUpperCase() }
+    val lengthValid = password.length >= 8
     val numberValid = password.any { it.isDigit() }
-    val symbolValid = password.any { !it.isLetterOrDigit() }
+    val digitValid = password.any { it.isDigit() }
     val language = context.resources.configuration.locales[0].language
     return when {
         !lengthValid ->
@@ -547,21 +546,16 @@ fun validatePassword(password: String, context: Context): String? {
                 "Password must be at least 6 characters long."
             else
                 "Ο κωδικός πρέπει να περιέχει τουλάχιστον 6 χαρακτήρες."
-        !capitalValid ->
-            if (language == "en")
-                "Password must contain at least one uppercase letter."
-            else
-                "Ο κωδικός πρέπει να περιέχει τουλάχιστον ένα κεφαλαίο γράμμα."
         !numberValid ->
             if (language == "en")
                 "Password must contain at least one number."
             else
                 "Ο κωδικός πρέπει να περιέχει τουλάχιστον έναν αριθμό."
-        !symbolValid ->
+        !digitValid ->
             if (language == "en")
-                "Password must contain at least one special character."
+                "Password must contain at least one digit."
             else
-                "Ο κωδικός πρέπει να περιέχει τουλάχιστον έναν ειδικό χαρακτήρα."
+                "Ο κωδικός πρέπει να περιέχει τουλάχιστον ένα αριθμητικό ψηφίο."
         else -> null // No errors
     }
 }
