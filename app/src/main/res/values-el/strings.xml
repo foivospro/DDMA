@@ -134,4 +134,9 @@
     <string name="date_label">Ημερομηνία: %1$s</string>
     <string name="duration_label">Διάρκεια: %1$s</string>
     <string name="workout_icon_description">εικονίδιο για γυμναστική </string>
+    <string name="search_icon">Εικονίδιο αναζήτησης</string>
+    <string name="clear_search">Καθαρισμός αναζήτησης</string>
+    <string name="selected"> Επιλέχθηκε </string>
+    <string name="image">Εικόνα</string>
+    <string name="no_image">Δεν υπάρχει εικόνα διαθέσιμη</string>
 </resources>

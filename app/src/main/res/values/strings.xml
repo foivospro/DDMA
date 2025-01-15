@@ -137,4 +137,9 @@
     <string name="date_label">Date: %1$s</string>
     <string name="duration_label">Duration: %1$s</string>
     <string name="workout_icon_description">Icon for the workout session</string>
+    <string name="search_icon">Search icon</string>
+    <string name="clear_search">Clear Search</string>
+    <string name="selected"> Selected </string>
+    <string name="image">Image</string>
+    <string name="no_image">No image available</string>
 </resources>

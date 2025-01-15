@@ -39,7 +39,7 @@ class NewsViewModel(private val service: NewsApiService) : ViewModel() {
                 )
                 NewsUiState.Success(response.articles)
             } catch (e: Exception) {
-                NewsUiState.Error(e.message ?: "An unexpected error occurred!")
+                    NewsUiState.Error(e.message ?: "An unexpected error occurred!")
             }
         }
     }

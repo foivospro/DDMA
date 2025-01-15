@@ -4,7 +4,6 @@ package com.example.gymappdemo.navigation
 import NewsScreen
 import android.app.Activity
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
@@ -278,7 +277,6 @@ fun BottomNavigationBar(navController: NavController) {
                 // Check if the current route exactly matches this bottom nav route.
                 // This ensures the proper icon size is selected.
                 val isSelected = currentRoute == item.route
-                Log.d("BottomNav", "Current Route: $currentRoute")
                 NavigationBarItem(
                     icon = {
                         Icon(
@@ -289,15 +287,11 @@ fun BottomNavigationBar(navController: NavController) {
                     },
                     selected = isSelected,
                     onClick = {
-                        // Check if the currentRoute is not any of the bottom nav routes.
-                        // Here, if you are in a route with parameters (like "CurrentStatus/1")
-                        // then currentRoute.startsWith(...) will return true.
                         if (currentRoute !in bottomNavRoutes) {
                             if (currentRoute?.startsWith(GymAppScreen.ExercisePicker.name) == true ||
                                 currentRoute?.startsWith(GymAppScreen.SetReps.name) == true ||
                                 currentRoute?.startsWith(GymAppScreen.CurrentStatus.name) == true
                             ) {
-                                Log.d("BottomNav", "Navigating from a special screen to ${item.route}")
                                 navController.navigate(item.route) {
                                     // Pop up to the start destination, without saving state.
                                     popUpTo(navController.graph.startDestinationId) {

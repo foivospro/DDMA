@@ -15,9 +15,12 @@ class LoginViewModel(private val userRepository: UserRepository) : ViewModel() {
     val loginState: StateFlow<LoginState> get() = _loginState
 
     // Login function
-    suspend fun login(email: String, password: String): User? {
+    suspend fun login(email: String, password: String, language: String): User? {
         if (email.isBlank() || password.isBlank()) {
-            _loginState.value = LoginState.Error("Το email και ο κωδικός δεν πρέπει να είναι κενά!")
+            if (language == "el")
+                _loginState.value = LoginState.Error("Το email και ο κωδικός δεν πρέπει να είναι κενά!")
+            else
+                _loginState.value = LoginState.Error("Email and password must not be empty!")
             return null
         }
 

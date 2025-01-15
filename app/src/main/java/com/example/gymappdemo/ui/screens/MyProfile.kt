@@ -30,7 +30,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -59,8 +58,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.example.gymappdemo.navigation.GymAppScreen
 import com.example.gymappdemo.R
+import com.example.gymappdemo.navigation.GymAppScreen
 import com.example.gymappdemo.ui.viewmodels.MyProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -128,7 +127,7 @@ fun UserProfileScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "Προφίλ",
+                        text = stringResource(id =R.string.profile),
                         style = MaterialTheme.typography.headlineMedium.copy(
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary
@@ -143,13 +142,13 @@ fun UserProfileScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Πίσω",
+                            contentDescription = stringResource(id =R.string.back),
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ExitToApp,
-                        contentDescription = "Profile",
+                        contentDescription = stringResource(id =R.string.profile),
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier
                             .size(40.dp)
@@ -177,7 +176,7 @@ fun UserProfileScreen(
                         // Χρήση AsyncImage όταν το profilePictureUri είναι διαθέσιμο και υπάρχει user.profilePicture
                         AsyncImage(
                             model = profilePictureUri, // Pass the URI or URL here
-                            contentDescription = "Profile Picture",
+                            contentDescription = stringResource(id = R.string.profile_picture),
                             modifier = imageModifier,
                             contentScale = ContentScale.Crop
                         )
@@ -185,7 +184,7 @@ fun UserProfileScreen(
                         // Χρήση Image με painterResource για την προεπιλεγμένη εικόνα
                         Image(
                             painter = painterResource(com.example.gymappdemo.R.drawable.default_profile),
-                            contentDescription = "Default Profile Picture",
+                            contentDescription = stringResource(id = R.string.default_profile_picture),
                             modifier = imageModifier,
                             contentScale = ContentScale.Crop
                         )

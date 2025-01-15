@@ -1,9 +1,11 @@
 package com.example.gymappdemo.ui.viewmodels
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gymappdemo.data.entities.ExerciseWithSets
+import com.example.gymappdemo.data.entities.Set
 import com.example.gymappdemo.data.repositories.WorkoutRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -11,10 +13,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import com.example.gymappdemo.data.entities.Set
 
 class CurrentStatusViewModel(
-    private val workoutRepository: WorkoutRepository
+    private val workoutRepository: WorkoutRepository,
 ) : ViewModel() {
 
     private val _currentSessionId = MutableStateFlow<Int?>(null)
@@ -77,10 +78,10 @@ class CurrentStatusViewModel(
     fun setSessionId(sessionId: Int) {
         _currentSessionId.value = sessionId
         loadExercises(sessionId)
-        Log.d("CurrentViewModel", "SessionId updated to: $sessionId")
     }
 
-    fun addSetToExercise(sessionExerciseId: Int, repetitions: Int, weight: Double) {
+    fun addSetToExercise(sessionExerciseId: Int, repetitions: Int, weight: Double, context: Context) {
+        val language = context.resources.configuration.locales[0].language
         viewModelScope.launch {
             try {
                 val newSet = Set(
@@ -91,13 +92,15 @@ class CurrentStatusViewModel(
                     notes = ""
                 )
                 workoutRepository.insertSet(newSet)
-                Log.d("CurrentStatusViewModel", "Set added successfully to exercise $sessionExerciseId")
 
                 // Ενημέρωση της λίστας ασκήσεων
                 loadExercises(_currentSessionId.value!!)
             } catch (e: Exception) {
-                Log.e("CurrentStatusViewModel", "Error adding set: ${e.message}")
-                _errorState.value = "Failed to add set: ${e.message}"
+                if (language == "el") {
+                    _errorState.value = "Αποτυχία προσθήκης set: ${e.message}"
+                } else
+                    _errorState.value = "Failed to add set: ${e.message}"
+
             }
         }
     }
@@ -115,7 +118,7 @@ class CurrentStatusViewModel(
         }
     }
 
-    fun deleteExercise(sessionExerciseId: Int) {
+    fun deleteExercise(sessionExerciseId: Int, language: String) {
         viewModelScope.launch {
             try {
                 // Διαγραφή όλων των sets που σχετίζονται με την άσκηση
@@ -130,7 +133,10 @@ class CurrentStatusViewModel(
                 loadExercises(_currentSessionId.value!!)
             } catch (e: Exception) {
                 Log.e("CurrentStatusViewModel", "Error deleting exercise: ${e.message}")
-                _errorState.value = "Failed to delete exercise: ${e.message}"
+                if (language == "el") {
+                    _errorState.value = "Αποτυχία διαγραφής άσκησης: ${e.message}"
+                } else
+                    _errorState.value = "Failed to delete exercise: ${e.message}"
             }
         }
     }
