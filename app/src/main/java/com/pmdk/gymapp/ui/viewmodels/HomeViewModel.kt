@@ -193,8 +193,6 @@ class HomeViewModel(
                     workoutRepository.updateSession(updatedSession)
                     _isWorkoutActive.value = false
                     _currentSessionId.value = null
-
-
                     _userSessions.value = _userSessions.value.map {
                         if (it.id == sessionId) updatedSession else it
                     }

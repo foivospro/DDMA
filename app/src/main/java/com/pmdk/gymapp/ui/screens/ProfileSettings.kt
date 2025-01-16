@@ -85,13 +85,15 @@ import com.pmdk.gymapp.ui.theme.primaryLight_Default
 import com.pmdk.gymapp.ui.theme.primaryLight_Orange
 import com.pmdk.gymapp.ui.theme.primaryLight_Purple
 import com.pmdk.gymapp.ui.theme.primaryLight_Yellow
+import com.pmdk.gymapp.ui.viewmodels.HomeViewModel
 import com.pmdk.gymapp.ui.viewmodels.MyProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfileScreen(
     onBackPressed: () -> Unit,
-    viewModel: MyProfileViewModel
+    viewModel: MyProfileViewModel,
+    homeViewModel: HomeViewModel
 ) {
     val context = LocalContext.current
 
@@ -184,6 +186,7 @@ fun EditProfileScreen(
                         profilePicture = profilePicture
                     )
                     viewModel.updateUser(updatedUser)
+                    homeViewModel.updateViewModel(asGuest = false)
                     viewModel.updateTheme(localAccentColor)
                     viewModel.toggleDarkMode(localDarkMode)
                     viewModel.saveThemeChanges()
