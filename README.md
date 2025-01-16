@@ -68,7 +68,7 @@ We’re **Material Wifes**, a passionate team of developers dedicated to making 
 
 
 ## 🛠️ Technologies Used  
-- **Android** (Java/Kotlin)  
+- **Android** (Kotlin)  
 - **SQLite / Room** for database management  
 - **MVVM Architecture**  
 - **Retrofit** for seamless API integration  
