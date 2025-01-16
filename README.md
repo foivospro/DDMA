@@ -34,11 +34,34 @@ Designed with **clean architecture** to ensure:
 ---
 
 ## 🖥️ Screenshots & Navigation  
-- **Home**: Your fitness dashboard!  
-- **Log In / Register**: Quick and secure setup. 🔒  
+- **Home**: Your fitness dashboard!
+
+<img src="./screenshots/home.png" width="190px">
+
+- **Register**: Quick and secure setup. 🔒 
+
+ <img src="./screenshots/register.png" width="190px">
+
+ - **Current Workout Session**: An easy way to manage your workouts
+
+ <img src="./screenshots/workoutSession.png" width="190px">
+
 - **Add Exercise**: Expand your workout library. ➕  
-- **Previous Workouts**: Review your fitness history. 📅  
+
+ <img src="./screenshots/addExercise.png" width="190px">
+
+ - **Athletics News**: Keep in contact with current affairs 📰
+
+  <img src="./screenshots/news.png" width="190px">
+
+
 - **Profile Settings**: Tweak your preferences anytime!  
+
+ <img src="./screenshots/profileSettings.png" width="190px">
+
+ - **Different Dark Mode Colors Palette**: Home off user preference 🎨
+
+<img src="./screenshots/homePalette.png">
 
 ---
 
