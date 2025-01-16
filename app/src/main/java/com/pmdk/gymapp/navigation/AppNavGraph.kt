@@ -309,7 +309,7 @@ fun BottomNavigationBar(navController: NavController) {
                         } else {
                             navController.navigate(item.route) {
                                 Log.d("BottomNavigationBar222", "Else")
-                                // Pop up to the start destination while saving state.
+
                                 popUpTo(navController.graph.startDestinationId) {
                                     saveState = true
                                 }
