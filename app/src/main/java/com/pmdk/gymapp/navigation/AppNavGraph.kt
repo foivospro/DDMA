@@ -305,7 +305,13 @@ fun BottomNavigationBar(navController: NavController) {
 
                         } else if(item.route == homeRoute) {
                                 Log.d("BottomNavigationBar222", "else if $homeRoute")
-                                navController.navigate(homeRoute)
+                                navController.navigate(homeRoute) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                            launchSingleTop = false
+                            restoreState = false
+                        }
                         } else {
                             navController.navigate(item.route) {
                                 Log.d("BottomNavigationBar222", "Else")
